@@ -1,0 +1,488 @@
+---
+title: "SEAS Study 1 Main Analyses"
+author:
+  name: Siobhan Crowley
+date: 01/18/2026
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+Analyses for Study 1 of the Social Exclusion and Status Study. See our [pre-registration](https://doi.org/10.17605/OSF.IO/SF5G7) for more details.
+
+# Packages
+```{r packages, message = FALSE, warning = FALSE}
+library(readxl)
+library(tidyverse)
+library(lme4)
+library(effsize)
+library(showtext)
+library(viridis)
+
+showtext_auto()
+```
+
+# Data Preparation
+```{r data-load}
+seas_full <- read_excel("Data/FINAL SEAS V1 Dataset.xlsx")
+
+seas <- filter(seas_full, final_data == "Y") #filtering out excluded participants
+```
+
+```{r data-prep}
+seas <- seas |>
+  mutate(
+    DOB = make_date(birth_year, birth_month, birth_day), #creating date of birth and date of test columns
+    DOT = as_date(DOT),
+    .before = DOT
+  ) |>
+  mutate(
+    age_months = interval(DOB, DOT) %/% months(1), .after = DOT #calculating age in months
+  )
+```
+
+```{r data-colors}
+magma_colors <- c("#000004FF", "#180F3EFF", "#451077FF", "#721F81FF", "#9F2F7FFF", "#CD4071FF", "#F1605DFF", "#FD9567FF", "#FEC98DFF", "#FCFDBFFF") #from magma(10)
+```
+
+# Demographics
+```{r demo}
+#Gender
+gender_count <- seas |>
+  group_by(gender) |>
+  summarise(n = n())
+
+#Age
+age_count <- seas |>
+  group_by(age) |>
+  summarise(n = n())
+
+#Race/Ethnicity
+identity_count <- seas |>
+  mutate(
+    identity = if_else(str_length(identity) > 3, "MX", identity)
+  ) |>
+  group_by(identity) |>
+  summarise(n = n()) |>
+  arrange(desc(n))
+```
+
+In this dataset, there are `r gender_count$n[1]` boys and `r gender_count$n[2]` girls. 
+
+There are `r age_count$n[1]` 3-year-olds, `r age_count$n[2]` 4-year-olds, `r age_count$n[3]` 5-year-olds, and `r age_count$n[4]` 6-year-olds (`r age_count$n[1] + age_count$n[2]` in the 3-4 group and `r age_count$n[3] + age_count$n[4]` in the 5-6 group).
+
+And there are `r identity_count$n[1]` participants who identify as White or European American, `r identity_count$n[2]` as Asian, `r identity_count$n[4]` as Middle Eastern or North African, `r identity_count$n[6]` as Hispanic, Latino/Latina/Latinx, or Spanish, and `r identity_count$n[3] + identity_count$n[5]` as multiple races or another race/ethnicity not listed. There are 0 participants who identified as Native Hawaiian or Pacific Islander, and 0 as American Indian or Alaska Native.
+
+
+# 1. Do children correctly identify the social excluder?
+
+```{r identify-prep}
+#Convert memory check results to numeric and calculate sum score
+seas <- seas |>
+  mutate(
+    mem_check_1 = if_else(mem_check_1 == "correct", 1, 0),
+    mem_check_2 = if_else(mem_check_2 == "correct", 1, 0),
+    mem_check_3 = if_else(mem_check_3 == "correct", 1, 0),
+    mem_check_4 = if_else(mem_check_4 == "correct", 1, 0),
+    mem_check_total = mem_check_1 + mem_check_2 + mem_check_3 + mem_check_4
+  )
+```
+
+### Preliminary Analysis
+```{r identify-glmm}
+#Pivoting to examine trial-by-trial
+mem_check_pivoted <- seas |>
+  select(subject, gender, age_months, starts_with("type"), starts_with("mem_check")) |>
+  pivot_longer(
+    cols = c(starts_with("type"), matches("mem_check_.$")), 
+    names_to = c(".value", "trial"),
+    names_pattern = "(.*)_(.)$"
+    ) |>
+  rename(response = mem_check) |>
+  mutate(
+    type_simple = if_else(type %in% c("cyber", "animals"), "video", "story")
+  )
+
+#Binomial GLMM
+identify_glmm <- summary(glmer(
+  response ~ trial + type_simple + gender + age_months + (1 | subject),
+  data = mem_check_pivoted,
+  family = "binomial"
+))
+#Drops video/story--is that good or bad? Rank-deficient means?
+
+identify_glmm
+
+#Can/should I look at the effect size of the age portion of the model?
+```
+
+```{r identify-age-scatter}
+identify_age_scatter <- seas |>
+  ggplot(aes(x = age_months, y = mem_check_total)) +
+  geom_jitter() +
+  stat_smooth(
+    method = "lm", 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 2, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 1 Memory Check Performance by Age in Months",
+    x = "Age (Months)",
+    y = "Correct Memory Responses"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  coord_cartesian(ylim = c(0, 4))
+
+
+identify_age_scatter
+```
+
+To assess other factors that may potentially affect participants' performance on memory check questions, we created a generalized linear mixed model (GLMM) with a binomial family, using trial, type (video vs story), gender, and age in months as predictors (along with a random intercept or whatever this is--do need to mention? Or is that what makes it mixed?). Of these, the only element that was found significant was age, with a z value of `r round(identify_glmm$coefficients[6,3], 2)` and a p-value of `r signif(identify_glmm$coefficients[6,4], 2)`.
+
+
+### Main Analysis
+```{r identify-ttest}
+identify_ttest <- t.test(seas$mem_check_total, mu = 2)
+identify_d <- cohen.d(seas$mem_check_total, f = NA, mu = 2)
+```
+
+We performed a t-test to assess whether participants' summed memory check scores were statistically different from chance, finding that the t statistic was equal to `r round(unname(identify_ttest$statistic), 2)` and the p-value was `r signif(unname(identify_ttest$p.value), 2)`, demonstrating that children were able to correctly recall the events of the scenarios. Cohen's d was `r round(unname(identify_d$estimate), 2)`, which is considered a `r as.character(identify_d$magnitude)` effect size.
+
+```{r identify-age-box}
+identify_age_boxplot <- seas |>
+  ggplot(aes(x = as.factor(age), y = mem_check_total, fill = as.factor(age))) +
+  geom_boxplot(fill = c(magma_colors[3], magma_colors[5], magma_colors[7], magma_colors[9])) +
+  geom_hline(yintercept = 2, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 1 Memory Check Performance by Age",
+    x = "Age (Years)",
+    y = "Correct Memory Responses"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  coord_cartesian(ylim = c(0, 4))
+
+identify_age_boxplot
+```
+
+# 2. Do children use information about social exclusion to determine who is in charge?
+
+## Hypothesis 1 
+Children will think that social excluders are in charge more often than they will think excluded characters are in charge.
+
+```{r status-prep}
+#Convert excluder/excluded selection to numeric and calculate sum score
+seas <- seas |>
+  mutate(
+    status_1 = if_else(status_1 == "excluder", 1, 0),
+    status_2 = if_else(status_2 == "excluder", 1, 0),
+    status_3 = if_else(status_3 == "excluder", 1, 0),
+    status_4 = if_else(status_4 == "excluder", 1, 0),
+    status_total = status_1 + status_2 + status_3 + status_4
+  )
+```
+
+### Preliminary Analysis
+```{r status-glmm}
+#glmm with binomial family; age, number of siblings, gender, mem check, or type of stimuli
+
+#Pivoting to examine trial-by-trial
+status_pivoted <- seas |>
+  select(subject, gender, siblings, age_months, mem_check_total, starts_with("type"), matches("status_.$")) |>
+  pivot_longer(
+    cols = c(starts_with("type"), matches("status_.$")), 
+    names_to = c(".value", "trial"),
+    names_pattern = "(.*)_(.)$"
+    ) |>
+  rename(response = status)
+
+#Binomial GLMM
+status_glmm <- summary(glmer(
+  response ~ trial + type + gender + siblings + age_months + (1 | subject),
+  data = status_pivoted,
+  family = "binomial"
+)) #rank-deficient, dropped a column though idk what; also model is nearly unidentifiable with a very large eigenvalue?
+
+identify_glmm
+```
+
+Nothing significant here [NOTE: add more info later?]
+
+### Main Analysis
+```{r status-ttest}
+status_ttest <- t.test(seas$status_total, mu = 2)
+```
+
+In this one-sample t-test, the t statistic was equal to `r round(unname(status_ttest$statistic), 2)` and the p-value `r round(unname(status_ttest$p.value), 2)`, demonstrating that participants did not select the excluder as being in charge more often than chance.
+
+## Hypothesis 2
+We expect that age will be significantly related to children's identification of who is in charge.
+
+### Main Analysis
+```{r status-age-lm}
+#Linear model with age
+status_age_lm <- summary(lm(
+  status_total ~ age_months,
+  data = seas
+))
+
+status_age_lm
+#what does it mean if intercept is significant
+```
+
+Age not significant [NOTE: add more]
+
+```{r status-box}
+status_age_boxplot <- seas |>
+  ggplot(aes(x = as.factor(age), y = status_total, fill = as.factor(age))) +
+  geom_boxplot(fill = c(magma_colors[3], magma_colors[5], magma_colors[7], magma_colors[9])) +
+  geom_hline(yintercept = 2, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Status Excluder Selection by Age",
+    x = "Age (Years)",
+    y = "Excluder Selection"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        )
+
+status_age_boxplot
+```
+
+# 3. Do children use information about social exclusion to determine who has more physical and social resources?
+
+## Hypothesis 1
+Children will identify the excluder as having more resources.
+
+```{r resource-prep}
+#Convert excluder/excluded selection to numeric and calculate sum score
+seas <- seas |>
+  mutate(
+    resource_1 = if_else(resource_1 == "excluder", 1, 0),
+    resource_2 = if_else(resource_2 == "excluder", 1, 0),
+    resource_3 = if_else(resource_3 == "excluder", 1, 0),
+    resource_4 = if_else(resource_4 == "excluder", 1, 0),
+    resource_total = resource_1 + resource_2 + resource_3 + resource_4
+  )
+
+#Physical and social resources sum scores
+seas <- seas |>
+  mutate(
+    resource_physical = case_when(
+      resource_type_1 == "physical" ~ resource_1,
+      resource_type_2 == "physical" ~ resource_2
+    ),
+    resource_social = case_when(
+      resource_type_1 == "social" ~ resource_1,
+      resource_type_2 == "social" ~ resource_2
+    )
+  ) |>
+  mutate(
+    resource_physical = case_when(
+      resource_type_3 == "physical" ~ resource_physical + resource_3,
+      resource_type_4 == "physical" ~ resource_physical + resource_4
+    ),
+    resource_social = case_when(
+      resource_type_3 == "social" ~ resource_social + resource_3,
+      resource_type_4 == "social" ~ resource_social + resource_4
+    )
+  )
+```
+
+### Preliminary Analysis
+```{r resource-glmm}
+#Pivoting to examine trial-by-trial
+resource_pivoted <- seas |>
+  select(subject, gender, siblings, age_months, starts_with("type"), matches("resource_type_.$"), matches("resource_.$")) |>
+  pivot_longer(
+    cols = c(starts_with("type"), starts_with("resource")), 
+    names_to = c(".value", "trial"),
+    names_pattern = "(.*)_(.)$"
+    ) |>
+  rename(response = resource)
+
+#Binomial GLMM
+resource_glmm <- summary(glmer(
+  response ~ trial + type + resource_type + gender +siblings + age_months + (1 | subject),
+  data = resource_pivoted,
+  family = "binomial"
+)) #rank deficit, dropping a column
+
+resource_glmm
+```
+
+Nothing significant [NOTE: add more]
+
+### Main Analysis
+```{r resource-ttest}
+resource_ttest <- t.test(seas$resource_total, mu = 2)
+physical_ttest <- t.test(seas$resource_physical, mu = 1)
+social_ttest <- t.test(seas$resource_social, mu = 1)
+
+resource_d <- cohen.d(seas$resource_total, f = NA, mu = 2)
+physical_d <- cohen.d(seas$resource_physical, f = NA, mu = 1) 
+social_d <- cohen.d(seas$resource_social, f = NA, mu = 1)
+```
+
+In this one-sample t-test of overall resources, the t statistic was `r round(unname(resource_ttest$statistic), 2)`, with a p-value of `r signif(unname(resource_ttest$p.value), 2)` and a Cohen's d of `r round(unname(resource_d$estimate), 2)` (`r as.character(resource_d$magnitude)`), demonstrating that children chose the excluder as having more resources more often than chance. 
+
+These results hold when physical and social resources are examined separately. A t-test exploring the former produces a t statistic of `r round(unname(physical_ttest$statistic), 2)` and a p-value of `r signif(unname(social_ttest$p.value), 2)` with a Cohen's d of `r round(unname(physical_d$estimate), 2)` (`r as.character(physical_d$magnitude)`).
+
+
+A t-test examining only social resources resulted in a t of `r round(unname(social_ttest$statistic), 2)` and a p-value of `r signif(unname(physical_ttest$p.value), 2)`, with a Cohen's d of `r round(unname(social_d$estimate), 2)` (`r as.character(social_d$magnitude)`).
+
+## Hypothesis 2
+Older children will be more likely to identify excluders as controlling resources than younger children.
+
+### Main Analysis
+```{r resource-age-lm}
+#Linear models with age
+#Total resources
+resource_age_lm <- summary(lm(
+  resource_total ~ age_months,
+  data = seas
+))
+
+resource_age_lm
+
+#Physical resources
+physical_age_lm <- summary(lm(
+  resource_physical ~ age_months,
+  data = seas
+))
+
+physical_age_lm
+
+#Social resources
+social_age_lm <- summary(lm(
+  resource_social ~ age_months,
+  data = seas
+))
+
+social_age_lm
+```
+
+Age significant for total resources (wasn't true for glmm?); intercept significant for physical resources; age significant for social
+
+```{r resource-age-scatter}
+resource_age_scatter <- seas |>
+  ggplot(aes(x = age_months, y = resource_total)) +
+  geom_jitter() +
+  stat_smooth(
+    method = "lm", 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 2, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Resource Excluder Selection by Age in Months",
+    x = "Age (Months)",
+    y = "Excluder Selection"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        )
+
+resource_age_scatter
+```
+
+```{r resource-box}
+#Total resources
+resource_age_boxplot <- seas |>
+  ggplot(aes(x = as.factor(age), y = resource_total, fill = as.factor(age))) +
+  geom_boxplot(fill = c(magma_colors[3], magma_colors[5], magma_colors[7], magma_colors[9])) +
+  labs(
+    title = "Resource Excluder Selection by Age",
+    x = "Age (Years)",
+    y = "Excluder Selection"
+  ) +
+  geom_hline(yintercept = 2, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        )
+
+resource_age_boxplot
+
+#Physical and social resources
+physsoc_age_boxplot <- seas |>
+  pivot_longer(c("resource_physical", "resource_social"), names_to = "resource_total_type", names_pattern = ".*_(.*)", values_to = "excluder_select") |>
+  ggplot(aes(x = as.factor(age), y = excluder_select, fill = resource_total_type)) +
+  geom_boxplot(
+    position = "dodge") +
+  labs(
+    title = "Resource Excluder Selection by Age",
+    x = "Age (Years)",
+    y = "Excluder Selection",
+    fill = NULL
+  ) +
+  geom_hline(yintercept = 1, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  scale_fill_manual(
+    values = c(magma_colors[3], magma_colors[7]),
+    labels = c("Physical", "Social")) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+    scale_y_continuous(breaks = c(0, 1, 2))
+
+physsoc_age_boxplot
+```
+
+
+
+
+
+
+Do a column chart at some point? I lost the code for what I did previously, and this has been complicated to make it work so far lol
+
+```{r resource-column, error = TRUE}
+seas |>
+  pivot_longer(c("resource_physical", "resource_social"), names_to = "resource_total_type", names_pattern = ".*_(.*)", values_to = "excluder_select") |> 
+  group_by(resource_total_type, age) |>
+  summarise(
+    mean_excluder = mean(excluder_select),
+    sd_excluder = sd(excluder_select)
+  ) |>
+  mutate(
+    ymin = mean_excluder - sd_excluder,
+    ymax = mean_excluder + sd_excluder
+  ) |>
+  ggplot(aes(x = as.factor(age), y = mean_excluder, fill = resource_total_type)) +
+  geom_col(
+    position = position_dodge(),
+    width = 0.7) +
+  geom_errorbar(
+    aes(ymin = ymin, ymax = ymax), 
+    width = 0.5,
+    position = position_dodge(width = 0.7)
+    )
+```
+
+
+
+```{r error = TRUE}
+ggplot(resourceLongData, aes(age, Score, fill = resourceType ))+geom_boxplot() + labs(title = "Resource Choice by Age", x = "Age (years)", y = "Excluder Selection", fill = "Resource Type") + scale_fill_manual(values = c("#dfafb6", "#b3dbe2"), labels = c("Physical", "Social"))
+
+
+
+resource_pivoted |>
+  ggplot(aes(x = as.factor(age), y = ))
+```

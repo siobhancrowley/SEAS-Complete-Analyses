@@ -1,0 +1,384 @@
+---
+title: "02 SEAS Study 1 Exploratory Analyses"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+# Packages
+
+```{r packages, message = FALSE, warning = FALSE}
+library(readxl)
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+```
+
+# Data Preparation
+
+```{r data-load}
+seas_full <- read_excel("Data/FINAL SEAS V1 Dataset.xlsx")
+
+seas <- filter(seas_full, final_data == "Y") #filtering out excluded participants
+```
+
+```{r data-init-prep}
+seas <- seas |>
+  mutate(
+    DOB = make_date(birth_year, birth_month, birth_day), #creating date of birth and date of test columns
+    DOT = as_date(DOT),
+    .before = DOT
+  ) |>
+  mutate(
+    age_months = interval(DOB, DOT) %/% months(1), .after = DOT #calculating age in months
+  )
+```
+
+```{r data-main-prep}
+#Converting explanation data to numerical
+seas_united <- seas |>
+  unite("status_explain_1", status_storyref_1:status_relation_1, sep = " ", na.rm = TRUE) |>
+  unite("resource_explain_1", resource_storyref_1:resource_relation_1, sep  = " ", na.rm = TRUE) |>
+  unite("status_explain_2", status_storyref_2:status_relation_2, sep = " ", na.rm = TRUE) |>
+  unite("resource_explain_2", resource_storyref_2:resource_relation_2, sep  = " ", na.rm = TRUE) |>
+  unite("status_explain_3", status_storyref_3:status_relation_3, sep = " ", na.rm = TRUE) |>
+  unite("resource_explain_3", resource_storyref_3:resource_relation_3, sep  = " ", na.rm = TRUE) |>
+  unite("status_explain_4", status_storyref_4:status_relation_4, sep = " ", na.rm = TRUE) |>
+  unite("resource_explain_4", resource_storyref_4:resource_relation_4, sep  = " ", na.rm = TRUE)
+
+possible_explain <- c("ST", "VG", "SG", "EX", "IN", "NR", "MR", "AR", "EP", "EN", "PR", "EM", "MT", "FR", "PS", "OR")
+
+seas_test <- purrr::map(possible_explain, function(explain) {
+    seas_united |>
+      mutate(!!paste0("status_", explain, "_1") := if_else(str_detect(status_explain_1, explain), 1, 0))
+  })
+
+selected_cols <- map(seas_test, ~select(., subject, last_col()))
+
+final_df <- reduce(selected_cols, left_join, by = "subject")
+
+
+
+purrr::map_dfr(seas_test, ~select(., subject, last_col()))
+```
+
+```{r explain-map-func}
+#Creating a general explanation mapping function
+individual_explain_func <- function(status_or_resource, trial_num) {
+  
+  possible_explain <- c("ST", "VG", "SG", "EX", "IN", "NR", "MR", "AR", "EP", "EN", "PR", "EM", "MT", "FR", "PS", "OR")
+  
+  column_of_interest <- paste0(status_or_resource, "_explain_", trial_num)
+  
+  list_of_dfs <- purrr::map(possible_explain, function(explain) {
+    seas_united |>
+      mutate(!!paste0(status_or_resource, "_", explain, "_", trial_num) := if_else(str_detect(.data[[column_of_interest]], explain), 1, 0))
+  })
+    
+    selected_cols <- map(list_of_dfs, ~select(., subject, last_col()))
+    
+    reduce(selected_cols, left_join, by = "subject")
+  }
+```
+
+```{r explain-columns}
+#Gathering individual explanation columns for each response
+seas_status_1 <- individual_explain_func("status", 1)
+seas_resource_1 <- individual_explain_func("resource", 1)
+seas_status_2 <- individual_explain_func("status", 2)
+seas_resource_2 <- individual_explain_func("resource", 2)
+seas_status_3 <- individual_explain_func("status", 3)
+seas_resource_3 <- individual_explain_func("resource", 3)
+seas_status_4 <- individual_explain_func("status", 4)
+seas_resource_4 <- individual_explain_func("resource", 4)
+
+#Combining back into one dataframe
+seas_separated <- seas_united |>
+  left_join(seas_status_1, by = "subject") |>
+  left_join(seas_resource_1, by = "subject") |>
+  left_join(seas_status_2, by = "subject") |>
+  left_join(seas_resource_2, by = "subject") |>
+  left_join(seas_status_3, by = "subject") |>
+  left_join(seas_resource_3, by = "subject") |>
+  left_join(seas_status_4, by = "subject") |>
+  left_join(seas_resource_4, by = "subject")
+```
+
+```{r sum-scores}
+seas_separated <- seas_separated |>
+  rowwise() |>
+  mutate(
+    ST_total = sum(c_across(matches(".*_ST_."))),
+    VG_total = sum(c_across(matches(".*_VG_."))),
+    SG_total = sum(c_across(matches(".*_SG_."))),
+    EX_total = sum(c_across(matches(".*_EX_."))),
+    IN_total = sum(c_across(matches(".*_IN_."))),
+    NR_total = sum(c_across(matches(".*_NR_."))),
+    MR_total = sum(c_across(matches(".*_MR_."))),
+    AR_total = sum(c_across(matches(".*_AR_."))),
+    EP_total = sum(c_across(matches(".*_EP_."))),
+    EN_total = sum(c_across(matches(".*_EN_."))),
+    PR_total = sum(c_across(matches(".*_PR_."))),
+    EM_total = sum(c_across(matches(".*_EM_."))),
+    MT_total = sum(c_across(matches(".*_MT_."))),
+    FR_total = sum(c_across(matches(".*_FR_."))),
+    PS_total = sum(c_across(matches(".*_PS_."))),
+    OR_total = sum(c_across(matches(".*_OR_."))),
+    ) |>
+  ungroup() 
+```
+
+```{r pivot-explain}
+#Pivoting explanation type
+seas_pivoted <- seas_separated |>
+  pivot_longer(ST_total:OR_total, names_to = "explanation_type", names_pattern = "(..)_total", values_to = "total")
+```
+
+```{r}
+#some exploration of frequency of each type of explanation
+
+seas_pivoted |>
+  group_by(explanation_type) |>
+  summarize(
+    max = max(total),
+    min = min(total),
+    mean = mean(total)
+  )
+```
+
+# Number of Times a Ppt Used Explanation Across Each Response (0-8)
+
+## Graphs
+
+```{r explain-count-basiccol}
+#column chart to see the total number of each type of explanation category participants used across their 8 explanation questions (explain better; can use multiple types of explanation in one response, but using that explanation in response will only be counted once for each question--i.e. maximum for each category is 8)
+
+seas_pivoted |>
+  ggplot(aes(x = as.factor(age), y = total, fill = explanation_type)) +
+  geom_col()
+```
+
+```{r explain-count-scatter}
+#Scatterplot of explanation types across age
+wo_black <- viridis::magma(20)[5:20]
+
+seas_pivoted |>
+  mutate(
+    explanation_type = fct_relevel(explanation_type, "ST", "VG", "SG", "EX", "IN", "NR", "MR", "AR", "EP", "EN", "PR", "EM", "MT", "FR", "PS", "OR")) |>
+  ggplot(aes(x = age_months, y = total, color = explanation_type, fill = explanation_type)) +
+  geom_jitter() +
+  geom_smooth(method = "lm", alpha = 0.2) +
+  scale_fill_manual(values = wo_black) +
+  scale_color_manual(values = wo_black) +
+  labs(
+    title = "Types of Explanations in All Participants' Responses", #better title/explain better
+    x = "Age (Months)",
+    y = "Responses to Explanation Questions",
+    color = "Explanations",
+    fill = "Explanations"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 15),
+    text = element_text(family = "serif", size = 25)
+        )
+```
+
+```{r explain-count-scatter-faceted}
+seas_pivoted |>
+  mutate(
+    explanation_type = fct_relevel(explanation_type, "ST", "VG", "SG", "EX", "IN", "NR", "MR", "AR", "EP", "EN", "PR", "EM", "MT", "FR", "PS", "OR")) |>
+  ggplot(aes(x = age_months, y = total, color = explanation_type, fill = explanation_type)) +
+  geom_jitter() +
+  geom_smooth(method = "lm", alpha = 0.2) +
+  facet_wrap(~explanation_type) +
+  scale_fill_manual(values = wo_black) +
+  scale_color_manual(values = wo_black) +
+  labs(
+    title = "Types of Explanations in All Participants' Responses", #better title/explain better
+    x = "Age (Months)",
+    y = "Responses to Explanation Questions",
+    color = "Explanations",
+    fill = "Explanations"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 15),
+    text = element_text(family = "serif", size = 25)
+        )
+```
+
+## Analyses
+
+```{r explain-count-lm}
+summary(lmer(
+  total ~ age_months + (1 | subject),
+  data = seas_pivoted
+))
+
+summary(lmer(
+  total ~ age_months * explanation_type + (1 | subject),
+  data = seas_pivoted
+))
+```
+
+Age alone: age significant
+
+Combination: SG, ST, age x SG significant; age x VG significant
+
+# Did a Ppt Use Type of Explanation in Any Response?
+
+## Graphs
+
+```{r explain-present-scatter}
+seas_pivoted <- seas_pivoted |>
+  mutate(
+    present = if_else(total == 0, 0, 1), 
+    explanation_type = fct_relevel(explanation_type, "ST", "VG", "SG", "EX", "IN", "NR", "MR", "AR", "EP", "EN", "PR", "EM", "MT", "FR", "PS", "OR")
+  )
+
+seas_pivoted|>
+  ggplot(aes(x = age_months, y = present, color = explanation_type, fill = explanation_type)) +
+  geom_point(position = position_jitter(height = .15)) +
+  geom_smooth(method = "lm", alpha = 0.2) +
+  scale_fill_manual(values = wo_black) +
+  scale_color_manual(values = wo_black) +
+  labs(
+    title = "Types of Explanations Present in Participants' Responses", #better title/explain better
+    x = "Age (Months)",
+    y = "Responses Present Across Explanation Questions",
+    color = "Explanations",
+    fill = "Explanations"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 15),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(breaks = c(0, 1), labels = (c("Absent", "Present")))
+```
+
+```{r explain-present-scatter-faceted}
+seas_pivoted |>
+  ggplot(aes(x = age_months, y = present, color = explanation_type, fill = explanation_type)) +
+  geom_point(position = position_jitter(height = .15)) +
+  geom_smooth(method = "lm", alpha = 0.2) +
+  scale_fill_manual(values = wo_black) +
+  scale_color_manual(values = wo_black) +
+  facet_wrap(~explanation_type) +
+  labs(
+    title = "Types of Explanations Present in Participants' Responses", #better title/explain better
+    x = "Age (Months)",
+    y = "Responses Present Across Explanation Questions",
+    color = "Explanations",
+    fill = "Explanations"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 15),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(breaks = c(0, 1), labels = (c("Absent", "Present")))
+```
+
+## Analyses
+
+```{r explain-present-lm}
+#or is glmer correct here?
+
+summary(lmer(
+  present ~ age_months + (1 | subject),
+  data = seas_pivoted
+))
+
+summary(lmer(
+  present ~ age_months * explanation_type + (1 | subject),
+  data = seas_pivoted
+))
+```
+
+Age alone: significant
+
+Combination: EX, age x EM, age x MT significant
+
+# Word Count
+
+## Graphs
+
+```{r word-scatter}
+#Scatterplot of total word count by age
+
+seas |>
+  mrowwise() |>
+  mutate(
+    word_total = sum(c_across(contains("word"))) #could remove NAs from this step, but it's actually probably better to drop NAs from the scatter bc don't know how many words MS people would have
+  ) |>
+  ungroup() |>
+  ggplot(aes(x = age_months, y = word_total)) +
+  geom_point() +
+  stat_smooth(method = "lm", formula = y ~ x)
+
+```
+
+## Analyses
+
+```{r word-lm}
+#not working lol
+
+seas_wordtot <- seas |>
+  rowwise() |>
+  mutate(
+    word_total = sum(c_across(contains("word")))) |>
+  filter(!is.na(word_total))
+
+summary(lmer(
+  word_total ~ age_months + (1 | subject),
+  data = seas_wordtot
+))
+```
+
+## also add NA/RA/MS
+
+```{r mapping-function-test, eval = FALSE, echo = FALSE}
+status_or_resource <- "status"
+trial_num <- 1
+
+possible_explain <- c("ST", "VG", "SG", "EX", "IN", "NR", "MR", "AR", "EP", "EN", "PR", "EM", "MT", "FR", "PS", "OR")
+  
+  column_of_interest <- paste0(status_or_resource, "_explain_", trial_num)
+  
+  list_of_dfs <- purrr::map(possible_explain, function(explain) {
+    seas_united |>
+      mutate(!!paste0(status_or_resource, "_", explain, "_", trial_num) := if_else(str_detect(.data[[column_of_interest]], explain), 1, 0)) 
+  })
+    
+    selected_cols <- map(list_of_dfs, ~select(., subject, last_col()))
+    
+    View(reduce(selected_cols, left_join, by = "subject"))
+```
+
+```{r mapping-test, eval = FALSE, echo = FALSE}
+possible_explain <- c("ST", "VG", "SG", "EX", "IN", "NR", "MR", "AR", "EP", "EN", "PR", "EM", "MT", "FR", "PS", "OR")
+
+seas_test <- purrr::map(possible_explain, function(explain) {
+    seas_united |>
+      mutate(!!paste0("status_", explain, "_1") := if_else(str_detect(status_explain_1, explain), 1, 0))
+  })
+
+selected_cols <- map(seas_test, ~select(., subject, last_col()))
+
+final_df <- reduce(selected_cols, left_join, by = "subject")
+
+
+
+purrr::map_dfr(seas_test, ~select(., subject, last_col()))
+```
