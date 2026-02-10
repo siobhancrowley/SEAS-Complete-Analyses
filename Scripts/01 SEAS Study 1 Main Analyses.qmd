@@ -24,7 +24,7 @@ showtext_auto()
 
 # Data Preparation
 ```{r data-load}
-seas_full <- read_excel("Data/FINAL SEAS V1 Dataset.xlsx")
+seas_full <- read_excel("../Data/FINAL SEAS V1 Dataset.xlsx")
 
 seas <- filter(seas_full, final_data == "Y") #filtering out excluded participants
 ```

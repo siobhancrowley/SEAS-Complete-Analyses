@@ -18,7 +18,7 @@ library(lmerTest)
 # Data Preparation
 
 ```{r data-load}
-seas_full <- read_excel("Data/FINAL SEAS V1 Dataset.xlsx")
+seas_full <- read_excel("../Data/FINAL SEAS V1 Dataset.xlsx")
 
 seas <- filter(seas_full, final_data == "Y") #filtering out excluded participants
 ```
@@ -318,7 +318,7 @@ Combination: EX, age x EM, age x MT significant
 #Scatterplot of total word count by age
 
 seas |>
-  mrowwise() |>
+  rowwise() |>
   mutate(
     word_total = sum(c_across(contains("word"))) #could remove NAs from this step, but it's actually probably better to drop NAs from the scatter bc don't know how many words MS people would have
   ) |>
