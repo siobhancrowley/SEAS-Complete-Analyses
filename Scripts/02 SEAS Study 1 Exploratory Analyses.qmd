@@ -147,10 +147,66 @@ seas_pivoted |>
   )
 ```
 
+# Basic Answer Categorization
+
+## Graphs
+```{r answer-col}
+seas |>
+  pivot_longer(
+    cols = contains("response"),
+    names_to = "trial",
+    values_to = "response"
+  ) |>
+#  group_by(response) |>
+#  summarize(n = n())
+  
+  ggplot(aes(x = as.factor(age), fill = fct_rev(response))) +
+    geom_bar(position = "fill") +
+    scale_fill_manual(
+      values = c(magma_colors[7], magma_colors[5], magma_colors[3]),
+      labels = c("Relevant Answer", "No or Irrelevant Answer", "Missing")
+      ) +
+    labs(
+      title = "Explanations Given by Age",
+      x = "Age (Years)",
+      y = "Proportion",
+      fill = NULL
+    ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 15),
+    legend.position = "top",
+    text = element_text(family = "serif", size = 25)
+        )
+```
+
+## Analyses
+```{r answer-chi}
+seas_response_contingency <- seas |>
+  pivot_longer(
+    cols = contains("response"),
+    names_to = "trial",
+    values_to = "response"
+  ) |>
+  count(response, age) |>
+  pivot_wider(
+    names_from = age, values_from = n, values_fill = 0L
+  ) |>
+  select(-response) |>
+  as.matrix()
+
+seas_response_chi <- chisq.test(seas_response_contingency)
+
+seas_response_chi
+```
+
+Significant. What post-hoc test should we use?
+
 # Number of Times a Ppt Used Explanation Across Each Response (0-8)
 
 ## Graphs
-
 ```{r explain-count-basiccol}
 #column chart to see the total number of each type of explanation category participants used across their 8 explanation questions (explain better; can use multiple types of explanation in one response, but using that explanation in response will only be counted once for each question--i.e. maximum for each category is 8)
 

@@ -18,6 +18,7 @@ library(lme4)
 library(effsize)
 library(showtext)
 library(viridis)
+library(lmerTest)
 
 showtext_auto()
 ```
@@ -603,7 +604,6 @@ em_resource_type_age_scatter
 
 # 4. Do children use information about social inclusion and exclusion differently to determine who is in charge or possesses resources?
 
-## Preliminary Analysis
 ```{r eim-prep}
 #Create selected includer over included sum scores for status
 seas2 <- seas2 |>
@@ -654,6 +654,7 @@ seas2 <- seas2 |>
   ungroup() #create total resources score
 ```
 
+## Preliminary Analysis
 ```{r eim-status-glmm}
 eim_status_num <- seas2_main_pivoted |>
   mutate(
@@ -819,52 +820,254 @@ eim_resource_scatter_facet
 ```
 
 
-
-Not really sure what this communicates or how useful it is.
-
 # 5. Do children view social excluders and includers differently in determinations of status and physical and social resource possession?
 
-## Hypothesis 1
+```{r eic-status-prep}
+#Create selected excluder over includer sum scores for status
+seas2 <- seas2 |>
+  mutate(
+    comp_status_1_num = if_else(comp_status_1 == "excluder", 1, 0),
+    comp_status_2_num = if_else(comp_status_2 == "excluder", 1, 0),
+    comp_status_total = comp_status_1_num + comp_status_2_num
+  )
+```
+
+```{r eic-resources-prep}
+#Create selected excluder over includer for resources
+seas2 <- seas2 |>
+  mutate(
+    comp_physical_selection = if_else(comp_resource_type_1 == "physical", comp_resource_1, comp_resource_2),
+    comp_social_selection = if_else(comp_resource_type_1 == "social", comp_resource_1, comp_resource_2)
+  ) |>
+  mutate(
+    across(
+      .cols = c(comp_physical_selection, comp_social_selection), 
+      .fns = ~if_else(.x == "excluder", 1, 0)
+    ),
+    comp_resource_total = comp_physical_selection + comp_social_selection
+  )
+```
+
+## Preliminary Analyses
+```{r eic-status-glmm}
+#Pivot for comparison status
+seas2_comp_status_pivot <- seas2 |>
+  select(subject, gender, age_months, siblings, EQ_total, side, comp_status_1_num, comp_status_2_num) |>
+  pivot_longer(
+    cols = c(comp_status_1_num, comp_status_2_num),
+    names_pattern = "comp_status_(.)_num",
+    names_to = "trial",
+    values_to = "response"
+    )
+
+eic_status_glmm <- summary(glmer(
+  response ~ trial + age_months + gender + siblings + EQ_total + side + (1 | subject),
+  data = seas2_comp_status_pivot,
+  family = "binomial"
+))
+
+eic_status_glmm
+```
+
+Nothing is significant NOTE: Add more
+
+```{r eic-resources-glmm}
+#Pivot for comparison resource
+seas2_comp_resource_pivot <- seas2 |>
+  select(subject, gender, age_months, siblings, side, EQ_total, starts_with("comp_resource_type"), matches("comp_resource_.$")) |>
+  pivot_longer(
+    cols = c(matches("comp_resource_type_."), matches("comp_resource_.$")),
+    names_to = c(".value", "trial"),
+    names_pattern = "comp_(.*)_(.)"
+  ) |>
+  mutate(
+    resource = if_else(resource == "excluder", 1, 0)
+  )
+
+#Binomial GLMM
+eic_resource_glmm <- summary(glmer(
+  resource ~ trial + side + resource_type + age_months + siblings + EQ_total + (1 | subject),
+  data = seas2_comp_resource_pivot,
+  family = "binomial"
+)) 
+
+eic_resource_glmm
+```
+
+EQ_total significant but nothing else
+
+```{r eic-resource-EQ-scatter}
+eic_resource_EQ_scatter <- seas2 |>
+  ggplot(aes(x = EQ_total, y = comp_resource_total)) +
+  geom_jitter() +
+  stat_smooth(
+    method = "lm", 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 1, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 2 Excluder Status Selection for Comparison Trials by Total EmQue Score",
+    x = "EmQue Total",
+    y = "Excluder Selection"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  coord_cartesian(ylim = c(0, 2)) +
+  scale_y_continuous(breaks = c(0, 1, 2))
+
+eic_resource_EQ_scatter
+
+#Should this actually use the pivoted information because that's actually what the glmm is based on?
+```
+
+## Main Analyses
+
+### Hypothesis 1
 Children will view social excluders as being in charge more often than social includers.
 
 ```{r eic-status-ttest}
-#One-sample t-test with status selection excluder over includer sum score
+eic_status_ttest <- t.test(seas2$comp_status_total, mu = 1)
+
+eic_status_ttest
 ```
 
-## Hypothesis 2
+Not significant
+
+### Hypothesis 2
 Children will view social excluders as having physical resources more often than social includers.
 
 ```{r eic-physresources-binom}
-#Binomial test of physical resources selection excluder over includer
+eic_phys_excluder_count <- seas2 |>
+  group_by(comp_physical_selection) |>
+  summarize(n = n()) |>
+  filter(comp_physical_selection == 1) |>
+  pull(n) #extracts the number of children who selected the excluder for the physical resources comparison question
+
+em_phys_binom <- binom.test(eic_phys_excluder_count, nrow(seas2), p = 0.5)
 ```
 
-## Hypothesis 3
+Not significant.
+
+### Hypothesis 3
 Children will view social excluders as having social resources more often than social includers.
 
 ```{r eic-socresources-binom}
-#Binomial test of social resources selection excluder over includer
+eic_soc_excluder_count <- seas2 |>
+  group_by(comp_social_selection) |>
+  summarize(n = n()) |>
+  filter(comp_social_selection == 1) |>
+  pull(n) #extracts the number of children who selected the excluder for the physical resources comparison question
+
+eic_soc_binom <- binom.test(eic_soc_excluder_count, nrow(seas2), p = 0.5)
 ```
 
-## Hypothesis 4
+Significant; children more likely to choose includer as having social resources.
+
+### Hypothesis 4
 Age will be associated with identifying the social excluder as being in charge more often than the includer.
 
 ```{r eic-status-age-glmm}
-#Binomial GLMM with selection of excluder over includer with cont. age
+#Lmer vs glmer again?
+
+eic_status_age_glmm <- summary(lmer(
+  response ~ age_months + (1 | subject),
+  data = seas2_comp_status_pivot
+))
+
+eic_status_age_glmm
 ```
 
-## Hypothesis 5
+Nothing significant
+
+### Hypothesis 5
 Age will be associated with identifying the social excluder as having physical resources more often.
 
 ```{r eic-physresources-age-logreg}
-#Logistic regression for physical resources excluder/includer selection and cont. age
+#do we have a random subjects effect here or no?
+eic_phys_age_glm <- summary(glm(
+  comp_physical_selection ~ age_months,
+  data = seas2,
+  family = "binomial"
+))
+
+eic_phys_age_glm
 ```
 
-## Hypothesis 6
+Nothing significant
+
+### Hypothesis 6
 Age will be associated with identifying the social excluder as having social resources more often.
 
 ```{r eic-socresources-age-logreg}
-#Logistic regression for social resources excluder/includer selection and cont. age
+#do we have a random subjects effect here or no?
+eic_soc_age_glm <- summary(glm(
+  comp_social_selection ~ age_months,
+  data = seas2,
+  family = "binomial"
+))
+
+eic_soc_age_glm
 ```
 
+Nothing significant
 
+```{r eic-resources-age-scatter}
+eic_resrouce_age_scatter <- seas2_comp_resource_pivot |>
+  ggplot(aes(x = age_months, y = resource, color = resource_type, fill = resource_type)) +
+  geom_point(position = position_jitter(height = 0.1)) +
+  stat_smooth(
+    method = "lm", 
+    formula = y ~ x, 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  scale_color_manual(
+    values = c(magma_colors[3], magma_colors[7]), 
+    labels = c("Physical", "Social")) +
+  scale_fill_manual(
+    values = c(magma_colors[3], magma_colors[7]),
+    labels = c("Physical", "Social")) +
+  labs(
+    title = "Study 2 Resource Selection for Comparison Trials by Age",
+    x = "Age (Months)",
+    y = NULL,
+    color = NULL,
+    fill = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25),
+    legend.position = "top"
+        ) +
+  scale_y_continuous(
+    breaks = c(0, 1),
+    labels = c("Includer", "Excluder"))
 
+eic_resrouce_age_scatter
+```
+
+```{r eic-status-boxplot}
+eic_status_boxplot <- seas2 |>
+  ggplot(aes(x = as.factor(age), y = comp_status_total, fill = as.factor(age))) +
+  geom_boxplot(fill = c(magma_colors[3], magma_colors[5], magma_colors[7], magma_colors[9])) +
+  geom_hline(yintercept = 1, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 2 Excluder Status Selection for Comparison Trials",
+    x = "Age (Years)",
+    y = "Excluder Selection"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  coord_cartesian(ylim = c(0, 2)) +
+  scale_y_continuous(breaks = c(0, 1, 2))
+
+eic_status_boxplot
+```
