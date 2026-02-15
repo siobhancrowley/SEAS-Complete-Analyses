@@ -60,18 +60,18 @@ age_count <- seas |>
 #Race/Ethnicity
 identity_count <- seas |>
   mutate(
-    identity = if_else(str_length(identity) > 3, "MX", identity)
+    identity = if_else(str_length(identity) > 3, "MX", identity) #Re-classifying anyone with more than one selection as "mixed race"
   ) |>
   group_by(identity) |>
   summarise(n = n()) |>
   arrange(desc(n))
 ```
 
-In this dataset, there are `r gender_count$n[1]` boys and `r gender_count$n[2]` girls. 
+There are `r nrow(seas)` participants in the final SEAS dataset, `r gender_count$n[1]` boys and `r gender_count$n[2]` girls. 
 
 There are `r age_count$n[1]` 3-year-olds, `r age_count$n[2]` 4-year-olds, `r age_count$n[3]` 5-year-olds, and `r age_count$n[4]` 6-year-olds (`r age_count$n[1] + age_count$n[2]` in the 3-4 group and `r age_count$n[3] + age_count$n[4]` in the 5-6 group).
 
-And there are `r identity_count$n[1]` participants who identify as White or European American, `r identity_count$n[2]` as Asian, `r identity_count$n[4]` as Middle Eastern or North African, `r identity_count$n[6]` as Hispanic, Latino/Latina/Latinx, or Spanish, and `r identity_count$n[3] + identity_count$n[5]` as multiple races or another race/ethnicity not listed. There are 0 participants who identified as Native Hawaiian or Pacific Islander, and 0 as American Indian or Alaska Native.
+And there are `r identity_count$n[1]` participants who identify as White or European American, `r identity_count$n[2]` as Asian, `r identity_count$n[4]` as Middle Eastern or North African, `r identity_count$n[6]` as Hispanic, Latino/Latina/Latinx, or Spanish, and `r identity_count$n[3] + identity_count$n[5]` as multiple races or another race/ethnicity not listed. There are 0 participants who identify as Native Hawaiian or Pacific Islander, and 0 as American Indian or Alaska Native.
 
 
 # 1. Do children correctly identify the social excluder?
@@ -154,8 +154,8 @@ identify_d <- cohen.d(seas$mem_check_total, f = NA, mu = 2)
 
 We performed a t-test to assess whether participants' summed memory check scores were statistically different from chance, finding that the t statistic was equal to `r round(unname(identify_ttest$statistic), 2)` and the p-value was `r signif(unname(identify_ttest$p.value), 2)`, demonstrating that children were able to correctly recall the events of the scenarios. Cohen's d was `r round(unname(identify_d$estimate), 2)`, which is considered a `r as.character(identify_d$magnitude)` effect size.
 
-```{r identify-age-box}
-identify_age_boxplot <- seas |>
+```{r identify-box}
+identify_boxplot <- seas |>
   ggplot(aes(x = as.factor(age), y = mem_check_total, fill = as.factor(age))) +
   geom_boxplot(fill = c(magma_colors[3], magma_colors[5], magma_colors[7], magma_colors[9])) +
   geom_hline(yintercept = 2, linetype = "dashed", linewidth = 1, alpha = 0.5) +
@@ -171,13 +171,45 @@ identify_age_boxplot <- seas |>
         ) +
   coord_cartesian(ylim = c(0, 4))
 
-identify_age_boxplot
+identify_boxplot
+```
+
+```{r identify-col}
+identify_column <- seas |>
+  ggplot(aes(x = as.factor(age), y = mem_check_total)) +
+  stat_summary(
+    fun = "mean",
+    geom = "bar",
+    position = position_dodge(width = 0.9),
+    fill = "#CD4071FF"
+  ) +
+  stat_summary(
+    fun.data = "mean_cl_normal",
+    geom = "errorbar",
+    width = 0.2,
+    linewidth = 0.75,
+    position = position_dodge(width = 0.9)
+  ) +
+  labs(
+    title = "Study 1 Memory Check Performance by Age",
+    x = "Age (Years)",
+    y = "Correct Memory Responses"
+  ) +
+  geom_hline(yintercept = 2, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25),
+        ) +
+    scale_y_continuous(breaks = c(0, 1, 2, 3, 4))
+
+identify_column
 ```
 
 # 2. Do children use information about social exclusion to determine who is in charge?
 
 ## Hypothesis 1 
-Children will think that social excluders are in charge more often than they will think excluded characters are in charge.
+We expect that children will think that social excluders are in charge more often than they will think excluded characters are in charge.
 
 ```{r status-prep}
 #Convert excluder/excluded selection to numeric and calculate sum score
@@ -210,12 +242,12 @@ status_glmm <- summary(glmer(
   response ~ trial + type + gender + siblings + age_months + (1 | subject),
   data = status_pivoted,
   family = "binomial"
-)) #rank-deficient, dropped a column though idk what; also model is nearly unidentifiable with a very large eigenvalue?
+)) #rank-deficient, dropped a column though idk what; also model is nearly unidentifiable with a very large eigenvalue? Failed to converge?
 
 identify_glmm
 ```
 
-Nothing significant here [NOTE: add more info later?]
+Nothing significant here [NOTE: add more info later]
 
 ### Main Analysis
 ```{r status-ttest}
@@ -239,7 +271,7 @@ status_age_lm
 #what does it mean if intercept is significant
 ```
 
-Age not significant [NOTE: add more]
+In this linear model of the number of times the excluder was selected as in charge with age in months as a predictor, the t value was `r round(status_age_lm$coefficients[2, 3], 2)` and the p-value was `r round(status_age_lm$coefficients[2, 4], 2)`, demonstrating that age did not significantly influence the number of times the excluder was selected as in charge.
 
 ```{r status-box}
 status_age_boxplot <- seas |>
@@ -247,7 +279,7 @@ status_age_boxplot <- seas |>
   geom_boxplot(fill = c(magma_colors[3], magma_colors[5], magma_colors[7], magma_colors[9])) +
   geom_hline(yintercept = 2, linetype = "dashed", linewidth = 1, alpha = 0.5) +
   labs(
-    title = "Status Excluder Selection by Age",
+    title = "Study 1 Status Excluder Selection by Age",
     x = "Age (Years)",
     y = "Excluder Selection"
   ) +
@@ -260,13 +292,46 @@ status_age_boxplot <- seas |>
 status_age_boxplot
 ```
 
+```{r status-col}
+status_column <- seas |>
+  ggplot(aes(x = as.factor(age), y = status_total)) +
+  stat_summary(
+    fun = "mean",
+    geom = "bar",
+    position = position_dodge(width = 0.9),
+    fill = "#CD4071FF"
+  ) +
+  stat_summary(
+    fun.data = "mean_cl_normal",
+    geom = "errorbar",
+    width = 0.2,
+    linewidth = 0.75,
+    position = position_dodge(width = 0.9)
+  ) +
+  labs(
+    title = "Study 1 Status Excluder Selection by Age",
+    x = "Age (Years)",
+    y = "Excluder Selection"
+  ) +
+  geom_hline(yintercept = 2, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25),
+        ) +
+    scale_y_continuous(breaks = c(0, 1, 2, 3, 4)) +
+  coord_cartesian(ylim = c(0, 4))
+
+status_column
+```
+
 # 3. Do children use information about social exclusion to determine who has more physical and social resources?
 
 ## Hypothesis 1
-Children will identify the excluder as having more resources.
+We expect that children will identify the excluder as having more resources.
 
 ```{r resource-prep}
-#Convert excluder/excluded selection to numeric and calculate sum score
+#Convert excluder resource selection to numeric and calculate sum score
 seas <- seas |>
   mutate(
     resource_1 = if_else(resource_1 == "excluder", 1, 0),
@@ -322,7 +387,7 @@ resource_glmm <- summary(glmer(
 resource_glmm
 ```
 
-Nothing significant [NOTE: add more]
+In this GLMM, only age, with a z-value of `r round(resource_glmm$coefficients[10, 3], 2)` and a p-value of `r signif(resource_glmm$coefficients[10, 4], 2)`, significantly influenced participants' selections for the resource question.
 
 ### Main Analysis
 ```{r resource-ttest}
@@ -373,7 +438,7 @@ social_age_lm <- summary(lm(
 social_age_lm
 ```
 
-Age significant for total resources (wasn't true for glmm?); intercept significant for physical resources; age significant for social
+In a linear model with only age, age significantly influenced resource selection (t = `r round(resource_age_lm$coefficients[2, 3], 2)`, p = `r signif(resource_age_lm$coefficients[2, 4], 2)`. When examining physical and social resources separately, age was on the border of significance for physical resources (t = `r round(physical_age_lm$coefficients[2, 3], 2)` and p = `r signif(physical_age_lm$coefficients[2, 4], 2)`) and social resources was significant (t = `r round(social_age_lm$coefficients[2, 3], 2)` and p = `r signif(social_age_lm$coefficients[2, 4], 2)`).
 
 ```{r resource-age-scatter}
 resource_age_scatter <- seas |>
@@ -387,7 +452,7 @@ resource_age_scatter <- seas |>
     alpha = 0.25) +
   geom_hline(yintercept = 2, linetype = "dashed", linewidth = 1, alpha = 0.5) +
   labs(
-    title = "Resource Excluder Selection by Age in Months",
+    title = "Study 1 Resource Excluder Selection by Age in Months",
     x = "Age (Months)",
     y = "Excluder Selection"
   ) +
@@ -406,7 +471,7 @@ resource_age_boxplot <- seas |>
   ggplot(aes(x = as.factor(age), y = resource_total, fill = as.factor(age))) +
   geom_boxplot(fill = c(magma_colors[3], magma_colors[5], magma_colors[7], magma_colors[9])) +
   labs(
-    title = "Resource Excluder Selection by Age",
+    title = "Study 1 Resource Excluder Selection by Age",
     x = "Age (Years)",
     y = "Excluder Selection"
   ) +
@@ -426,7 +491,7 @@ physsoc_age_boxplot <- seas |>
   geom_boxplot(
     position = "dodge") +
   labs(
-    title = "Resource Excluder Selection by Age",
+    title = "Study 1 Resource Excluder Selection by Age",
     x = "Age (Years)",
     y = "Excluder Selection",
     fill = NULL
@@ -446,43 +511,41 @@ physsoc_age_boxplot <- seas |>
 physsoc_age_boxplot
 ```
 
-
-
-
-
-
-Do a column chart at some point? I lost the code for what I did previously, and this has been complicated to make it work so far lol
-
-```{r resource-column, error = TRUE}
-seas |>
+```{r resource-col}
+resource_column <- seas |>
   pivot_longer(c("resource_physical", "resource_social"), names_to = "resource_total_type", names_pattern = ".*_(.*)", values_to = "excluder_select") |> 
-  group_by(resource_total_type, age) |>
-  summarise(
-    mean_excluder = mean(excluder_select),
-    sd_excluder = sd(excluder_select)
-  ) |>
-  mutate(
-    ymin = mean_excluder - sd_excluder,
-    ymax = mean_excluder + sd_excluder
-  ) |>
-  ggplot(aes(x = as.factor(age), y = mean_excluder, fill = resource_total_type)) +
-  geom_col(
-    position = position_dodge(),
-    width = 0.7) +
-  geom_errorbar(
-    aes(ymin = ymin, ymax = ymax), 
-    width = 0.5,
-    position = position_dodge(width = 0.7)
-    )
-```
+  ggplot(aes(x = as.factor(age), y = excluder_select, fill = resource_total_type)) +
+  stat_summary(
+    fun = "mean",
+    geom = "bar",
+    position = position_dodge(width = 0.9)
+  ) +
+  stat_summary(
+    fun.data = "mean_cl_normal",
+    geom = "errorbar",
+    width = 0.2,
+    linewidth = 0.75,
+    position = position_dodge(width = 0.9)
+  ) +
+  labs(
+    title = "Study 1 Excluder Resource Selection by Age",
+    x = "Age (Years)",
+    y = "Excluder Selection",
+    fill = NULL
+  ) +
+  geom_hline(yintercept = 1, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  scale_fill_manual(
+    values = c(magma_colors[3], magma_colors[7]),
+    labels = c("Physical", "Social")) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+    scale_y_continuous(breaks = c(0, 1, 2))
 
+resource_column
 
-
-```{r error = TRUE}
-ggplot(resourceLongData, aes(age, Score, fill = resourceType ))+geom_boxplot() + labs(title = "Resource Choice by Age", x = "Age (years)", y = "Excluder Selection", fill = "Resource Type") + scale_fill_manual(values = c("#dfafb6", "#b3dbe2"), labels = c("Physical", "Social"))
-
-
-
-resource_pivoted |>
-  ggplot(aes(x = as.factor(age), y = ))
+#Do the error bars blend into the physical color too much?
 ```

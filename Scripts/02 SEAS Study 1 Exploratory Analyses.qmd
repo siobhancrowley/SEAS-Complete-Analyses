@@ -7,15 +7,21 @@ editor_options:
 ---
 
 # Packages
-
 ```{r packages, message = FALSE, warning = FALSE}
 library(readxl)
 library(tidyverse)
 library(lme4)
 library(lmerTest)
+library(showtext)
+library(viridis)
+
+showtext_auto()
 ```
 
 # Data Preparation
+```{r data-colors}
+magma_colors <- c("#000004FF", "#180F3EFF", "#451077FF", "#721F81FF", "#9F2F7FFF", "#CD4071FF", "#F1605DFF", "#FD9567FF", "#FEC98DFF", "#FCFDBFFF") #from magma(10)
+```
 
 ```{r data-load}
 seas_full <- read_excel("../Data/FINAL SEAS V1 Dataset.xlsx")
@@ -46,21 +52,6 @@ seas_united <- seas |>
   unite("resource_explain_3", resource_storyref_3:resource_relation_3, sep  = " ", na.rm = TRUE) |>
   unite("status_explain_4", status_storyref_4:status_relation_4, sep = " ", na.rm = TRUE) |>
   unite("resource_explain_4", resource_storyref_4:resource_relation_4, sep  = " ", na.rm = TRUE)
-
-possible_explain <- c("ST", "VG", "SG", "EX", "IN", "NR", "MR", "AR", "EP", "EN", "PR", "EM", "MT", "FR", "PS", "OR")
-
-seas_test <- purrr::map(possible_explain, function(explain) {
-    seas_united |>
-      mutate(!!paste0("status_", explain, "_1") := if_else(str_detect(status_explain_1, explain), 1, 0))
-  })
-
-selected_cols <- map(seas_test, ~select(., subject, last_col()))
-
-final_df <- reduce(selected_cols, left_join, by = "subject")
-
-
-
-purrr::map_dfr(seas_test, ~select(., subject, last_col()))
 ```
 
 ```{r explain-map-func}
@@ -202,6 +193,7 @@ seas_response_chi <- chisq.test(seas_response_contingency)
 seas_response_chi
 ```
 
+
 Significant. What post-hoc test should we use?
 
 # Number of Times a Ppt Used Explanation Across Each Response (0-8)
@@ -285,7 +277,7 @@ summary(lmer(
 
 Age alone: age significant
 
-Combination: SG, ST, age x SG significant; age x VG significant
+Combination: SG, ST, age x SG significant; age x VG and age x PR borderline significant 
 
 # Did a Ppt Use Type of Explanation in Any Response?
 
@@ -387,7 +379,7 @@ seas |>
 
 ## Analyses
 
-```{r word-lm}
+```{r word-lm, error = TRUE}
 #not working lol
 
 seas_wordtot <- seas |>
@@ -402,7 +394,28 @@ summary(lmer(
 ))
 ```
 
-## also add NA/RA/MS
+
+
+
+
+
+# Testing--shouldn't need
+```{r}
+possible_explain <- c("ST", "VG", "SG", "EX", "IN", "NR", "MR", "AR", "EP", "EN", "PR", "EM", "MT", "FR", "PS", "OR")
+
+seas_test <- purrr::map(possible_explain, function(explain) {
+    seas_united |>
+      mutate(!!paste0("status_", explain, "_1") := if_else(str_detect(status_explain_1, explain), 1, 0))
+  })
+
+selected_cols <- map(seas_test, ~select(., subject, last_col()))
+
+final_df <- reduce(selected_cols, left_join, by = "subject")
+
+
+
+purrr::map_dfr(seas_test, ~select(., subject, last_col()))
+```
 
 ```{r mapping-function-test, eval = FALSE, echo = FALSE}
 status_or_resource <- "status"
