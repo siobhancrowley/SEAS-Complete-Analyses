@@ -239,7 +239,7 @@ mem_column <- seas2 |>
     fun.data = "mean_cl_normal",
     geom = "errorbar",
     width = 0.2,
-    linewidth = 0.75,
+    linewidth = 0.5,
     position = position_dodge(width = 0.9)
   ) +
   labs(
@@ -442,7 +442,7 @@ em_status_column <- seas2 |>
     fun.data = "mean_cl_normal",
     geom = "errorbar",
     width = 0.2,
-    linewidth = 0.75,
+    linewidth = 0.5,
     position = position_dodge(width = 0.9)
   ) +
   labs(
@@ -666,7 +666,7 @@ em_physoc_column <- seas2 |>
     fun.data = "mean_cl_normal",
     geom = "errorbar",
     width = 0.2,
-    linewidth = 0.75,
+    linewidth = 0.5,
     position = position_dodge(width = 0.9)
   ) +
   labs(
@@ -688,7 +688,7 @@ em_physoc_column <- seas2 |>
     scale_y_continuous(breaks = c(0, 1)) +
   coord_cartesian(ylim = c(0, 1))
 
-eic_physoc_column
+em_physoc_column
 
 #Do the error bars blend into the physical color too much?
 ```
@@ -1176,7 +1176,7 @@ eic_status_column <- seas2 |>
     fun.data = "mean_cl_normal",
     geom = "errorbar",
     width = 0.2,
-    linewidth = 0.75,
+    linewidth = 0.5,
     position = position_dodge(width = 0.9)
   ) +
   labs(
@@ -1209,7 +1209,7 @@ eic_resource_column <- seas2 |>
     fun.data = "mean_cl_normal",
     geom = "errorbar",
     width = 0.2,
-    linewidth = 0.75,
+    linewidth = 0.5,
     position = position_dodge(width = 0.9)
   ) +
   labs(
@@ -1242,7 +1242,7 @@ eic_physoc_column <- seas2 |>
     fun.data = "mean_cl_normal",
     geom = "errorbar",
     width = 0.2,
-    linewidth = 0.75,
+    linewidth = 0.5,
     position = position_dodge(width = 0.9)
   ) +
   labs(

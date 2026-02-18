@@ -187,7 +187,7 @@ identify_column <- seas |>
     fun.data = "mean_cl_normal",
     geom = "errorbar",
     width = 0.2,
-    linewidth = 0.75,
+    linewidth = 0.5,
     position = position_dodge(width = 0.9)
   ) +
   labs(
@@ -305,7 +305,7 @@ status_column <- seas |>
     fun.data = "mean_cl_normal",
     geom = "errorbar",
     width = 0.2,
-    linewidth = 0.75,
+    linewidth = 0.5,
     position = position_dodge(width = 0.9)
   ) +
   labs(
@@ -524,7 +524,7 @@ resource_column <- seas |>
     fun.data = "mean_cl_normal",
     geom = "errorbar",
     width = 0.2,
-    linewidth = 0.75,
+    linewidth = 0.5,
     position = position_dodge(width = 0.9)
   ) +
   labs(
