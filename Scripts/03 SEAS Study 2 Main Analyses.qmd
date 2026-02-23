@@ -124,21 +124,76 @@ seas2 <- seas2 |>
 
 ## Preliminary Analysis
 ```{r mem-glmm}
-mem_check_pivoted2 <- seas2 |>
-  select(subject, gender, age_months, siblings, EQ_total, side, starts_with("type"), starts_with("interaction"), matches("^mem_check_.$"), matches("^comp_mem_check_.$")) |>
+#Main Trials
+mem_check_main <- seas2 |>
+  mutate(              #duplicating type and interaction columns so pivoting mem_check is easier
+    type_1A = type_1,
+    type_2A = type_2,
+    type_3A = type_3,
+    type_4A = type_4,
+    interaction_1A = interaction_1,
+    interaction_2A = interaction_2,
+    interaction_3A = interaction_3,
+    interaction_4A = interaction_4,
+    type_1B = type_1A,
+    type_2B = type_2A,
+    type_3B = type_3A,
+    type_4B = type_4A,
+    interaction_1B = interaction_1A,
+    interaction_2B = interaction_2A,
+    interaction_3B = interaction_3A,
+    interaction_4B = interaction_4A,
+  ) |>
+   select(subject, gender, age_months, siblings, EQ_total, side, matches("^type_..$"), matches("^interaction_..$"), matches("^mem_check_..$")) |>
   pivot_longer(
-    cols = c(starts_with("type"), starts_with("interaction"), matches("^mem_check_.$")), 
+    cols = c(starts_with("type"), starts_with("interaction"), matches("^mem_check_..$")), 
     names_to = c(".value", "trial"),
-    names_pattern = "(.*)_(.)$"
+    names_pattern = "(.*)_(.).?$"
+  ) |>
+  mutate(
+    mem_check = if_else(mem_check == 0.5, 1, 0)
   )
 
-mem_glmm <- summary(glmer(
+
+mem_glmm_main <- summary(glmer(
   mem_check ~ trial + type + interaction + gender + siblings + age_months + side + EQ_total + (1 | subject),
-  data = mem_check_pivoted2, 
+  data = mem_check_main, 
   family = "binomial"
 )) #rank deficient and dropped a column; also model is nearly unidentifiable/large eigenvalue ratios
   
-mem_glmm
+mem_glmm_main
+
+summary(glmer(
+  mem_check ~ trial + type + interaction + gender + siblings + age_months + side + EQ_total + (1 | subject),
+  data = mem_check_main, 
+  family = "binomial"
+))
+
+#Comparison Trials
+mem_check_comp <- seas2 |>
+   select(subject, gender, age_months, siblings, EQ_total, side, matches("^comp_mem_check_..$")) |>
+  pivot_longer(
+    cols = matches("^comp_mem_check_..$"), 
+    names_to = c(".value", "trial"),
+    names_pattern = "comp_(mem_check)_(.).?$"
+  ) |>
+  mutate(
+    mem_check = if_else(mem_check == 0.5, 1, 0)
+  )
+
+mem_glmm_comp <- summary(glmer(
+  mem_check ~ trial + gender + siblings + age_months + side + EQ_total + (1 | subject),
+  data = mem_check_comp, 
+  family = "binomial"
+)) #rank deficient and dropped a column; also model is nearly unidentifiable/large eigenvalue ratios
+  
+mem_glmm_comp
+
+summary(glmer(
+  mem_check ~ trial + siblings + age_months + side + EQ_total + (1 | subject),
+  data = mem_check_comp, 
+  family = "binomial"
+))
 ```
 
 GLMM found that only age_months and side were significant when looking at main memory check qs
@@ -310,6 +365,12 @@ em_status_glmm <- summary(glmer(
 )) #rank deficient dropping a column
 
 em_status_glmm
+
+ summary(glmer(
+    status ~ trial + side  age_months + EQ_total + (1 | subject),
+     data = seas2_exclusion_pivoted,
+     family = "binomial"
+ ))
 
 #Removing sibling outlier
 seas2_exclusion_pivoted_sib <- seas2_exclusion_pivoted |>

@@ -161,7 +161,7 @@ seas |>
       labels = c("Relevant Answer", "No or Irrelevant Answer", "Missing")
       ) +
     labs(
-      title = "Explanations Given by Age",
+      title = "Study 1 Explanations Given by Age",
       x = "Age (Years)",
       y = "Proportion",
       fill = NULL
@@ -267,21 +267,46 @@ seas_pivoted |>
 
 ## Analyses
 
-```{r explain-count-lm}
-summary(lmer(
-  total ~ age_months + (1 | subject),
-  data = seas_pivoted
-))
-
+```{r explain-count-lmer}
+#Does the frequency of each answer type change with age?
 summary(lmer(
   total ~ age_months * explanation_type + (1 | subject),
   data = seas_pivoted
 ))
 ```
 
-Age alone: age significant
+VG, SG, EX, FR, OR, age x VG, and age x SG are significant
 
-Combination: SG, ST, age x SG significant; age x VG and age x PR borderline significant
+```{r EX-count-age-lm}
+#Does the frequency of explanations that reference exclusion change with age?
+summary(lm(
+  EX_total ~ age_months,
+  data = seas_separated
+))
+
+ggplot(seas_separated, aes(x = age_months, y = EX_total)) + 
+  geom_jitter() +
+  geom_smooth(method = "lm") #probably move this/reorganize at some point
+```
+
+The number of explanations that reference exclusion given by participants does significantly differ by age.
+
+```{r EX-count-QType-lm}
+seas_EX_qtype <- seas_separated |>
+  select(subject, age_months, matches(".*_EX_.")) |>
+  pivot_longer(
+    cols = -(subject:age_months),
+    names_to = "question_type",
+    names_pattern = "(.*)_EX_.",
+    values_to = "EX"
+  )
+
+summary(lm(
+  EX ~ question_type * age_months,
+  data = seas_EX_qtype
+)) #probably move again; not significant; double-check lm, lmer, glmer
+```
+
 
 # Did a Ppt Use Type of Explanation in Any Response?
 
@@ -326,7 +351,7 @@ seas_pivoted |>
   scale_color_manual(values = wo_black) +
   facet_wrap(~explanation_type) +
   labs(
-    title = "Types of Explanations Present in Participants' Responses", #better title/explain better
+    title = "Study 1 Types of Explanations Present in Participants' Responses", #better title/explain better
     x = "Age (Months)",
     y = "Responses Present Across Explanation Questions",
     color = "Explanations",
@@ -344,13 +369,8 @@ seas_pivoted |>
 
 ## Analyses
 
-```{r explain-present-lm}
+```{r explain-present-lmer}
 #or is glmer correct here?
-
-summary(lmer(
-  present ~ age_months + (1 | subject),
-  data = seas_pivoted
-))
 
 summary(lmer(
   present ~ age_months * explanation_type + (1 | subject),
@@ -358,9 +378,7 @@ summary(lmer(
 ))
 ```
 
-Age alone: significant
-
-Combination: EX, age x EM, age x MT significant
+Age, age x PR, age x MT significant. Double-check this because this doesn't seem to match the visual at all?
 
 # Word Count
 

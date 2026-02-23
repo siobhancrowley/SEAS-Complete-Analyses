@@ -98,20 +98,26 @@ mem_check_pivoted <- seas |>
     names_to = c(".value", "trial"),
     names_pattern = "(.*)_(.)$"
     ) |>
-  rename(response = mem_check) |>
-  mutate(
-    type_simple = if_else(type %in% c("cyber", "animals"), "video", "story")
-  )
+  rename(response = mem_check)
 
 #Binomial GLMM
 identify_glmm <- summary(glmer(
-  response ~ trial + type_simple + gender + age_months + (1 | subject),
+  response ~ trial + type + gender + age_months + (1 | subject),
   data = mem_check_pivoted,
   family = "binomial"
 ))
-#Drops video/story--is that good or bad? Rank-deficient means?
+
+#Still rank-deficient when all 4, drops trampoline or animals? But cyber is significant
 
 identify_glmm
+
+summary(glmer(
+  response ~ trial + gender + age_months + (1 | subject),
+  data = mem_check_pivoted,
+  family = "binomial"
+))
+
+#No longer rank-deficient when remove type, and only age is significant
 
 #Can/should I look at the effect size of the age portion of the model?
 ```
@@ -244,7 +250,13 @@ status_glmm <- summary(glmer(
   family = "binomial"
 )) #rank-deficient, dropped a column though idk what; also model is nearly unidentifiable with a very large eigenvalue? Failed to converge?
 
-identify_glmm
+status_glmm
+
+summary(glmer(
+  response ~ age_months + (1 | subject),
+  data = status_pivoted,
+  family = "binomial"
+)) #finally converges; nothing significant
 ```
 
 Nothing significant here [NOTE: add more info later]
@@ -334,7 +346,10 @@ We expect that children will identify the excluder as having more resources.
 #Convert excluder resource selection to numeric and calculate sum score
 seas <- seas |>
   mutate(
-    resource_1 = if_else(resource_1 == "excluder", 1, 0),
+    resource_1 = case_when(
+      resource_1 == "excluder" ~ 1,
+      resource_1 == "excluded" ~ 0,
+      is.na(resource_1) ~ NA), #One participant who did not answer the first resource question
     resource_2 = if_else(resource_2 == "excluder", 1, 0),
     resource_3 = if_else(resource_3 == "excluder", 1, 0),
     resource_4 = if_else(resource_4 == "excluder", 1, 0),
@@ -382,9 +397,21 @@ resource_glmm <- summary(glmer(
   response ~ trial + type + resource_type + gender +siblings + age_months + (1 | subject),
   data = resource_pivoted,
   family = "binomial"
-)) #rank deficit, dropping a column
+)) #rank-deficient; only age is sig
 
 resource_glmm
+
+summary(glmer(
+    response ~ trial + resource_type + gender +siblings + age_months + (1 | subject),
+    data = resource_pivoted,
+    family = "binomial"
+)) #if remove type, fails to converge
+
+summary(glmer(
+    response ~ trial + gender + siblings + age_months + (1 | subject),
+    data = resource_pivoted,
+    family = "binomial"
+)) #if remove type and resource_type, converges and is not rank-deficient; age_months (and intercept) sig
 ```
 
 In this GLMM, only age, with a z-value of `r round(resource_glmm$coefficients[10, 3], 2)` and a p-value of `r signif(resource_glmm$coefficients[10, 4], 2)`, significantly influenced participants' selections for the resource question.
