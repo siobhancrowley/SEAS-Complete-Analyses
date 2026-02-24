@@ -7,7 +7,6 @@ editor_options:
 ---
 
 # Packages
-
 ```{r packages, message = FALSE, warning = FALSE}
 library(readxl)
 library(tidyverse)
@@ -20,7 +19,6 @@ showtext_auto()
 ```
 
 # Data Preparation
-
 ```{r data-colors}
 magma_colors <- c("#000004FF", "#180F3EFF", "#451077FF", "#721F81FF", "#9F2F7FFF", "#CD4071FF", "#F1605DFF", "#FD9567FF", "#FEC98DFF", "#FCFDBFFF") #from magma(10)
 ```
@@ -44,7 +42,7 @@ seas <- seas |>
 ```
 
 ```{r data-main-prep}
-#Converting explanation data to numerical
+#Combining any explanation code for a particular response
 seas_united <- seas |>
   unite("status_explain_1", status_storyref_1:status_relation_1, sep = " ", na.rm = TRUE) |>
   unite("resource_explain_1", resource_storyref_1:resource_relation_1, sep  = " ", na.rm = TRUE) |>
@@ -99,6 +97,7 @@ seas_separated <- seas_united |>
 ```
 
 ```{r sum-scores}
+#Creating sum scores for each type of explanation
 seas_separated <- seas_separated |>
   rowwise() |>
   mutate(
@@ -128,9 +127,8 @@ seas_pivoted <- seas_separated |>
   pivot_longer(ST_total:OR_total, names_to = "explanation_type", names_pattern = "(..)_total", values_to = "total")
 ```
 
-```{r}
+```{r frequency-table}
 #some exploration of frequency of each type of explanation
-
 seas_pivoted |>
   group_by(explanation_type) |>
   summarize(
@@ -143,7 +141,6 @@ seas_pivoted |>
 # Basic Answer Categorization
 
 ## Graphs
-
 ```{r answer-col}
 seas |>
   pivot_longer(
@@ -151,9 +148,6 @@ seas |>
     names_to = "trial",
     values_to = "response"
   ) |>
-#  group_by(response) |>
-#  summarize(n = n())
-  
   ggplot(aes(x = as.factor(age), fill = fct_rev(response))) +
     geom_bar(position = "fill") +
     scale_fill_manual(
@@ -177,7 +171,6 @@ seas |>
 ```
 
 ## Analyses
-
 ```{r answer-chi}
 seas_response_contingency <- seas |>
   pivot_longer(
@@ -201,8 +194,7 @@ Significant. What post-hoc test should we use?
 
 # Number of Times a Ppt Used Explanation Across Each Response (0-8)
 
-## Graphs
-
+## Initial Graphs
 ```{r explain-count-basiccol}
 #column chart to see the total number of each type of explanation category participants used across their 8 explanation questions (explain better; can use multiple types of explanation in one response, but using that explanation in response will only be counted once for each question--i.e. maximum for each category is 8)
 
@@ -267,31 +259,30 @@ seas_pivoted |>
 
 ## Analyses
 
+### Overall
 ```{r explain-count-lmer}
 #Does the frequency of each answer type change with age?
 summary(lmer(
   total ~ age_months * explanation_type + (1 | subject),
   data = seas_pivoted
-))
+)) #lmer correct? I thought it would be glmer with a poisson family but that produced errors
 ```
 
-VG, SG, EX, FR, OR, age x VG, and age x SG are significant
+In this model, SG and SG x age are significant, demonstrating that the frequencies of explanation responses (0-8 across trial) changes with these conditons.
 
-```{r EX-count-age-lm}
+### Exclusion
+```{r EX-count-age-glm}
 #Does the frequency of explanations that reference exclusion change with age?
-summary(lm(
+summary(glm(
   EX_total ~ age_months,
   data = seas_separated
 ))
-
-ggplot(seas_separated, aes(x = age_months, y = EX_total)) + 
-  geom_jitter() +
-  geom_smooth(method = "lm") #probably move this/reorganize at some point
 ```
 
 The number of explanations that reference exclusion given by participants does significantly differ by age.
 
-```{r EX-count-QType-lm}
+```{r EX-count-QType-glm}
+#does whether a response references exclusion depend on the question type (status or resources), age, or the interaction thereof?
 seas_EX_qtype <- seas_separated |>
   select(subject, age_months, matches(".*_EX_.")) |>
   pivot_longer(
@@ -301,17 +292,97 @@ seas_EX_qtype <- seas_separated |>
     values_to = "EX"
   )
 
-summary(lm(
+summary(glm(
   EX ~ question_type * age_months,
   data = seas_EX_qtype
-)) #probably move again; not significant; double-check lm, lmer, glmer
+))
 ```
 
+Neither question type, age, nor the interaction between the two significantly affects whether an answer references exclusion or not.
+
+### Specific Game
+```{r SG-count-age-glm}
+#Does the frequency of explanations that reference the game specifically change with age?
+summary(glm(
+  SG_total ~ age_months,
+  data = seas_separated
+))
+```
+
+The number of explanations that reference the game with specific details given by participants does significantly differ by age.
+
+```{r SG-count-QType-glm}
+#does whether a response references the game specifically depend on the question type (status or resources), age, or the interaction thereof?
+seas_SG_qtype <- seas_separated |>
+  select(subject, age_months, matches(".*_SG_.")) |>
+  pivot_longer(
+    cols = -(subject:age_months),
+    names_to = "question_type",
+    names_pattern = "(.*)_SG_.",
+    values_to = "SG"
+  )
+
+summary(glm(
+  SG ~ question_type * age_months,
+  data = seas_SG_qtype
+))
+```
+
+Whether an answer references the game specifically is significantly associated with age but not question type nor an interaction between age and question type.
+
+## Follow-Up Graphs
+```{r EX-count-age-scatter}
+EX_count_age_scatter <- seas_separated |>
+  ggplot(aes(x = age_months, y = EX_total)) +
+  geom_jitter() +
+  stat_smooth(
+    method = "lm", 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  labs(
+    title = "Study 1 Explanations Referencing Exclusion by Age",
+    x = "Age (Months)",
+    y = "Explanations Referencing Exclusion"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        )
+
+EX_count_age_scatter
+#Also the actual possible range of responses is 0-8, so this graph would look even worse zoomed out
+```
+
+```{r SG-count-age-scatter}
+SG_count_age_scatter <- seas_separated |>
+  ggplot(aes(x = age_months, y = SG_total)) +
+  geom_jitter() +
+  stat_smooth(
+    method = "lm", 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  labs(
+    title = "Study 1 Explanations Referencing the Game Specifically by Age",
+    x = "Age (Months)",
+    y = "Explanations Referencing the Game Specifically"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        )
+
+SG_count_age_scatter
+```
 
 # Did a Ppt Use Type of Explanation in Any Response?
 
-## Graphs
-
+## Initial Graphs
 ```{r explain-present-scatter}
 seas_pivoted <- seas_pivoted |>
   mutate(
@@ -369,21 +440,253 @@ seas_pivoted |>
 
 ## Analyses
 
+### Overall
 ```{r explain-present-lmer}
-#or is glmer correct here?
-
 summary(lmer(
   present ~ age_months * explanation_type + (1 | subject),
   data = seas_pivoted
+)) #Again, I thought this would be a binomial glmer but errors; however lmer output doesn't seem to match graphs
+```
+
+In this model, the presence of a type of explanation across a participant's responses significantly differs based on age, age x PR, and age x MT.
+
+### Exclusion
+```{r EX-present-age-glm}
+#Does the presence of explanations that reference exclusion change with age?
+
+seas_separated <- seas_separated |>
+  mutate(
+    across(
+      .cols = ST_total:OR_total,
+      .fns = ~if_else(.x > 0, 1, 0),
+      .names = "{sub('total', 'present', col)}"
+    )
+  ) #Adding present columns to non-pivoted dataset
+
+
+summary(glm(
+  EX_present ~ age_months,
+  data = seas_separated
 ))
 ```
 
-Age, age x PR, age x MT significant. Double-check this because this doesn't seem to match the visual at all?
+Whether participants reference exclusion at least once in the study significantly differs with age.
+
+### Preferences
+```{r PR-present-age-glm}
+#Does the presence of explanations that reference preferences change with age?
+summary(glm(
+  PR_present ~ age_months,
+  data = seas_separated
+))
+```
+
+Whether participants reference preferences at least once in the study does not significantly differ with age.
+
+### Motivation
+```{r MT-present-age-glm}
+#Does the presence of explanations that reference motivations change with age?
+summary(glm(
+  MT_present ~ age_months,
+  data = seas_separated
+))
+```
+
+Whether participants reference motivations at least once in the study does not significantly differ with age.
+
+### Specific Game
+```{r SG-present-age-glm}
+#Does the presence of explanations that reference the game specifically change with age?
+summary(glm(
+  SG_present ~ age_months,
+  data = seas_separated
+))
+```
+
+Whether participants reference the game specifically at least once in the study significantly differs with age.
+
+### Vague Game
+```{r VG-present-age-glm}
+#Does the presence of explanations that reference the game vaguely change with age?
+summary(glm(
+  VG_present ~ age_months,
+  data = seas_separated
+))
+```
+
+Whether participants reference the game vaguely at least once in the study significantly differs with age.
+
+### Friends
+```{r FR-present-age-glm}
+#Does the presence of explanations that reference preferences change with age?
+summary(glm(
+  FR_present ~ age_months,
+  data = seas_separated
+))
+```
+
+Whether participants reference friends at least once in the study significantly differs with age.
+
+### Possessions
+```{r PS-present-age-glm}
+#Does the presence of explanations that reference preferences change with age?
+summary(glm(
+  PS_present ~ age_months,
+  data = seas_separated
+))
+```
+
+Whether participants reference possessions at least once in the study significantly differs with age.
+
+## Follow-Up Graphs
+```{r EX-presence-age-scatter}
+EX_presence_age_scatter <- seas_separated |>
+  ggplot(aes(x = age_months, y = EX_present)) +
+  geom_jitter() +
+  stat_smooth(
+    method = "lm", 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 1 Explanations Referencing Exclusion by Age",
+    x = "Age (Months)",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(
+    breaks = c(0,1),
+    labels = c("Not Referenced", "Exclusion Referenced")
+    )
+
+EX_presence_age_scatter
+```
+
+```{r SG-presence-age-scatter}
+SG_presence_age_scatter <- seas_separated |>
+  ggplot(aes(x = age_months, y = SG_present)) +
+  geom_jitter() +
+  stat_smooth(
+    method = "lm", 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 1 Explanations Referencing the Game Specifically by Age",
+    x = "Age (Months)",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(
+    breaks = c(0,1),
+    labels = c("Not Referenced", "Specific Game Referenced")
+    )
+
+SG_presence_age_scatter
+```
+
+```{r VG-presence-age-scatter}
+VG_presence_age_scatter <- seas_separated |>
+  ggplot(aes(x = age_months, y = VG_present)) +
+  geom_jitter() +
+  stat_smooth(
+    method = "lm", 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 1 Explanations Referencing the Game Vaguely by Age",
+    x = "Age (Months)",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(
+    breaks = c(0,1),
+    labels = c("Not Referenced", "Vague Game Referenced")
+    )
+
+VG_presence_age_scatter
+```
+
+```{r FR-presence-age-scatter}
+FR_presence_age_scatter <- seas_separated |>
+  ggplot(aes(x = age_months, y = FR_present)) +
+  geom_jitter() +
+  stat_smooth(
+    method = "lm", 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 1 Explanations Referencing Friendship by Age",
+    x = "Age (Months)",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(
+    breaks = c(0,1),
+    labels = c("Not Referenced", "Friendship Referenced")
+    )
+
+FR_presence_age_scatter
+```
+
+```{r PS-presence-age-scatter}
+PS_presence_age_scatter <- seas_separated |>
+  ggplot(aes(x = age_months, y = PS_present)) +
+  geom_jitter() +
+  stat_smooth(
+    method = "lm", 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 1 Explanations Referencing Possession by Age",
+    x = "Age (Months)",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(
+    breaks = c(0,1),
+    labels = c("Not Referenced", "Possession Referenced")
+    )
+
+PS_presence_age_scatter
+```
 
 # Word Count
 
 ## Graphs
-
 ```{r word-scatter}
 #Scatterplot of total word count by age
 
@@ -395,77 +698,36 @@ seas |>
   ungroup() |>
   ggplot(aes(x = age_months, y = word_total)) +
   geom_point() +
-  stat_smooth(method = "lm", formula = y ~ x)
-
+  stat_smooth(
+    method = "lm", 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  labs(
+    title = "Study 1 Explanation Total Word Count by Age",
+    x = "Age (Months)",
+    y = "Word Count"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        )
 ```
 
 ## Analyses
-
 ```{r word-lm, error = TRUE}
-#not working lol
-
 seas_wordtot <- seas |>
   rowwise() |>
   mutate(
     word_total = sum(c_across(contains("word")))) |>
   filter(!is.na(word_total))
 
-summary(lmer(
-  word_total ~ age_months + (1 | subject),
+summary(glm(
+  word_total ~ age_months,
   data = seas_wordtot
 ))
 ```
 
-# Testing--shouldn't need
-
-```{r}
-possible_explain <- c("ST", "VG", "SG", "EX", "IN", "NR", "MR", "AR", "EP", "EN", "PR", "EM", "MT", "FR", "PS", "OR")
-
-seas_test <- purrr::map(possible_explain, function(explain) {
-    seas_united |>
-      mutate(!!paste0("status_", explain, "_1") := if_else(str_detect(status_explain_1, explain), 1, 0))
-  })
-
-selected_cols <- map(seas_test, ~select(., subject, last_col()))
-
-final_df <- reduce(selected_cols, left_join, by = "subject")
-
-
-
-purrr::map_dfr(seas_test, ~select(., subject, last_col()))
-```
-
-```{r mapping-function-test, eval = FALSE, echo = FALSE}
-status_or_resource <- "status"
-trial_num <- 1
-
-possible_explain <- c("ST", "VG", "SG", "EX", "IN", "NR", "MR", "AR", "EP", "EN", "PR", "EM", "MT", "FR", "PS", "OR")
-  
-  column_of_interest <- paste0(status_or_resource, "_explain_", trial_num)
-  
-  list_of_dfs <- purrr::map(possible_explain, function(explain) {
-    seas_united |>
-      mutate(!!paste0(status_or_resource, "_", explain, "_", trial_num) := if_else(str_detect(.data[[column_of_interest]], explain), 1, 0)) 
-  })
-    
-    selected_cols <- map(list_of_dfs, ~select(., subject, last_col()))
-    
-    View(reduce(selected_cols, left_join, by = "subject"))
-```
-
-```{r mapping-test, eval = FALSE, echo = FALSE}
-possible_explain <- c("ST", "VG", "SG", "EX", "IN", "NR", "MR", "AR", "EP", "EN", "PR", "EM", "MT", "FR", "PS", "OR")
-
-seas_test <- purrr::map(possible_explain, function(explain) {
-    seas_united |>
-      mutate(!!paste0("status_", explain, "_1") := if_else(str_detect(status_explain_1, explain), 1, 0))
-  })
-
-selected_cols <- map(seas_test, ~select(., subject, last_col()))
-
-final_df <- reduce(selected_cols, left_join, by = "subject")
-
-
-
-purrr::map_dfr(seas_test, ~select(., subject, last_col()))
-```
+The number of words used by participants significantly differs based on age.
