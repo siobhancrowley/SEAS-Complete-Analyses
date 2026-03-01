@@ -47,6 +47,12 @@ magma_colors <- c("#000004FF", "#180F3EFF", "#451077FF", "#721F81FF", "#9F2F7FFF
 
 # Demographics
 ```{r demo}
+full_count <- nrow(seas_full)
+
+full_count_nopilot <- seas_full |>
+  filter(str_detect(subject, "^SEAS-._P..$", negate = TRUE)) |> #excluding pilot participants
+  nrow()
+
 #Gender
 gender_count <- seas |>
   group_by(gender) |>
@@ -67,7 +73,7 @@ identity_count <- seas |>
   arrange(desc(n))
 ```
 
-There are `r nrow(seas)` participants in the final SEAS dataset, `r gender_count$n[1]` boys and `r gender_count$n[2]` girls. 
+`r full_count_nopilot` children participated in the study, and there are `r nrow(seas)` participants in the final SEAS dataset, `r gender_count$n[1]` boys and `r gender_count$n[2]` girls. 
 
 There are `r age_count$n[1]` 3-year-olds, `r age_count$n[2]` 4-year-olds, `r age_count$n[3]` 5-year-olds, and `r age_count$n[4]` 6-year-olds (`r age_count$n[1] + age_count$n[2]` in the 3-4 group and `r age_count$n[3] + age_count$n[4]` in the 5-6 group).
 
@@ -155,6 +161,7 @@ To assess other factors that may potentially affect participants' performance on
 ### Main Analysis
 ```{r identify-ttest}
 identify_ttest <- t.test(seas$mem_check_total, mu = 2)
+identify_ttest
 identify_d <- cohen.d(seas$mem_check_total, f = NA, mu = 2)
 ```
 
@@ -264,6 +271,7 @@ Nothing significant here [NOTE: add more info later]
 ### Main Analysis
 ```{r status-ttest}
 status_ttest <- t.test(seas$status_total, mu = 2)
+status_ttest
 ```
 
 In this one-sample t-test, the t statistic was equal to `r round(unname(status_ttest$statistic), 2)` and the p-value `r round(unname(status_ttest$p.value), 2)`, demonstrating that participants did not select the excluder as being in charge more often than chance.
@@ -422,8 +430,12 @@ resource_ttest <- t.test(seas$resource_total, mu = 2)
 physical_ttest <- t.test(seas$resource_physical, mu = 1)
 social_ttest <- t.test(seas$resource_social, mu = 1)
 
-resource_d <- cohen.d(seas$resource_total, f = NA, mu = 2)
-physical_d <- cohen.d(seas$resource_physical, f = NA, mu = 1) 
+resource_ttest
+physical_ttest
+social_ttest
+
+resource_d <- cohen.d(seas$resource_total, f = NA, mu = 2, na.rm = TRUE)
+physical_d <- cohen.d(seas$resource_physical, f = NA, mu = 1, na.rm = TRUE) 
 social_d <- cohen.d(seas$resource_social, f = NA, mu = 1)
 ```
 

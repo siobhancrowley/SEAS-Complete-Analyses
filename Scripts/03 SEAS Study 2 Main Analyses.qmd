@@ -94,7 +94,7 @@ identity_count2 <- seas2 |>
   arrange(desc(n))
 ```
 
-In this dataset, there are `r nrow(seas2)` participants--`r gender_count2$n[1]` boys and `r gender_count2$n[2]` girls, as well as `r gender_count2$n[3]` child who did not identify as either.
+`r nrow(seas2_full) - 1` children participated in this study, and `r nrow(seas2)` were included in the final analysis--`r gender_count2$n[1]` boys and `r gender_count2$n[2]` girls, as well as `r gender_count2$n[3]` child who did not identify as either.
 
 There are `r age_count2$n[1]` 3-year-olds, `r age_count2$n[2]` 4-year-olds, `r age_count2$n[3]` 5-year-olds, and `r age_count2$n[4]` 6-year-olds (`r age_count2$n[1] + age_count2$n[2]` in the 3-4 group and `r age_count2$n[3] + age_count2$n[4]` in the 5-6 group).
 
@@ -205,6 +205,7 @@ We expect that children, on average, will accurately recall the details of the g
 
 ```{r mem-ttest}
 mem_ttest <- t.test(seas2$mem_check_total, mu = 3)
+mem_ttest
 mem_d <- cohen.d(seas2$mem_check_total, f = NA, mu = 3)
 ```
 
@@ -367,7 +368,7 @@ em_status_glmm <- summary(glmer(
 em_status_glmm
 
  summary(glmer(
-    status ~ trial + side  age_months + EQ_total + (1 | subject),
+    status ~ trial + side + age_months + EQ_total + (1 | subject),
      data = seas2_exclusion_pivoted,
      family = "binomial"
  ))
@@ -622,6 +623,7 @@ em_phys_excluder_count <- seas2 |>
   pull(n) #extracts the number of children who selected the excluder for the physical resources exclusion question
 
 em_phys_binom <- binom.test(em_phys_excluder_count, nrow(seas2), p = 0.5)
+em_phys_binom
 ```
 
 To examine whether children were more likely than chance to select the excluder over the excluded character as having more physical resources, we conducted a binomial test. `r em_phys_excluder_count` out of `r nrow(seas2)` selected the excluder, producing a p-value of `r signif(em_phys_binom$p.value, 2)`, demonstrating that children were more likely to select the excluder.
@@ -637,6 +639,7 @@ em_soc_excluder_count <- seas2 |>
   pull(n) #extracts the number of children who selected the excluder for the physical resources exclusion question
 
 em_soc_binom <- binom.test(em_soc_excluder_count, nrow(seas2), p = 0.5)
+em_soc_binom
 ```
 
 Conducting the same binomial test to assess whether children were more likely than chance to select the excluder over the excluded character as having more social resources found that `r em_soc_excluder_count` out of `r nrow(seas2)` selected the excluder, producing a p-value of `r signif(em_soc_binom$p.value, 2)`, demonstrating that children were more likely to select the excluder. 
@@ -1101,6 +1104,7 @@ eic_phys_excluder_count <- seas2 |>
   pull(n) #extracts the number of children who selected the excluder for the physical resources comparison question
 
 eic_phys_binom <- binom.test(eic_phys_excluder_count, nrow(seas2), p = 0.5)
+eic_phys_binom
 ```
 
 To examine whether children were more likely than chance to select the excluder over the includer as having more physical resources, we conducted a binomial test. `r unname(eic_phys_binom$statistic)` out of `r nrow(seas2)` chose the excluder, producing a p-value of `r round(eic_phys_binom$p.value, 2)`, demonstrating that children did not select the excluder more than at chance.
@@ -1116,6 +1120,7 @@ eic_soc_excluder_count <- seas2 |>
   pull(n) #extracts the number of children who selected the excluder for the physical resources comparison question
 
 eic_soc_binom <- binom.test(eic_soc_excluder_count, nrow(seas2), p = 0.5)
+eic_soc_binom
 ```
 
 To examine whether children were more likely than chance to select the excluder over the includer as having more physical resources, we conducted a binomial test. `r unname(eic_soc_binom$statistic)` out of `r nrow(seas2)` chose the excluder, producing a p-value of `r signif(eic_soc_binom$p.value, 2)`, demonstrating that children selected the excluder less frequently than at chance (i.e. they were significantly more likely to select the includer).
