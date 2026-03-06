@@ -140,7 +140,7 @@ identify_age_scatter <- seas |>
     alpha = 0.25) +
   geom_hline(yintercept = 2, linetype = "dashed", linewidth = 1, alpha = 0.5) +
   labs(
-    title = "Study 1 Memory Check Performance by Age in Months",
+    title = "Study 1 Memory Check Performance",
     x = "Age (Months)",
     y = "Correct Memory Responses"
   ) +
@@ -299,7 +299,7 @@ status_age_boxplot <- seas |>
   geom_boxplot(fill = c(magma_colors[3], magma_colors[5], magma_colors[7], magma_colors[9])) +
   geom_hline(yintercept = 2, linetype = "dashed", linewidth = 1, alpha = 0.5) +
   labs(
-    title = "Study 1 Status Excluder Selection by Age",
+    title = "Study 1 Excluder Status Selection",
     x = "Age (Years)",
     y = "Excluder Selection"
   ) +
@@ -491,7 +491,7 @@ resource_age_scatter <- seas |>
     alpha = 0.25) +
   geom_hline(yintercept = 2, linetype = "dashed", linewidth = 1, alpha = 0.5) +
   labs(
-    title = "Study 1 Resource Excluder Selection by Age in Months",
+    title = "Study 1 Excluder Resource Selection by Age in Months",
     x = "Age (Months)",
     y = "Excluder Selection"
   ) +
@@ -510,7 +510,7 @@ resource_age_boxplot <- seas |>
   ggplot(aes(x = as.factor(age), y = resource_total, fill = as.factor(age))) +
   geom_boxplot(fill = c(magma_colors[3], magma_colors[5], magma_colors[7], magma_colors[9])) +
   labs(
-    title = "Study 1 Resource Excluder Selection by Age",
+    title = "Study 1 Excluder Resource Selection",
     x = "Age (Years)",
     y = "Excluder Selection"
   ) +
@@ -530,7 +530,7 @@ physsoc_age_boxplot <- seas |>
   geom_boxplot(
     position = "dodge") +
   labs(
-    title = "Study 1 Resource Excluder Selection by Age",
+    title = "Study 1 Excluder Resource Selection",
     x = "Age (Years)",
     y = "Excluder Selection",
     fill = NULL
@@ -567,7 +567,7 @@ resource_column <- seas |>
     position = position_dodge(width = 0.9)
   ) +
   labs(
-    title = "Study 1 Excluder Resource Selection by Age",
+    title = "Study 1 Excluder Resource Selection",
     x = "Age (Years)",
     y = "Excluder Selection",
     fill = NULL

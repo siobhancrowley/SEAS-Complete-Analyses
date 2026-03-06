@@ -476,6 +476,79 @@ SG_count_age_scatter <- seas2_separated |>
 SG_count_age_scatter
 ```
 
+## Correlation
+```{r explain-count-status-cor, warning = FALSE}
+seas2_count_status_cor_data <- seas2_separated |>
+  mutate(
+    exclusion_video_selection = case_when(
+      interaction_1 == "exclusion" ~ status_1, 
+      interaction_2 == "exclusion" ~ status_2
+    ),
+    exclusion_story_selection = case_when(
+      interaction_3 == "exclusion" ~ status_3, 
+      interaction_4 == "exclusion" ~ status_4
+    )
+  ) |> #select exclusion from videos and stories
+  mutate(across(
+    .cols = c(exclusion_video_selection, exclusion_story_selection),
+    .fns = ~if_else(.x == "excluder", 1, 0)
+  )) |> #convert numeric
+  rowwise() |>
+  mutate(
+    status_total = sum(c_across(c(exclusion_video_selection, exclusion_story_selection)))
+  ) |> #sum
+  ungroup() |>
+  select(status_total, ST_total:OR_total)
+
+seas2_count_status_cor <- cor(seas2_count_status_cor_data, method = "spearman")["status_total", ] #MR is NA because no one responded with this category
+
+seas2_count_status_cor[abs(seas2_count_status_cor) > .20] #.20 is the bottom threshold for a weak correlation
+
+SG2_count_status_cor <- cor.test(seas2_count_status_cor_data$status_total, seas2_count_status_cor_data$SG_total, method = "spearman", exact = FALSE)
+
+EX2_count_status_cor <- cor.test(seas2_count_status_cor_data$status_total, seas2_count_status_cor_data$EX_total, method = "spearman", exact = FALSE)
+```
+
+SG and EX were the only explanation types whose frequencies displayed at least a weak correlation with the number of times a participant selected an excluder as being in charge. SG: rho = `r signif(unname(SG2_count_status_cor$estimate), 2)` and p = `r signif(unname(SG2_count_status_cor$p.value), 2)`, therefore demonstrating a weak positive association. EX: rho = `r signif(unname(EX2_count_status_cor$estimate), 2)` and p = `r signif(unname(EX2_count_status_cor$p.value), 2)`, also a weak positive correlation. 
+
+When applying a Bonferroni correction for the 32 different correlations calculated across both status and resource totals, however, neither finding remains significant. P~SG~ = `r signif(unname(SG2_count_status_cor$p.value), 2) * 32`, P~EX~ = `r signif(unname(EX2_count_status_cor$p.value), 2) * 32`.
+
+```{r explain-count-resources-cor, warning = FALSE}
+seas2_count_resource_cor_data <- seas2_separated |>
+  mutate(
+    exclusion_physical_selection = case_when(
+      interaction_1 == "exclusion" & resource_type_1 == "physical" ~ resource_1, 
+      interaction_2 == "exclusion" & resource_type_2 == "physical" ~ resource_2,
+      interaction_3 == "exclusion" & resource_type_3 == "physical" ~ resource_3,
+      interaction_4 == "exclusion" & resource_type_4 == "physical" ~ resource_4
+    ),
+    exclusion_social_selection = case_when(
+      interaction_1 == "exclusion" & resource_type_1 == "social" ~ resource_1, 
+      interaction_2 == "exclusion" & resource_type_2 == "social" ~ resource_2,
+      interaction_3 == "exclusion" & resource_type_3 == "social" ~ resource_3,
+      interaction_4 == "exclusion" & resource_type_4 == "social" ~ resource_4
+    )
+  ) |> #pull out physical and social excluder selection responses
+  mutate(across(
+    .cols = c(exclusion_physical_selection, exclusion_social_selection),
+    .fns = ~if_else(.x == "excluder", 1, 0)
+  )) |> #convert to numeric
+  rowwise() |>
+  mutate(
+    resource_total = exclusion_physical_selection + exclusion_social_selection
+  ) |>
+  ungroup() |> #create total resources score 
+  select(resource_total, ST_total:OR_total)
+
+seas2_count_resource_cor <- cor(seas2_count_resource_cor_data, method = "spearman", use = "complete.obs")["resource_total", ] #MR is NA because no one responded with this category
+
+seas2_count_resource_cor[abs(seas2_count_resource_cor) > .20] #.20 is the bottom threshold for a weak correlation
+
+EM2_count_resource_cor <- cor.test(seas2_count_resource_cor_data$resource_total, seas2_count_status_cor_data$EM_total, method = "spearman", exact = FALSE)
+```
+
+EM was the only explanation types whose frequencies displayed at least a weak correlation with the number of times a participant selected an excluder as having more resources. EM: rho = `r signif(unname(EM2_count_resource_cor$estimate), 2)` and p = `r signif(unname(EM2_count_resource_cor$p.value), 2)`, therefore demonstrating a weak negative association. This, however, did not survive a Bonferroni correction for the 32 different correlations calculated across both status and resource totals, p = `r signif(unname(EM2_count_resource_cor$p.value), 2) * 32`.
+
 # Did a Ppt Use Type of Explanation in Any Response?
 
 ## Initial Graphs

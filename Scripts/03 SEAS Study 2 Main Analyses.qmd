@@ -698,7 +698,7 @@ em_resource_type_age_scatter <- seas2 |>
     values = c(magma_colors[3], magma_colors[7]),
     labels = c("Physical", "Social")) +
   labs(
-    title = "Study 2 Resource Selection for Exclusion Trials by Age",
+    title = "Study 2 Resource Selection for Exclusion Trials",
     x = "Age (Months)",
     y = "Selection",
     color = NULL,
@@ -734,7 +734,7 @@ em_physoc_column <- seas2 |>
     position = position_dodge(width = 0.9)
   ) +
   labs(
-    title = "Study 2 Resource Excluder Selection for Main Trials",
+    title = "Study 2 Excluder Resource Selection for Main Trials",
     x = "Age (Years)",
     y = "Excluder Selection",
     fill = NULL
@@ -955,21 +955,22 @@ eim_resource_scatter_facet <- eim_resource_num |>
     values = c(magma_colors[3], magma_colors[7]),
     labels = c("Exclusion", "Inclusion")) +
   labs(
-    title = "Study 2 Resource Selection for Main Trials by Age",
+    title = "Study 2 Resource Selection for Main Trials",
     x = "Age (Months)",
     y = NULL,
     color = NULL,
-    fill = NULL
+    fill = NULL,
+    caption = "Note. In Exclusion trials, 1 represents the Excluder and 0 the Excluded Character; in Inclusion trials, 1 represnts the Includer and 0 the Included Character."
   ) +
   theme_minimal() +
   theme(
     plot.title = element_text(hjust = 0.5, size = 30),
+    plot.caption = element_text(hjust = 0.5),
     text = element_text(family = "serif", size = 25),
     legend.position = "top"
         ) +
   scale_y_continuous(
-    breaks = c(0, 1),
-    labels = c("Excluded or Included", "Excluder or Includer"))
+    breaks = c(0, 1))
 
 eim_resource_scatter_facet
 ```
@@ -1312,7 +1313,7 @@ eic_physoc_column <- seas2 |>
     position = position_dodge(width = 0.9)
   ) +
   labs(
-    title = "Study 2 Resource Excluder Selection for Comparison Trials",
+    title = "Study 2 Excluder Resource Selection for Comparison Trials",
     x = "Age (Years)",
     y = "Excluder Selection",
     fill = NULL
