@@ -1,0 +1,173 @@
+---
+title: "05 SEAS Study 2 Empathy Analyses"
+format: html
+editor: source
+editor_options: 
+  chunk_output_type: console
+---
+
+# Packages
+```{r packages-data, message = FALSE, warning = FALSE}
+library(readxl)
+library(tidyverse)
+```
+
+# Data Preparation
+```{r data-load}
+seas2_full <- read_excel("../Data/FINAL SEAS V2 Dataset.xlsx")
+
+seas2 <- subset(seas2_full, final_data == "Y") # dropping excluded participants
+```
+
+```{r data-prep}
+#Dates
+seas2 <- seas2 |>
+  mutate(
+    DOB = make_date(birth_year, birth_month, birth_day), #creating date of birth and date of test columns
+    DOT = as_date(DOT),
+    .before = DOT
+  ) |>
+  mutate(
+    age_months = interval(DOB, DOT) %/% months(1), .after = DOT #calculating age in months
+  )
+
+#EmQue Scores
+seas2 <- seas2 |>
+  mutate(across(starts_with("EQ_"), ~case_when(
+    . == "Never" ~ 0,
+    . == "Sometimes" ~ 1,
+    . == "Often" ~ 2
+  ))) |> #convert EmQue columns to numeric
+  rowwise() |>
+  mutate(
+      EQ_total = sum(c_across(starts_with("EQ_"))),
+      EQ_contagion = sum(c_across(c(EQ_1, EQ_4, EQ_7, EQ_10, EQ_13, EQ_16, EQ_19))),
+      EQ_attention = sum(c_across(c(EQ_3, EQ_6, EQ_9, EQ_12, EQ_15, EQ_18, EQ_20))), 
+      EQ_prosocial = sum(c_across(c(EQ_2, EQ_5, EQ_8, EQ_11, EQ_14, EQ_17))),
+      .after = EQ_20
+    ) |>
+  ungroup()
+
+# Memory Check
+seas2 <- seas2 |>
+  mutate(across(
+    .cols = c(starts_with("mem_check"), starts_with("comp_mem_check")),
+    .fns = ~if_else(.x == "correct", 0.5, 0)
+         )) |> #convert to numeric
+  mutate(
+    mem_check_1 = mem_check_1A + mem_check_1B,
+    mem_check_2 = mem_check_2A + mem_check_2B,
+    comp_mem_check_1 = comp_mem_check_1A + comp_mem_check_1B,
+    mem_check_3 = mem_check_3A + mem_check_3B,
+    mem_check_4 = mem_check_4A + mem_check_4B,
+    comp_mem_check_2 = comp_mem_check_2A + comp_mem_check_2B,
+    mem_check_total = mem_check_1 + mem_check_2 + mem_check_3 + mem_check_4 + comp_mem_check_1 + comp_mem_check_2
+  ) #sum scores
+
+# Status
+## Exclusion Trials
+seas2 <- seas2 |>
+  mutate(
+    exclusion_video_selection = case_when(
+      interaction_1 == "exclusion" ~ status_1, 
+      interaction_2 == "exclusion" ~ status_2
+    ),
+    exclusion_story_selection = case_when(
+      interaction_3 == "exclusion" ~ status_3, 
+      interaction_4 == "exclusion" ~ status_4
+    )
+  ) |> #select exclusion from videos and stories
+  mutate(across(
+    .cols = c(exclusion_video_selection, exclusion_story_selection),
+    .fns = ~if_else(.x == "excluder", 1, 0)
+  )) |> #convert numeric
+  rowwise() |>
+  mutate(
+    exclusion_selection_total = sum(c_across(c(exclusion_video_selection, exclusion_story_selection)))
+  ) |> #sum
+  ungroup()
+
+## Comparison Trials
+seas2 <- seas2 |>
+  mutate(
+    comp_status_1_num = if_else(comp_status_1 == "excluder", 1, 0),
+    comp_status_2_num = if_else(comp_status_2 == "excluder", 1, 0),
+    comp_status_total = comp_status_1_num + comp_status_2_num
+  )
+
+# Resources
+## Exclusion Trials
+seas2 <- seas2 |>
+  mutate(
+    exclusion_physical_selection = case_when(
+      interaction_1 == "exclusion" & resource_type_1 == "physical" ~ resource_1, 
+      interaction_2 == "exclusion" & resource_type_2 == "physical" ~ resource_2,
+      interaction_3 == "exclusion" & resource_type_3 == "physical" ~ resource_3,
+      interaction_4 == "exclusion" & resource_type_4 == "physical" ~ resource_4
+    ),
+    exclusion_social_selection = case_when(
+      interaction_1 == "exclusion" & resource_type_1 == "social" ~ resource_1, 
+      interaction_2 == "exclusion" & resource_type_2 == "social" ~ resource_2,
+      interaction_3 == "exclusion" & resource_type_3 == "social" ~ resource_3,
+      interaction_4 == "exclusion" & resource_type_4 == "social" ~ resource_4
+    )
+  ) |> #pull out physical and social excluder selection responses
+  mutate(across(
+    .cols = c(exclusion_physical_selection, exclusion_social_selection),
+    .fns = ~if_else(.x == "excluder", 1, 0)
+  )) |> #convert to numeric
+  rowwise() |>
+  mutate(
+    exclusion_resource_total = exclusion_physical_selection + exclusion_social_selection
+  ) |>
+  ungroup() #create total resources score
+
+## Comparison Trials
+seas2 <- seas2 |>
+  mutate(
+    comp_physical_selection = if_else(comp_resource_type_1 == "physical", comp_resource_1, comp_resource_2),
+    comp_social_selection = if_else(comp_resource_type_1 == "social", comp_resource_1, comp_resource_2)
+  ) |>
+  mutate(
+    across(
+      .cols = c(comp_physical_selection, comp_social_selection), 
+      .fns = ~if_else(.x == "excluder", 1, 0)
+    ),
+    comp_resource_total = comp_physical_selection + comp_social_selection
+  )
+```
+
+# Empathy Correlations
+```{r empathy}
+empathy_cols <- seas2 |>
+  select(EQ_total:EQ_prosocial)
+
+outcome_cols <- seas2 |>
+  select(mem_check_total, exclusion_selection_total, comp_status_total, exclusion_resource_total, exclusion_physical_selection, exclusion_social_selection, comp_resource_total, comp_physical_selection, comp_social_selection)
+
+empathy_cor <- cor(empathy_cols, outcome_cols, use = "complete.obs")
+
+empathy_cor <- data.frame(empathy_cor) |>
+  rownames_to_column(var = "empathy_scale") |>
+  mutate(across(
+    .cols = -empathy_scale,
+    .fns = ~if_else(abs(.x) > .20, .x, 0) #coercing anything less than a small correlation to 0 for simplicity of viewing
+  ))
+
+#empathy_cor #see full matrix (with 0s)
+
+empathy_cor_sig <- empathy_cor |>
+  select(empathy_scale, comp_resource_total, comp_physical_selection)
+
+tot_resource <- cor.test(seas2$EQ_total, seas2$comp_resource_total, exact = FALSE)
+
+contagion_resource <- cor.test(seas2$EQ_contagion, seas2$comp_resource_total, exact = FALSE) #this follow-up test was not significant/above .20, even though the initial correlation table showed it to be
+
+tot_phys <- cor.test(seas2$EQ_total, seas2$comp_physical_selection, exact = FALSE)
+
+attention_phys <- cor.test(seas2$EQ_attention, seas2$comp_physical_selection, exact = FALSE)
+```
+
+The only relationships that displayed at least a weak correlation (absolute value >= .20) were EmQue total x comparison resource selection (r = `r signif(unname(tot_resource$estimate), 2)` (weak negative), p = `r signif(unname(tot_resource$p.value), 2)`), EmQue total x comparison physical resource selection (r = `r signif(unname(tot_phys$estimate), 2)` (weak negative), p = `r signif(unname(tot_phys$p.value), 2)`), and EmQue attention x comparison physical resource selection (r = `r signif(unname(attention_phys$estimate), 2)` (weak negative), p = `r signif(unname(attention_phys$p.value), 2)`).
+
+When a Bonferroni correction was applied to account for the 36 exploratory correlations calculated here, none of the above associations remained significant, p~total_resource~ = `r signif(unname(tot_resource$p.value), 2) * 36`, p~total_physical~ = `r signif(unname(tot_phys$p.value), 2) * 36`, p~attention_physical~ = `r signif(unname(attention_phys$p.value), 2) * 36`.

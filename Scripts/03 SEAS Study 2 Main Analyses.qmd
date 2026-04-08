@@ -10,7 +10,7 @@ editor_options:
 
 Analyses for Study 2 of the Social Exclusion and Status Study. See our [pre-registration](https://osf.io/zebgx/overview) for more details.
 
-# Packages and Data
+# Packages
 ```{r packages-data, message = FALSE, warning = FALSE}
 library(readxl)
 library(tidyverse)
@@ -56,7 +56,6 @@ seas2 <- seas2 |>
       EQ_attention = sum(c_across(c(EQ_3, EQ_6, EQ_9, EQ_12, EQ_15, EQ_18, EQ_20))), 
       EQ_prosocial = sum(c_across(c(EQ_2, EQ_5, EQ_8, EQ_11, EQ_14, EQ_17))),
       .after = EQ_20
-      #could remove NAs from this step but maybe shouldn't
     ) |>
   ungroup()
 
@@ -154,20 +153,19 @@ mem_check_main <- seas2 |>
     mem_check = if_else(mem_check == 0.5, 1, 0)
   )
 
+# summary(glmer(
+#   mem_check ~ trial + type + interaction + gender + siblings + age_months + EQ_total + (1 | subject),
+#   data = mem_check_main, 
+#   family = "binomial"
+# )) #rank-deficient; dropped type, siblings, EmQue, and gender in that order until converged
 
 mem_glmm_main <- summary(glmer(
-  mem_check ~ trial + type + interaction + gender + siblings + age_months + side + EQ_total + (1 | subject),
-  data = mem_check_main, 
-  family = "binomial"
-)) #rank deficient and dropped a column; also model is nearly unidentifiable/large eigenvalue ratios
-  
-mem_glmm_main
-
-summary(glmer(
-  mem_check ~ trial + type + interaction + gender + siblings + age_months + side + EQ_total + (1 | subject),
+  mem_check ~ trial + interaction + age_months + (1 | subject),
   data = mem_check_main, 
   family = "binomial"
 ))
+  
+mem_glmm_main
 
 #Comparison Trials
 mem_check_comp <- seas2 |>
@@ -181,22 +179,28 @@ mem_check_comp <- seas2 |>
     mem_check = if_else(mem_check == 0.5, 1, 0)
   )
 
-mem_glmm_comp <- summary(glmer(
-  mem_check ~ trial + gender + siblings + age_months + side + EQ_total + (1 | subject),
-  data = mem_check_comp, 
-  family = "binomial"
-)) #rank deficient and dropped a column; also model is nearly unidentifiable/large eigenvalue ratios
-  
-mem_glmm_comp
+# summary(glmer(
+#   mem_check ~ trial + gender + siblings + age_months + EQ_total + (1 | subject),
+#   data = mem_check_comp, 
+#   family = "binomial"
+# )) #rank-deficient; dropped siblings, EQ_total, and gender in that order
 
-summary(glmer(
-  mem_check ~ trial + siblings + age_months + side + EQ_total + (1 | subject),
+
+mem_glmm_comp <- summary(glmer(
+  mem_check ~ trial + age_months + (1 | subject),
   data = mem_check_comp, 
   family = "binomial"
-))
+)) 
+
+mem_glmm_comp
 ```
 
-GLMM found that only age_months and side were significant when looking at main memory check qs
+To test whether other factors influenced performance on the memory check questions, we created a pair of generalized linear mixed models 
+(GLMMs) to examine the memory check questions for the main trials and those for the comparison trials.
+
+The original model for main trials was rank-deficient; type, siblings, EmQue total, and gender were removed in that order until the model converged--the final model contained trial, interaction (exclusion/inclusion), and age in months. Of these, only age was significant (z = `r round(mem_glmm_main$coefficients[6,3], 2)`, p = `r signif(mem_glmm_main$coefficients[6,4], 2)`), indicating that children were more likely to correctly answer the main trial memory check questions as they got older. 
+
+The model for the comparison trials also did not converge initially, and siblings, EmQue total, and gender were removed until the model converged--only trial and age were present in this model, and only age was significant (z = `r round(mem_glmm_comp$coefficients[3,3], 2)`, p = `r signif(mem_glmm_comp$coefficients[3,4], 2)`).
 
 ## Main Analyses
 
@@ -359,34 +363,23 @@ seas2_exclusion_pivoted <- seas2_main_pivoted |>
   )
 
 #Binomial GLMM
+
+# summary(glmer(
+#   status ~ trial + type + age_months + gender + siblings + EQ_total + (1 | subject),
+#   data = seas2_exclusion_pivoted,
+#   family = "binomial"
+# )) #rank-deficient; removed type, siblings, EQ_total, and gender in that order
+
 em_status_glmm <- summary(glmer(
-  status ~ trial + side + type + age_months + siblings + EQ_total + (1 | subject),
+  status ~ trial + age_months + (1 | subject),
   data = seas2_exclusion_pivoted,
   family = "binomial"
-)) #rank deficient dropping a column
+))
 
 em_status_glmm
-
- summary(glmer(
-    status ~ trial + side + age_months + EQ_total + (1 | subject),
-     data = seas2_exclusion_pivoted,
-     family = "binomial"
- ))
-
-#Removing sibling outlier
-seas2_exclusion_pivoted_sib <- seas2_exclusion_pivoted |>
-  filter(siblings < 7)
-
-summary(glmer(
-  status ~ trial + side + type + age_months + siblings + EQ_total + (1 | subject),
-  data = seas2_exclusion_pivoted_sib,
-  family = "binomial"
-)) #rank deficient dropping a column; model failed to converge?
 ```
 
-Siblings are significant? and nothing else
-
-Siblings are significant even when remove sibling outlier?
+The original GLMM to assess excluder selection in the main exclusion trials was rank-deficient; type, siblings, EmQue total, and gender were removed for the model to converge. Neither trial nor age in months were significant in the final model.
 
 ## Main Analyses
 
@@ -416,59 +409,6 @@ em_status_age_glmm
 ```
 
 Age not significant but intercept is?
-
-```{r em-status-siblings-scatter}
-#With sibling outlier
-em_status_siblings_scatter <- seas2 |>
-  ggplot(aes(x = siblings, y = exclusion_selection_total)) +
-  geom_jitter() +
-  stat_smooth(
-    method = "lm", 
-    formula = y ~ x, 
-    color = magma_colors[3], 
-    fill = magma_colors[5], 
-    alpha = 0.25) +
-  geom_hline(yintercept = 1, linetype = "dashed", linewidth = 1, alpha = 0.5) +
-  labs(
-    title = "Study 2 Excluder Status Selection for Main Trials by Number of Siblings",
-    x = "Number of Siblings",
-    y = "Excluder Selection"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 30),
-    text = element_text(family = "serif", size = 25)
-        )
-
-em_status_siblings_scatter
-
-#With sibling outlier removed
-seas2 |>
-  filter(siblings < 7) |>
-  ggplot(aes(x = siblings, y = exclusion_selection_total)) +
-  geom_jitter() +
-  stat_smooth(
-    method = "lm", 
-    formula = y ~ x, 
-    color = magma_colors[3], 
-    fill = magma_colors[5], 
-    alpha = 0.25) +
-  geom_hline(yintercept = 1, linetype = "dashed", linewidth = 1, alpha = 0.5) +
-  labs(
-    title = "Study 2 Excluder Status Selection for Main Trials by Number of Siblings",
-    x = "Number of Siblings",
-    y = "Excluder Selection"
-  ) +
-  scale_y_continuous(breaks = c(0, 1, 2)) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 30),
-    text = element_text(family = "serif", size = 25)
-        ) + 
-  coord_cartesian(ylim = c(0, 2))
-```
-
-I can't tell if the trend line itself actually changed when took out the siblings outlier.
 
 ```{r em-status-boxplot}
 em_status_boxplot <- seas2 |>
@@ -573,16 +513,24 @@ seas2_exclusion_resource_pivoted <- seas2_main_resource_pivoted |>
   )
 
 #Binomial GLMM
+
+# summary(glmer(
+#   resource ~ trial + type + resource_type + age_months + gender + siblings + EQ_total + (1 | subject),
+#   data = seas2_exclusion_resource_pivoted,
+#   family = "binomial"
+# )) #rank-deficient; removed type, siblings, EQ_total, and gender in that order
+
+
 em_resource_glmm <- summary(glmer(
-  resource ~ trial + side + type + resource_type + age_months + siblings + EQ_total + (1 | subject),
+  resource ~ trial + resource_type + age_months + (1 | subject),
   data = seas2_exclusion_resource_pivoted,
   family = "binomial"
-)) #rank deficient dropping a column
+))
 
 em_resource_glmm
 ```
 
-Significant: intercept, trial (specifically trial 2), side, type (playdoh), age
+The GLMM for excluder resource selection in the exclusion main trials was rank-deficient; type, siblings, EmQue total and gender were removed. In the final model, trial (Trial 2: z = `r round(em_resource_glmm$coefficients[2,3], 2)`, p = `r signif(em_resource_glmm$coefficients[2,4], 2)`; Trial 3: z = `r round(em_resource_glmm$coefficients[3,3], 2)`, p = `r signif(em_resource_glmm$coefficients[3,4], 2)`; Trial 4: z = `r round(em_resource_glmm$coefficients[4,3], 2)`, p = `r signif(em_resource_glmm$coefficients[4,4], 2)`) and age (z = `r round(em_resource_glmm$coefficients[6,3], 2)`, p = `r signif(em_resource_glmm$coefficients[6,4], 2)`) were significant, but resource type was not. This suggests that participants were more likely to choose the excluder as having more resources in earlier trials and as they get older.
 
 ```{r em-resource-total-age-scatter}
 em_resource_total_age_scatter <- seas2 |>
@@ -816,16 +764,22 @@ eim_status_num <- seas2_main_pivoted |>
     status = if_else(status %in% c("excluder", "includer"), 1, 0)
   )
 
+# summary(glmer(
+#   status ~ trial + type + interaction + age_months + gender + siblings + EQ_total + (1 | subject),
+#   data = eim_status_num,
+#   family = "binomial"
+# )) #rank-deficient; removed type and siblings
+
 eim_status_glmm <- summary(glmer(
-  status ~ trial + type + interaction + age_months + gender + siblings + EQ_total + side + (1 | subject),
+  status ~ trial + interaction + gender + EQ_total + age_months + (1 | subject),
   data = eim_status_num,
   family = "binomial"
-)) #rank deficient and failed to converge
+))
 
 eim_status_glmm
 ```
 
-Nothing significant.
+The GLMM examining status selection across all main trials was initially rank-deficient, and type and siblings were removed to make it converge. The final model included trial, interaction, gender, EmQue total, and age; none of these were significant.
 
 ```{r eim-resources-glmm}
 eim_resource_num <- seas2_main_resource_pivoted |>
@@ -833,16 +787,22 @@ eim_resource_num <- seas2_main_resource_pivoted |>
     resource = if_else(resource %in% c("excluder", "includer"), 1, 0)
   )
 
+# summary(glmer(
+#   resource ~ trial + type + resource_type + interaction + gender + siblings + EQ_total + age_months + (1 | subject),
+#   data = eim_resource_num,
+#   family = "binomial"
+# )) #rank-deficient; removed type, siblings, EQ_total, and gender in that order
+
 eim_resource_glmm <- summary(glmer(
-  resource ~ trial + type + resource_type + interaction + age_months + gender + siblings + EQ_total + side + (1 | subject),
-  data = eim_resource_num,
-  family = "binomial"
-)) #rank deficient and model is nearly unidentifiable/large eigenvalue
+    resource ~ trial + resource_type + interaction + age_months + (1 | subject),
+    data = eim_resource_num,
+    family = "binomial"
+))
 
 eim_resource_glmm
 ```
 
-Trial (2) significant, as is age in months. Interaction is just barely not (0.055).
+The GLMM for resource selection across all main trials was also initially rank-deficient, and type, siblings, EmQue total, and gender were removed in that order to make it converge. The final model included trial, resource type, interaction (exclusion/inclusion), and age; of these, interaction (z = `r round(eim_resource_glmm$coefficients[6,3], 2)`, p = `r signif(eim_resource_glmm$coefficients[6,4], 2)`) and age (z = `r round(eim_resource_glmm$coefficients[7,3], 2)`, p = `r signif(eim_resource_glmm$coefficients[7,4], 2)`) were significant.
 
 ## Main Analyses
 
@@ -1016,8 +976,15 @@ seas2_comp_status_pivot <- seas2 |>
     values_to = "response"
     )
 
+# summary(glmer(
+#   response ~ trial + gender + siblings + EQ_total + age_months + (1 | subject),
+#   data = seas2_comp_status_pivot,
+#   family = "binomial"
+# )) #warning messges; removed siblings, EQ_total, and gender in order
+
+
 eic_status_glmm <- summary(glmer(
-  response ~ trial + age_months + gender + siblings + EQ_total + side + (1 | subject),
+  response ~ trial + age_months + (1 | subject),
   data = seas2_comp_status_pivot,
   family = "binomial"
 ))
@@ -1025,7 +992,7 @@ eic_status_glmm <- summary(glmer(
 eic_status_glmm
 ```
 
-Nothing is significant NOTE: Add more
+The GLMM assessing status selection in the comparison trials initially produced errors as the variance-covariance matrix computed from finite-difference Hessian was not positive definite or contained NA values. In this order, siblings, EmQue total, and gender were removed. The final model contained trial and age in months, but neither of these were significant.
 
 ```{r eic-resources-glmm}
 #Pivot for comparison resource
@@ -1042,7 +1009,7 @@ seas2_comp_resource_pivot <- seas2 |>
 
 #Binomial GLMM
 eic_resource_glmm <- summary(glmer(
-  resource ~ trial + side + resource_type + age_months + siblings + EQ_total + (1 | subject),
+  resource ~ trial + resource_type + siblings + gender + EQ_total + age_months + (1 | subject),
   data = seas2_comp_resource_pivot,
   family = "binomial"
 )) 
@@ -1050,7 +1017,7 @@ eic_resource_glmm <- summary(glmer(
 eic_resource_glmm
 ```
 
-EQ_total significant but nothing else
+The GLMM examining resource selection in the comparison trials contained trial, resource type, siblings, gender, EmQue total, and age in months, but none of these were significant.
 
 ```{r eic-resource-EQ-scatter}
 eic_resource_EQ_scatter <- seas2 |>
@@ -1077,8 +1044,6 @@ eic_resource_EQ_scatter <- seas2 |>
   scale_y_continuous(breaks = c(0, 1, 2))
 
 eic_resource_EQ_scatter
-
-#Should this actually use the pivoted information because that's actually what the glmm is based on?
 ```
 
 ## Main Analyses
