@@ -103,7 +103,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Packages</h1>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Hmisc)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(webshot2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="data-preparation" class="level1">
@@ -233,37 +236,2352 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="empathy-correlations" class="level1">
 <h1>Empathy Correlations</h1>
+<section id="emque-total" class="level2">
+<h2 class="anchored" data-anchor-id="emque-total">EmQue Total</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>empathy_cols <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(EQ_total<span class="sc">:</span>EQ_prosocial)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>outcome_cols <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(mem_check_total, exclusion_selection_total, comp_status_total, exclusion_resource_total, exclusion_physical_selection, exclusion_social_selection, comp_resource_total, comp_physical_selection, comp_social_selection)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>labels <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Memory Check"</span>, <span class="st">"Exclusion Status Selection"</span>, <span class="st">"Comparison Status Selection"</span>, <span class="st">"Exclusion Resource Selection"</span>, <span class="st">"Exclusion Physical Selection"</span>, <span class="st">"Exclusion Social Selection"</span>, <span class="st">"Comparison Resource Selection"</span>, <span class="st">"Comparison Physical Selection"</span>, <span class="st">"Comparison Social Selection"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>total_outcomes <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(EQ_total, mem_check_total, exclusion_selection_total, comp_status_total, exclusion_resource_total, exclusion_physical_selection, exclusion_social_selection, comp_resource_total, comp_physical_selection, comp_social_selection)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>empathy_cor <span class="ot">&lt;-</span> <span class="fu">cor</span>(empathy_cols, outcome_cols, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>total_cor_matrix <span class="ot">&lt;-</span> <span class="fu">rcorr</span>(<span class="fu">as.matrix</span>(total_outcomes), <span class="at">type =</span> <span class="st">"pearson"</span>)</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>empathy_cor <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(empathy_cor) <span class="sc">|&gt;</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"empathy_scale"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">.cols =</span> <span class="sc">-</span>empathy_scale,</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">.fns =</span> <span class="sc">~</span><span class="fu">if_else</span>(<span class="fu">abs</span>(.x) <span class="sc">&gt;</span> .<span class="dv">20</span>, .x, <span class="dv">0</span>) <span class="co">#coercing anything less than a small correlation to 0 for simplicity of viewing</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">#empathy_cor #see full matrix (with 0s)</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>empathy_cor_sig <span class="ot">&lt;-</span> empathy_cor <span class="sc">|&gt;</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(empathy_scale, comp_resource_total, comp_physical_selection)</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>tot_resource <span class="ot">&lt;-</span> <span class="fu">cor.test</span>(seas2<span class="sc">$</span>EQ_total, seas2<span class="sc">$</span>comp_resource_total, <span class="at">exact =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>total_correlation <span class="ot">=</span> total_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>total_p <span class="ot">=</span> total_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>total_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> total_correlation, <span class="at">p =</span> total_p)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>total_df <span class="ot">&lt;-</span> total_df <span class="sc">|&gt;</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"variable"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> labels,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">r =</span> <span class="fu">signif</span>(r, <span class="dv">2</span>),</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">signif</span>(p, <span class="dv">2</span>),</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrected p"</span> <span class="ot">=</span> <span class="fu">if_else</span>(p <span class="sc">*</span> <span class="dv">9</span> <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="fl">1.0</span>, p <span class="sc">*</span> <span class="dv">9</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>contagion_resource <span class="ot">&lt;-</span> <span class="fu">cor.test</span>(seas2<span class="sc">$</span>EQ_contagion, seas2<span class="sc">$</span>comp_resource_total, <span class="at">exact =</span> <span class="cn">FALSE</span>) <span class="co">#this follow-up test was not significant/above .20, even though the initial correlation table showed it to be</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>tot_phys <span class="ot">&lt;-</span> <span class="fu">cor.test</span>(seas2<span class="sc">$</span>EQ_total, seas2<span class="sc">$</span>comp_physical_selection, <span class="at">exact =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>attention_phys <span class="ot">&lt;-</span> <span class="fu">cor.test</span>(seas2<span class="sc">$</span>EQ_attention, seas2<span class="sc">$</span>comp_physical_selection, <span class="at">exact =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>total_cor_table <span class="ot">&lt;-</span> total_df <span class="sc">|&gt;</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">rowname_col =</span> <span class="st">"variable"</span>,</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">|&gt;</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"EmQue Total Correlations"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_body</span>(</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>      <span class="at">columns =</span> <span class="fu">c</span>(r, p, <span class="st">"Corrected p"</span>),</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>      <span class="at">rows =</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_align</span>(</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"center"</span>,</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>()</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Correlations were calculated with the sum scores of each respective variable"</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Significant p-values (regardless of whether corrected p was significant) have been highlighted"</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>total_cor_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="uxqcipikfx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#uxqcipikfx table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#uxqcipikfx thead, #uxqcipikfx tbody, #uxqcipikfx tfoot, #uxqcipikfx tr, #uxqcipikfx td, #uxqcipikfx th {
+  border-style: none;
+}
+
+#uxqcipikfx p {
+  margin: 0;
+  padding: 0;
+}
+
+#uxqcipikfx .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#uxqcipikfx .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#uxqcipikfx .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#uxqcipikfx .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#uxqcipikfx .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#uxqcipikfx .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#uxqcipikfx .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#uxqcipikfx .gt_col_heading {
+  color: #FFFFFF;
+  background-color: #0076BA;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#uxqcipikfx .gt_column_spanner_outer {
+  color: #FFFFFF;
+  background-color: #0076BA;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#uxqcipikfx .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#uxqcipikfx .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#uxqcipikfx .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#uxqcipikfx .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#uxqcipikfx .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#uxqcipikfx .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: middle;
+}
+
+#uxqcipikfx .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#uxqcipikfx .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#uxqcipikfx .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: none;
+  border-top-width: 1px;
+  border-top-color: #D5D5D5;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D5D5D5;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D5D5D5;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#uxqcipikfx .gt_stub {
+  color: #333333;
+  background-color: #89D3FE;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D5D5D5;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uxqcipikfx .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#uxqcipikfx .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#uxqcipikfx .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#uxqcipikfx .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uxqcipikfx .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #5F5F5F;
+}
+
+#uxqcipikfx .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#uxqcipikfx .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#uxqcipikfx .gt_grand_summary_row {
+  color: #333333;
+  background-color: #D5D5D5;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uxqcipikfx .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #5F5F5F;
+}
+
+#uxqcipikfx .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #5F5F5F;
+}
+
+#uxqcipikfx .gt_striped {
+  background-color: #EDF7FC;
+}
+
+#uxqcipikfx .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#uxqcipikfx .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#uxqcipikfx .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uxqcipikfx .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#uxqcipikfx .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uxqcipikfx .gt_left {
+  text-align: left;
+}
+
+#uxqcipikfx .gt_center {
+  text-align: center;
+}
+
+#uxqcipikfx .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#uxqcipikfx .gt_font_normal {
+  font-weight: normal;
+}
+
+#uxqcipikfx .gt_font_bold {
+  font-weight: bold;
+}
+
+#uxqcipikfx .gt_font_italic {
+  font-style: italic;
+}
+
+#uxqcipikfx .gt_super {
+  font-size: 65%;
+}
+
+#uxqcipikfx .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#uxqcipikfx .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#uxqcipikfx .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#uxqcipikfx .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#uxqcipikfx .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#uxqcipikfx .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#uxqcipikfx .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#uxqcipikfx .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#uxqcipikfx div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">EmQue Total Correlations</td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="a::stub" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"></th>
+<th id="r" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">r</th>
+<th id="p" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">p</th>
+<th id="Corrected-p" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Corrected p</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<th id="stub_1_1" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Memory Check</th>
+<td class="gt_row gt_center" headers="stub_1_1 r">0.1100</td>
+<td class="gt_row gt_center" headers="stub_1_1 p">0.290</td>
+<td class="gt_row gt_center" headers="stub_1_1 Corrected p">1.000</td>
+</tr>
+<tr class="even">
+<th id="stub_1_2" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Status Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_2 r">-0.0370</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_2 p">0.730</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_2 Corrected p">1.000</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_3" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Status Selection</th>
+<td class="gt_row gt_center" headers="stub_1_3 r">-0.0260</td>
+<td class="gt_row gt_center" headers="stub_1_3 p">0.810</td>
+<td class="gt_row gt_center" headers="stub_1_3 Corrected p">1.000</td>
+</tr>
+<tr class="even">
+<th id="stub_1_4" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Resource Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_4 r">0.0680</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_4 p">0.520</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_4 Corrected p">1.000</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_5" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Physical Selection</th>
+<td class="gt_row gt_center" headers="stub_1_5 r">0.0950</td>
+<td class="gt_row gt_center" headers="stub_1_5 p">0.380</td>
+<td class="gt_row gt_center" headers="stub_1_5 Corrected p">1.000</td>
+</tr>
+<tr class="even">
+<th id="stub_1_6" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Social Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_6 r">0.0043</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_6 p">0.970</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_6 Corrected p">1.000</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_7" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Resource Selection</th>
+<td class="gt_row gt_center" headers="stub_1_7 r" style="font-weight: bold">-0.2300</td>
+<td class="gt_row gt_center" headers="stub_1_7 p" style="font-weight: bold">0.030</td>
+<td class="gt_row gt_center" headers="stub_1_7 Corrected p" style="font-weight: bold">0.270</td>
+</tr>
+<tr class="even">
+<th id="stub_1_8" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Physical Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_8 r" style="font-weight: bold">-0.2700</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_8 p" style="font-weight: bold">0.012</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_8 Corrected p" style="font-weight: bold">0.108</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_9" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Social Selection</th>
+<td class="gt_row gt_center" headers="stub_1_9 r">-0.0440</td>
+<td class="gt_row gt_center" headers="stub_1_9 p">0.680</td>
+<td class="gt_row gt_center" headers="stub_1_9 Corrected p">1.000</td>
+</tr>
+</tbody><tfoot>
+<tr class="gt_footnotes odd">
+<td colspan="4" class="gt_footnote">Correlations were calculated with the sum scores of each respective variable</td>
+</tr>
+<tr class="gt_footnotes even">
+<td colspan="4" class="gt_footnote">Significant p-values (regardless of whether corrected p was significant) have been highlighted</td>
+</tr>
+</tfoot>
+
+</table>
+
 </div>
-<p>The only relationships that displayed at least a weak correlation (absolute value &gt;= .20) were EmQue total x comparison resource selection (r = -0.23 (weak negative), p = 0.03), EmQue total x comparison physical resource selection (r = -0.27 (weak negative), p = 0.012), and EmQue attention x comparison physical resource selection (r = -0.25 (weak negative), p = 0.016).</p>
-<p>When a Bonferroni correction was applied to account for the 36 exploratory correlations calculated here, none of the above associations remained significant, p<sub>total_resource</sub> = 1.08, p<sub>total_physical</sub> = 0.432, p<sub>attention_physical</sub> = 0.576.</p>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(total_cor_table, <span class="st">"05 SEAS Study 2 Empathy Analyses_tables/total_cor_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/Rtmpu695xw/file13fc2dcc5bd.html screenshot completed</code></pre>
+</div>
+</div>
+<p>EmQue total scores correlated with two variables: comparison resource selection total (r = -0.23 (weak negative), p = 0.03, p with Bonferroni correction = 0.27) and comparison resource physical selection (r = -0.27 (weak negative), p = 0.012, p with Bonferroni correction = 0.11), such that participants with higher empathy scores were less likely to select the excluder over the includer as having more resources overall and more physical resources.</p>
+</section>
+<section id="emque-emotion-contagion-subscale" class="level2">
+<h2 class="anchored" data-anchor-id="emque-emotion-contagion-subscale">EmQue Emotion Contagion Subscale</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>contagion_outcomes <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(EQ_contagion, mem_check_total, exclusion_selection_total, comp_status_total, exclusion_resource_total, exclusion_physical_selection, exclusion_social_selection, comp_resource_total, comp_physical_selection, comp_social_selection)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>contagion_cor_matrix <span class="ot">&lt;-</span> <span class="fu">rcorr</span>(<span class="fu">as.matrix</span>(contagion_outcomes), <span class="at">type =</span> <span class="st">"pearson"</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>contagion_correlation <span class="ot">=</span> contagion_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>contagion_p <span class="ot">=</span> contagion_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>contagion_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> contagion_correlation, <span class="at">p =</span> contagion_p)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>contagion_df <span class="ot">&lt;-</span> contagion_df <span class="sc">|&gt;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"variable"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> labels,</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">r =</span> <span class="fu">signif</span>(r, <span class="dv">2</span>),</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">signif</span>(p, <span class="dv">2</span>),</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrected p"</span> <span class="ot">=</span> <span class="fu">if_else</span>(p <span class="sc">*</span> <span class="dv">9</span> <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="fl">1.0</span>, p <span class="sc">*</span> <span class="dv">9</span>)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>contagion_cor_table <span class="ot">&lt;-</span> contagion_df <span class="sc">|&gt;</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">rowname_col =</span> <span class="st">"variable"</span>,</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">|&gt;</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">"pink"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"EmQue Emotion Contagion Correlations"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_body</span>(</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">columns =</span> <span class="fu">c</span>(r, p, <span class="st">"Corrected p"</span>),</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">rows =</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_align</span>(</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"center"</span>,</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>()</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Correlations were calculated with the sum scores of each respective variable"</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Significant p-values (regardless of whether corrected p was significant) have been highlighted"</span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>contagion_cor_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="puvaksnduy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#puvaksnduy table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#puvaksnduy thead, #puvaksnduy tbody, #puvaksnduy tfoot, #puvaksnduy tr, #puvaksnduy td, #puvaksnduy th {
+  border-style: none;
+}
+
+#puvaksnduy p {
+  margin: 0;
+  padding: 0;
+}
+
+#puvaksnduy .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#puvaksnduy .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#puvaksnduy .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#puvaksnduy .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#puvaksnduy .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#puvaksnduy .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#puvaksnduy .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#puvaksnduy .gt_col_heading {
+  color: #FFFFFF;
+  background-color: #CB2A7B;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#puvaksnduy .gt_column_spanner_outer {
+  color: #FFFFFF;
+  background-color: #CB2A7B;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#puvaksnduy .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#puvaksnduy .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#puvaksnduy .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#puvaksnduy .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#puvaksnduy .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#puvaksnduy .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: middle;
+}
+
+#puvaksnduy .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#puvaksnduy .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#puvaksnduy .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: none;
+  border-top-width: 1px;
+  border-top-color: #D5D5D5;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D5D5D5;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D5D5D5;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#puvaksnduy .gt_stub {
+  color: #333333;
+  background-color: #FFC6E3;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D5D5D5;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#puvaksnduy .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#puvaksnduy .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#puvaksnduy .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#puvaksnduy .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#puvaksnduy .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #5F5F5F;
+}
+
+#puvaksnduy .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#puvaksnduy .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#puvaksnduy .gt_grand_summary_row {
+  color: #333333;
+  background-color: #D5D5D5;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#puvaksnduy .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #5F5F5F;
+}
+
+#puvaksnduy .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #5F5F5F;
+}
+
+#puvaksnduy .gt_striped {
+  background-color: #FCF2F7;
+}
+
+#puvaksnduy .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#puvaksnduy .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#puvaksnduy .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#puvaksnduy .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#puvaksnduy .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#puvaksnduy .gt_left {
+  text-align: left;
+}
+
+#puvaksnduy .gt_center {
+  text-align: center;
+}
+
+#puvaksnduy .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#puvaksnduy .gt_font_normal {
+  font-weight: normal;
+}
+
+#puvaksnduy .gt_font_bold {
+  font-weight: bold;
+}
+
+#puvaksnduy .gt_font_italic {
+  font-style: italic;
+}
+
+#puvaksnduy .gt_super {
+  font-size: 65%;
+}
+
+#puvaksnduy .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#puvaksnduy .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#puvaksnduy .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#puvaksnduy .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#puvaksnduy .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#puvaksnduy .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#puvaksnduy .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#puvaksnduy .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#puvaksnduy div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">EmQue Emotion Contagion Correlations</td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="a::stub" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"></th>
+<th id="r" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">r</th>
+<th id="p" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">p</th>
+<th id="Corrected-p" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Corrected p</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<th id="stub_1_1" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Memory Check</th>
+<td class="gt_row gt_center" headers="stub_1_1 r">0.076</td>
+<td class="gt_row gt_center" headers="stub_1_1 p">0.480</td>
+<td class="gt_row gt_center" headers="stub_1_1 Corrected p">1.000</td>
+</tr>
+<tr class="even">
+<th id="stub_1_2" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Status Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_2 r">-0.010</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_2 p">0.920</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_2 Corrected p">1.000</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_3" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Status Selection</th>
+<td class="gt_row gt_center" headers="stub_1_3 r">0.036</td>
+<td class="gt_row gt_center" headers="stub_1_3 p">0.740</td>
+<td class="gt_row gt_center" headers="stub_1_3 Corrected p">1.000</td>
+</tr>
+<tr class="even">
+<th id="stub_1_4" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Resource Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_4 r">0.099</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_4 p">0.360</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_4 Corrected p">1.000</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_5" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Physical Selection</th>
+<td class="gt_row gt_center" headers="stub_1_5 r">0.065</td>
+<td class="gt_row gt_center" headers="stub_1_5 p">0.540</td>
+<td class="gt_row gt_center" headers="stub_1_5 Corrected p">1.000</td>
+</tr>
+<tr class="even">
+<th id="stub_1_6" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Social Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_6 r">0.078</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_6 p">0.470</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_6 Corrected p">1.000</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_7" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Resource Selection</th>
+<td class="gt_row gt_center" headers="stub_1_7 r">-0.180</td>
+<td class="gt_row gt_center" headers="stub_1_7 p">0.089</td>
+<td class="gt_row gt_center" headers="stub_1_7 Corrected p">0.801</td>
+</tr>
+<tr class="even">
+<th id="stub_1_8" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Physical Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_8 r">-0.150</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_8 p">0.150</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_8 Corrected p">1.000</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_9" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Social Selection</th>
+<td class="gt_row gt_center" headers="stub_1_9 r">-0.092</td>
+<td class="gt_row gt_center" headers="stub_1_9 p">0.390</td>
+<td class="gt_row gt_center" headers="stub_1_9 Corrected p">1.000</td>
+</tr>
+</tbody><tfoot>
+<tr class="gt_footnotes odd">
+<td colspan="4" class="gt_footnote">Correlations were calculated with the sum scores of each respective variable</td>
+</tr>
+<tr class="gt_footnotes even">
+<td colspan="4" class="gt_footnote">Significant p-values (regardless of whether corrected p was significant) have been highlighted</td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(contagion_cor_table, <span class="st">"05 SEAS Study 2 Empathy Analyses_tables/contagion_cor_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/Rtmpu695xw/file13fc190262a4.html screenshot completed</code></pre>
+</div>
+</div>
+<p>There were no significant correlations with the EmQue emotion contagion subscale.</p>
+</section>
+<section id="emque-attention-to-others-feelings-subscale" class="level2">
+<h2 class="anchored" data-anchor-id="emque-attention-to-others-feelings-subscale">EmQue Attention to Others’ Feelings Subscale</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>attention_outcomes <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(EQ_attention, mem_check_total, exclusion_selection_total, comp_status_total, exclusion_resource_total, exclusion_physical_selection, exclusion_social_selection, comp_resource_total, comp_physical_selection, comp_social_selection)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>attention_cor_matrix <span class="ot">&lt;-</span> <span class="fu">rcorr</span>(<span class="fu">as.matrix</span>(attention_outcomes), <span class="at">type =</span> <span class="st">"pearson"</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>attention_correlation <span class="ot">=</span> attention_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>attention_p <span class="ot">=</span> attention_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>attention_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> attention_correlation, <span class="at">p =</span> attention_p)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>attention_df <span class="ot">&lt;-</span> attention_df <span class="sc">|&gt;</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"variable"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> labels,</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">r =</span> <span class="fu">signif</span>(r, <span class="dv">2</span>),</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">signif</span>(p, <span class="dv">2</span>),</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrected p"</span> <span class="ot">=</span> <span class="fu">if_else</span>(p <span class="sc">*</span> <span class="dv">9</span> <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="fl">1.0</span>, p <span class="sc">*</span> <span class="dv">9</span>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>attention_cor_table <span class="ot">&lt;-</span> attention_df <span class="sc">|&gt;</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">rowname_col =</span> <span class="st">"variable"</span>,</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">|&gt;</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">"green"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"EmQue Attention to Others' Feelings Correlations"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_body</span>(</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">columns =</span> <span class="fu">c</span>(r, p, <span class="st">"Corrected p"</span>),</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">rows =</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_align</span>(</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"center"</span>,</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>()</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Correlations were calculated with the sum scores of each respective variable"</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Significant p-values (regardless of whether corrected p was significant) have been highlighted"</span></span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>attention_cor_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="jkerlrhxwd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#jkerlrhxwd table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#jkerlrhxwd thead, #jkerlrhxwd tbody, #jkerlrhxwd tfoot, #jkerlrhxwd tr, #jkerlrhxwd td, #jkerlrhxwd th {
+  border-style: none;
+}
+
+#jkerlrhxwd p {
+  margin: 0;
+  padding: 0;
+}
+
+#jkerlrhxwd .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#jkerlrhxwd .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#jkerlrhxwd .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#jkerlrhxwd .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#jkerlrhxwd .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#jkerlrhxwd .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#jkerlrhxwd .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#jkerlrhxwd .gt_col_heading {
+  color: #FFFFFF;
+  background-color: #038901;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#jkerlrhxwd .gt_column_spanner_outer {
+  color: #FFFFFF;
+  background-color: #038901;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#jkerlrhxwd .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#jkerlrhxwd .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#jkerlrhxwd .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#jkerlrhxwd .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#jkerlrhxwd .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#jkerlrhxwd .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: middle;
+}
+
+#jkerlrhxwd .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#jkerlrhxwd .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#jkerlrhxwd .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: none;
+  border-top-width: 1px;
+  border-top-color: #D5D5D5;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D5D5D5;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D5D5D5;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#jkerlrhxwd .gt_stub {
+  color: #333333;
+  background-color: #CAFFAF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D5D5D5;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jkerlrhxwd .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#jkerlrhxwd .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#jkerlrhxwd .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#jkerlrhxwd .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jkerlrhxwd .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #5F5F5F;
+}
+
+#jkerlrhxwd .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#jkerlrhxwd .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#jkerlrhxwd .gt_grand_summary_row {
+  color: #333333;
+  background-color: #D5D5D5;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jkerlrhxwd .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #5F5F5F;
+}
+
+#jkerlrhxwd .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #5F5F5F;
+}
+
+#jkerlrhxwd .gt_striped {
+  background-color: #EDF6E8;
+}
+
+#jkerlrhxwd .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#jkerlrhxwd .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#jkerlrhxwd .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jkerlrhxwd .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#jkerlrhxwd .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jkerlrhxwd .gt_left {
+  text-align: left;
+}
+
+#jkerlrhxwd .gt_center {
+  text-align: center;
+}
+
+#jkerlrhxwd .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#jkerlrhxwd .gt_font_normal {
+  font-weight: normal;
+}
+
+#jkerlrhxwd .gt_font_bold {
+  font-weight: bold;
+}
+
+#jkerlrhxwd .gt_font_italic {
+  font-style: italic;
+}
+
+#jkerlrhxwd .gt_super {
+  font-size: 65%;
+}
+
+#jkerlrhxwd .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#jkerlrhxwd .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#jkerlrhxwd .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#jkerlrhxwd .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#jkerlrhxwd .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#jkerlrhxwd .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#jkerlrhxwd .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#jkerlrhxwd .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#jkerlrhxwd div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">EmQue Attention to Others' Feelings Correlations</td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="a::stub" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"></th>
+<th id="r" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">r</th>
+<th id="p" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">p</th>
+<th id="Corrected-p" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Corrected p</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<th id="stub_1_1" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Memory Check</th>
+<td class="gt_row gt_center" headers="stub_1_1 r">0.100</td>
+<td class="gt_row gt_center" headers="stub_1_1 p">0.340</td>
+<td class="gt_row gt_center" headers="stub_1_1 Corrected p">1.000</td>
+</tr>
+<tr class="even">
+<th id="stub_1_2" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Status Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_2 r">-0.030</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_2 p">0.780</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_2 Corrected p">1.000</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_3" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Status Selection</th>
+<td class="gt_row gt_center" headers="stub_1_3 r">-0.049</td>
+<td class="gt_row gt_center" headers="stub_1_3 p">0.650</td>
+<td class="gt_row gt_center" headers="stub_1_3 Corrected p">1.000</td>
+</tr>
+<tr class="even">
+<th id="stub_1_4" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Resource Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_4 r">0.012</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_4 p">0.910</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_4 Corrected p">1.000</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_5" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Physical Selection</th>
+<td class="gt_row gt_center" headers="stub_1_5 r">0.084</td>
+<td class="gt_row gt_center" headers="stub_1_5 p">0.430</td>
+<td class="gt_row gt_center" headers="stub_1_5 Corrected p">1.000</td>
+</tr>
+<tr class="even">
+<th id="stub_1_6" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Social Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_6 r">-0.069</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_6 p">0.520</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_6 Corrected p">1.000</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_7" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Resource Selection</th>
+<td class="gt_row gt_center" headers="stub_1_7 r">-0.180</td>
+<td class="gt_row gt_center" headers="stub_1_7 p">0.090</td>
+<td class="gt_row gt_center" headers="stub_1_7 Corrected p">0.810</td>
+</tr>
+<tr class="even">
+<th id="stub_1_8" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Physical Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_8 r" style="font-weight: bold">-0.250</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_8 p" style="font-weight: bold">0.016</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_8 Corrected p" style="font-weight: bold">0.144</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_9" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Social Selection</th>
+<td class="gt_row gt_center" headers="stub_1_9 r">0.015</td>
+<td class="gt_row gt_center" headers="stub_1_9 p">0.890</td>
+<td class="gt_row gt_center" headers="stub_1_9 Corrected p">1.000</td>
+</tr>
+</tbody><tfoot>
+<tr class="gt_footnotes odd">
+<td colspan="4" class="gt_footnote">Correlations were calculated with the sum scores of each respective variable</td>
+</tr>
+<tr class="gt_footnotes even">
+<td colspan="4" class="gt_footnote">Significant p-values (regardless of whether corrected p was significant) have been highlighted</td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(attention_cor_table, <span class="st">"05 SEAS Study 2 Empathy Analyses_tables/attention_cor_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/Rtmpu695xw/file13fcc27214d.html screenshot completed</code></pre>
+</div>
+</div>
+<p>The EmQue attention to others’ feelings subscale scores significantly correlate with comparison physical selection totals (r = -0.25 (weak negative), p = 0.016, p with Bonferroni correction = 0.14) and no other variables, such that participants with higher attention to others’ subscale scores were less likely to select the excluder over the includer as having more physical resources.</p>
+</section>
+<section id="emque-prosocial-actions-subscale" class="level2">
+<h2 class="anchored" data-anchor-id="emque-prosocial-actions-subscale">EmQue Prosocial Actions Subscale</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>prosocial_outcomes <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(EQ_prosocial, mem_check_total, exclusion_selection_total, comp_status_total, exclusion_resource_total, exclusion_physical_selection, exclusion_social_selection, comp_resource_total, comp_physical_selection, comp_social_selection)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>prosocial_cor_matrix <span class="ot">&lt;-</span> <span class="fu">rcorr</span>(<span class="fu">as.matrix</span>(prosocial_outcomes), <span class="at">type =</span> <span class="st">"pearson"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>prosocial_correlation <span class="ot">=</span> prosocial_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>prosocial_p <span class="ot">=</span> prosocial_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>prosocial_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> prosocial_correlation, <span class="at">p =</span> prosocial_p)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>prosocial_df <span class="ot">&lt;-</span> prosocial_df <span class="sc">|&gt;</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"variable"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> labels,</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">r =</span> <span class="fu">signif</span>(r, <span class="dv">2</span>),</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">signif</span>(p, <span class="dv">2</span>),</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrected p"</span> <span class="ot">=</span> <span class="fu">if_else</span>(p <span class="sc">*</span> <span class="dv">9</span> <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="fl">1.0</span>, p <span class="sc">*</span> <span class="dv">9</span>)</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>prosocial_cor_table <span class="ot">&lt;-</span> prosocial_df <span class="sc">|&gt;</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">rowname_col =</span> <span class="st">"variable"</span>,</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">|&gt;</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"EmQue Prosocial Actions Correlations"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_body</span>(</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">columns =</span> <span class="fu">c</span>(r, p, <span class="st">"Corrected p"</span>),</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">rows =</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_align</span>(</span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"center"</span>,</span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>()</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Correlations were calculated with the sum scores of each respective variable"</span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Significant p-values (regardless of whether corrected p was significant) have been highlighted"</span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>prosocial_cor_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="aawhijdfsx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#aawhijdfsx table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#aawhijdfsx thead, #aawhijdfsx tbody, #aawhijdfsx tfoot, #aawhijdfsx tr, #aawhijdfsx td, #aawhijdfsx th {
+  border-style: none;
+}
+
+#aawhijdfsx p {
+  margin: 0;
+  padding: 0;
+}
+
+#aawhijdfsx .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#aawhijdfsx .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#aawhijdfsx .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#aawhijdfsx .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#aawhijdfsx .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#aawhijdfsx .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#aawhijdfsx .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#aawhijdfsx .gt_col_heading {
+  color: #FFFFFF;
+  background-color: #E4220C;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#aawhijdfsx .gt_column_spanner_outer {
+  color: #FFFFFF;
+  background-color: #E4220C;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#aawhijdfsx .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#aawhijdfsx .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#aawhijdfsx .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#aawhijdfsx .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#aawhijdfsx .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#aawhijdfsx .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: middle;
+}
+
+#aawhijdfsx .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#aawhijdfsx .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#aawhijdfsx .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: none;
+  border-top-width: 1px;
+  border-top-color: #D5D5D5;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D5D5D5;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D5D5D5;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#aawhijdfsx .gt_stub {
+  color: #333333;
+  background-color: #FFCCC7;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D5D5D5;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#aawhijdfsx .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#aawhijdfsx .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#aawhijdfsx .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#aawhijdfsx .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#aawhijdfsx .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #5F5F5F;
+}
+
+#aawhijdfsx .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#aawhijdfsx .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#aawhijdfsx .gt_grand_summary_row {
+  color: #333333;
+  background-color: #D5D5D5;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#aawhijdfsx .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #5F5F5F;
+}
+
+#aawhijdfsx .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #5F5F5F;
+}
+
+#aawhijdfsx .gt_striped {
+  background-color: #FEEDEC;
+}
+
+#aawhijdfsx .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#aawhijdfsx .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#aawhijdfsx .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#aawhijdfsx .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#aawhijdfsx .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#aawhijdfsx .gt_left {
+  text-align: left;
+}
+
+#aawhijdfsx .gt_center {
+  text-align: center;
+}
+
+#aawhijdfsx .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#aawhijdfsx .gt_font_normal {
+  font-weight: normal;
+}
+
+#aawhijdfsx .gt_font_bold {
+  font-weight: bold;
+}
+
+#aawhijdfsx .gt_font_italic {
+  font-style: italic;
+}
+
+#aawhijdfsx .gt_super {
+  font-size: 65%;
+}
+
+#aawhijdfsx .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#aawhijdfsx .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#aawhijdfsx .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#aawhijdfsx .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#aawhijdfsx .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#aawhijdfsx .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#aawhijdfsx .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#aawhijdfsx .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#aawhijdfsx div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">EmQue Prosocial Actions Correlations</td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="a::stub" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"></th>
+<th id="r" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">r</th>
+<th id="p" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">p</th>
+<th id="Corrected-p" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Corrected p</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<th id="stub_1_1" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Memory Check</th>
+<td class="gt_row gt_center" headers="stub_1_1 r">0.033</td>
+<td class="gt_row gt_center" headers="stub_1_1 p">0.76</td>
+<td class="gt_row gt_center" headers="stub_1_1 Corrected p">1</td>
+</tr>
+<tr class="even">
+<th id="stub_1_2" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Status Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_2 r">-0.037</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_2 p">0.73</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_2 Corrected p">1</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_3" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Status Selection</th>
+<td class="gt_row gt_center" headers="stub_1_3 r">-0.038</td>
+<td class="gt_row gt_center" headers="stub_1_3 p">0.72</td>
+<td class="gt_row gt_center" headers="stub_1_3 Corrected p">1</td>
+</tr>
+<tr class="even">
+<th id="stub_1_4" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Resource Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_4 r">0.032</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_4 p">0.76</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_4 Corrected p">1</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_5" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Physical Selection</th>
+<td class="gt_row gt_center" headers="stub_1_5 r">0.065</td>
+<td class="gt_row gt_center" headers="stub_1_5 p">0.54</td>
+<td class="gt_row gt_center" headers="stub_1_5 Corrected p">1</td>
+</tr>
+<tr class="even">
+<th id="stub_1_6" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Exclusion Social Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_6 r">-0.020</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_6 p">0.85</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_6 Corrected p">1</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_7" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Resource Selection</th>
+<td class="gt_row gt_center" headers="stub_1_7 r">-0.076</td>
+<td class="gt_row gt_center" headers="stub_1_7 p">0.47</td>
+<td class="gt_row gt_center" headers="stub_1_7 Corrected p">1</td>
+</tr>
+<tr class="even">
+<th id="stub_1_8" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Physical Selection</th>
+<td class="gt_row gt_center gt_striped" headers="stub_1_8 r">-0.120</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_8 p">0.26</td>
+<td class="gt_row gt_center gt_striped" headers="stub_1_8 Corrected p">1</td>
+</tr>
+<tr class="odd">
+<th id="stub_1_9" class="gt_row gt_center gt_stub" data-quarto-table-cell-role="th" scope="row">Comparison Social Selection</th>
+<td class="gt_row gt_center" headers="stub_1_9 r">0.018</td>
+<td class="gt_row gt_center" headers="stub_1_9 p">0.87</td>
+<td class="gt_row gt_center" headers="stub_1_9 Corrected p">1</td>
+</tr>
+</tbody><tfoot>
+<tr class="gt_footnotes odd">
+<td colspan="4" class="gt_footnote">Correlations were calculated with the sum scores of each respective variable</td>
+</tr>
+<tr class="gt_footnotes even">
+<td colspan="4" class="gt_footnote">Significant p-values (regardless of whether corrected p was significant) have been highlighted</td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(prosocial_cor_table, <span class="st">"05 SEAS Study 2 Empathy Analyses_tables/prosocial_cor_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/Rtmpu695xw/file13fc8ac2b72.html screenshot completed</code></pre>
+</div>
+</div>
+<p>There were no significant correlations with the EmQue prosocial actions subscale.</p>
+</section>
 </section>
 
 </main>
