@@ -1,10 +1,15 @@
 ---
 title: "05 SEAS Study 2 Empathy Analyses"
 format: html
+author:
+  name: Siobhan Crowley
+date: 04/11/2026
 editor: source
 editor_options: 
   chunk_output_type: console
 ---
+
+NOTE: Need to create a "05 SEAS Study 2 Empathy Analyses_tables" folder in working directory for table pngs to save locally with current set-up
 
 # Packages
 ```{r packages-data, message = FALSE, warning = FALSE}
@@ -86,7 +91,7 @@ seas2 <- seas2 |>
   )) |> #convert numeric
   rowwise() |>
   mutate(
-    exclusion_selection_total = sum(c_across(c(exclusion_video_selection, exclusion_story_selection)))
+    exclusion_status_total = sum(c_across(c(exclusion_video_selection, exclusion_story_selection)))
   ) |> #sum
   ungroup()
 
@@ -146,8 +151,7 @@ seas2 <- seas2 |>
 labels = c("Memory Check", "Exclusion Status Selection", "Comparison Status Selection", "Exclusion Resource Selection", "Exclusion Physical Selection", "Exclusion Social Selection", "Comparison Resource Selection", "Comparison Physical Selection", "Comparison Social Selection")
 
 total_outcomes <- seas2 |>
-  select(EQ_total, mem_check_total, exclusion_selection_total, comp_status_total, exclusion_resource_total, exclusion_physical_selection, exclusion_social_selection, comp_resource_total, comp_physical_selection, comp_social_selection)
-
+  select(EQ_total, mem_check_total, exclusion_status_total, comp_status_total, exclusion_resource_total, exclusion_physical_selection, exclusion_social_selection, comp_resource_total, comp_physical_selection, comp_social_selection)
 
 total_cor_matrix <- rcorr(as.matrix(total_outcomes), type = "pearson")
 
@@ -199,8 +203,7 @@ EmQue total scores correlated with two variables: comparison resource selection 
 ## EmQue Emotion Contagion Subscale
 ```{r contagion}
 contagion_outcomes <- seas2 |>
-  select(EQ_contagion, mem_check_total, exclusion_selection_total, comp_status_total, exclusion_resource_total, exclusion_physical_selection, exclusion_social_selection, comp_resource_total, comp_physical_selection, comp_social_selection)
-
+  select(EQ_contagion, mem_check_total, exclusion_status_total, comp_status_total, exclusion_resource_total, exclusion_physical_selection, exclusion_social_selection, comp_resource_total, comp_physical_selection, comp_social_selection)
 
 contagion_cor_matrix <- rcorr(as.matrix(contagion_outcomes), type = "pearson")
 
@@ -252,8 +255,7 @@ There were no significant correlations with the EmQue emotion contagion subscale
 ## EmQue Attention to Others' Feelings Subscale
 ```{r attention}
 attention_outcomes <- seas2 |>
-  select(EQ_attention, mem_check_total, exclusion_selection_total, comp_status_total, exclusion_resource_total, exclusion_physical_selection, exclusion_social_selection, comp_resource_total, comp_physical_selection, comp_social_selection)
-
+  select(EQ_attention, mem_check_total, exclusion_status_total, comp_status_total, exclusion_resource_total, exclusion_physical_selection, exclusion_social_selection, comp_resource_total, comp_physical_selection, comp_social_selection)
 
 attention_cor_matrix <- rcorr(as.matrix(attention_outcomes), type = "pearson")
 
@@ -305,8 +307,7 @@ The EmQue attention to others' feelings subscale scores significantly correlate 
 ## EmQue Prosocial Actions Subscale
 ```{r prosocial}
 prosocial_outcomes <- seas2 |>
-  select(EQ_prosocial, mem_check_total, exclusion_selection_total, comp_status_total, exclusion_resource_total, exclusion_physical_selection, exclusion_social_selection, comp_resource_total, comp_physical_selection, comp_social_selection)
-
+  select(EQ_prosocial, mem_check_total, exclusion_status_total, comp_status_total, exclusion_resource_total, exclusion_physical_selection, exclusion_social_selection, comp_resource_total, comp_physical_selection, comp_social_selection)
 
 prosocial_cor_matrix <- rcorr(as.matrix(prosocial_outcomes), type = "pearson")
 
