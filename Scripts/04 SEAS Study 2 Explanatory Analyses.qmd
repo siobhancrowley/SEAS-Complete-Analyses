@@ -161,7 +161,7 @@ seas2_pivoted |>
 # Basic Answer Categorization
 ## Graphs
 ```{r answer-col}
-seas2 |>
+seas2_answer_col <- seas2 |>
   pivot_longer(
     cols = contains("response"),
     names_to = "trial",
@@ -187,6 +187,8 @@ seas2 |>
     legend.position = "top",
     text = element_text(family = "serif", size = 25)
         )
+
+seas2_answer_col
 ```
 
 ## Analyses
@@ -272,7 +274,7 @@ seas2_count_lmer <- summary(lmer(
 seas2_count_lmer
 ```
 
-In this model,  SG x age (p = `r signif(seas2_count_lmer$coefficients[30,5], 2)`) and ST x age (p = `r signif(seas2_count_lmer$coefficients[31,5], 2)`) are significant, demonstrating that the frequencies of explanation responses (0-12 across trial) change with these conditions.
+In this model, SG x age (p = `r signif(seas2_count_lmer$coefficients[30,5], 2)`) and ST x age (p = `r signif(seas2_count_lmer$coefficients[31,5], 2)`) are significant, demonstrating that the frequencies of explanation responses (0-12 across trial) change with these conditions.
 
 ### Exclusion
 ```{r EX-count-age-glm}

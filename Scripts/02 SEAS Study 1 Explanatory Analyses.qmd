@@ -1,6 +1,8 @@
 ---
 title: "02 SEAS Study 1 Explanatory Analyses"
 format: html
+author: Siobhan Crowley
+date: 04/12/2026
 editor: source
 editor_options: 
   chunk_output_type: console
@@ -15,6 +17,9 @@ library(lmerTest)
 library(showtext)
 library(viridis)
 library(chisq.posthoc.test)
+library(Hmisc)
+library(gt)
+library(webshot2)
 
 showtext_auto()
 ```
@@ -131,10 +136,10 @@ seas_pivoted <- seas_separated |>
 ```
 
 ```{r frequency-table}
-#some exploration of frequency of each type of explanation
+#Some exploration of frequency of each type of explanation
 seas_pivoted |>
   group_by(explanation_type) |>
-  summarize(
+  dplyr::summarize(
     max = max(total),
     min = min(total),
     mean = mean(total)
@@ -142,10 +147,9 @@ seas_pivoted |>
 ```
 
 # Basic Answer Categorization
-
 ## Graphs
 ```{r answer-col}
-seas |>
+seas_answer_col <- seas |>
   pivot_longer(
     cols = contains("response"),
     names_to = "trial",
@@ -171,6 +175,8 @@ seas |>
     legend.position = "top",
     text = element_text(family = "serif", size = 25)
         )
+
+seas_answer_col
 ```
 
 ## Analyses
@@ -206,11 +212,9 @@ A chi-square square test of independence found that there was a difference acros
 A post-hoc test with Bonferroni correction found no differences in whether the response data was missing across age (p~3~ = `r seas_response_posthoc$three[2]`, p~4~ = `r seas_response_posthoc$four[2]`, p~5~ = `r signif(seas_response_posthoc$five[2], 2)`, p~6~ = `r seas_response_posthoc$six[2]`). There were significant differences in no/irrelevant responses and relevant responses. For no/irrelevant responses, ages 3, 5, and 6 were significant while 4 was not (p~3~ = `r seas_response_posthoc$three[4]`, p~4~ = `r seas_response_posthoc$four[4]`, p~5~ = `r signif(seas_response_posthoc$five[4], 2)`, p~6~ = `r seas_response_posthoc$six[4]`). The standardized residuals demonstrate that this difference stems from 3-year olds having a greater number of no/irrelevant responses and 5- and 6-year olds having fewer than would be expected. (residual~3~ = `r round(seas_response_posthoc$three[3], 2)`, residual~5~ = `r round(seas_response_posthoc$five[3], 2)`, residual~6~ = `r round(seas_response_posthoc$six[3], 2)`). As might be expected, relevant answers show the opposite pattern, with 6-year-olds having a greater number and 3-year-olds having a fewer number--though, note that 5-year-olds are not significant for this category (p~3~ = `r seas_response_posthoc$three[6]`, residual~3~ = `r round(seas_response_posthoc$three[5], 2)`; p~6~ = `r seas_response_posthoc$six[6]`, residual~6~ = `r round(seas_response_posthoc$six[5], 2)`).
 
 # Number of Times a Ppt Used Explanation Across Each Response (0-8)
-
 ## Initial Graphs
 ```{r explain-count-basiccol}
-#column chart to see the total number of each type of explanation category participants used across their 8 explanation questions (explain better; can use multiple types of explanation in one response, but using that explanation in response will only be counted once for each question--i.e. maximum for each category is 8)
-
+#Column chart to see the total number of each type of explanation category participants used across their 8 explanation questions (explain better; can use multiple types of explanation in one response, but using that explanation in response will only be counted once for each question--i.e. maximum for each category is 8)
 seas_pivoted |>
   ggplot(aes(x = as.factor(age), y = total, fill = explanation_type)) +
   geom_col()
@@ -227,7 +231,7 @@ seas_pivoted |>
   scale_fill_manual(values = wo_black) +
   scale_color_manual(values = wo_black) +
   labs(
-    title = "Types of Explanations in All Participants' Responses", #better title/explain better
+    title = "Study 1 Frequency of Explanation Types",
     x = "Age (Months)",
     y = "Responses to Explanation Questions",
     color = "Explanations",
@@ -242,32 +246,37 @@ seas_pivoted |>
         )
 ```
 
-## Analyses
-
+## GLMMs
 ### Overall
 ```{r explain-count-lmer}
+#CHECK
+
 #Does the frequency of each answer type change with age?
-summary(lmer(
+seas_count_lmer <- summary(lmer(
   total ~ age_months * explanation_type + (1 | subject),
   data = seas_pivoted
 )) #lmer correct? I thought it would be glmer with a poisson family but that produced errors
+
+seas_count_lmer
 ```
 
-In this model, SG and SG x age are significant, demonstrating that the frequencies of explanation responses (0-8 across trial) changes with these conditions.
+In this model, SG (p = `r signif(seas_count_lmer$coefficients[15,5], 2)`) and SG x age (p = `r signif(seas_count_lmer$coefficients[30,5], 2)`) are significant, demonstrating that the frequencies of explanation responses (0-8 across trial) changes with these conditions.
 
 ### Exclusion
 ```{r EX-count-age-glm}
 #Does the frequency of explanations that reference exclusion change with age?
-summary(glm(
+seas_EX_count_age <- summary(glm(
   EX_total ~ age_months,
   data = seas_separated
 ))
+
+seas_EX_count_age
 ```
 
-The number of explanations that reference exclusion given by participants does significantly differ by age.
+The number of explanations that reference exclusion given by participants does significantly differ by age, t = `r round(seas_EX_count_age$coefficients[2,3], 2)`, p = `r signif(seas_EX_count_age$coefficients[2,4], 2)`, such that older participants are more likely to use a higher frequency of EX explanations.
 
 ```{r EX-count-QType-glm}
-#does whether a response references exclusion depend on the question type (status or resources), age, or the interaction thereof?
+#Does whether a response references exclusion depend on the question type (status or resources), age, or the interaction thereof?
 seas_EX_qtype <- seas_separated |>
   select(subject, age_months, matches(".*_EX_.")) |>
   pivot_longer(
@@ -285,37 +294,6 @@ summary(glm(
 
 Neither question type, age, nor the interaction between the two significantly affects whether an answer references exclusion or not.
 
-### Specific Game
-```{r SG-count-age-glm}
-#Does the frequency of explanations that reference the game specifically change with age?
-summary(glm(
-  SG_total ~ age_months,
-  data = seas_separated
-))
-```
-
-The number of explanations that reference the game with specific details given by participants does significantly differ by age.
-
-```{r SG-count-QType-glm}
-#does whether a response references the game specifically depend on the question type (status or resources), age, or the interaction thereof?
-seas_SG_qtype <- seas_separated |>
-  select(subject, age_months, matches(".*_SG_.")) |>
-  pivot_longer(
-    cols = -(subject:age_months),
-    names_to = "question_type",
-    names_pattern = "(.*)_SG_.",
-    values_to = "SG"
-  )
-
-summary(glm(
-  SG ~ question_type * age_months,
-  data = seas_SG_qtype
-))
-```
-
-Whether an answer references the game specifically is significantly associated with age but not question type nor an interaction between age and question type.
-
-## Follow-Up Graphs
 ```{r EX-count-age-scatter}
 EX_count_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = EX_total)) +
@@ -335,11 +313,44 @@ EX_count_age_scatter <- seas_separated |>
   theme(
     plot.title = element_text(hjust = 0.5, size = 30),
     text = element_text(family = "serif", size = 25)
-        )
+        ) +
+  coord_cartesian(ylim = c(0,8)) +
+  scale_y_continuous(breaks = c(0, 2, 4, 8))
 
 EX_count_age_scatter
-#Also the actual possible range of responses is 0-8, so this graph would look even worse zoomed out
 ```
+
+### Specific Game
+```{r SG-count-age-glm}
+#Does the frequency of explanations that reference the game specifically change with age?
+seas_SG_count_age <- summary(glm(
+  SG_total ~ age_months,
+  data = seas_separated
+))
+
+seas_SG_count_age
+```
+
+The number of explanations that reference the game with specific details given by participants does significantly differ by age, t = `r round(seas_SG_count_age$coefficients[2,3], 2)`, p = `r signif(seas_SG_count_age$coefficients[2,4], 2)`.
+
+```{r SG-count-QType-glm}
+#Does whether a response references the game specifically depend on the question type (status or resources), age, or the interaction thereof?
+seas_SG_qtype <- seas_separated |>
+  select(subject, age_months, matches(".*_SG_.")) |>
+  pivot_longer(
+    cols = -(subject:age_months),
+    names_to = "question_type",
+    names_pattern = "(.*)_SG_.",
+    values_to = "SG"
+  )
+
+summary(glm(
+  SG ~ question_type * age_months,
+  data = seas_SG_qtype
+))
+```
+
+Whether an answer references the game specifically is significantly associated with age but not question type nor an interaction between age and question type.
 
 ```{r SG-count-age-scatter}
 SG_count_age_scatter <- seas_separated |>
@@ -365,61 +376,129 @@ SG_count_age_scatter <- seas_separated |>
 SG_count_age_scatter
 ```
 
-## Correlation
-```{r explain-count-status-cor, warning = FALSE}
+## Correlations
+### Status
+```{r explain-count-status-cor}
+seas_separated <- seas_separated |> #adding status total score to this dataset
+   mutate(
+    status_1 = if_else(status_1 == "excluder", 1, 0),
+    status_2 = if_else(status_2 == "excluder", 1, 0),
+    status_3 = if_else(status_3 == "excluder", 1, 0),
+    status_4 = if_else(status_4 == "excluder", 1, 0),
+    status_total = status_1 + status_2 + status_3 + status_4
+  )
+
 seas_count_status_cor_data <- seas_separated |>
-  mutate(across(
-    .cols = matches("^status_.$"),
-    .fns = ~if_else(. == "excluder", 1, 0)
-  )) |>
-  mutate(status_total = status_1 + status_2 + status_3 + status_4) |>
   select(status_total, ST_total:OR_total)
 
-seas_count_status_cor <- cor(seas_count_status_cor_data, method = "spearman")["status_total", ] #MR is NA because no one responded with this category
+seas_count_status_cor_matrix <- rcorr(as.matrix(seas_count_status_cor_data), type = "spearman")
 
-seas_count_status_cor[abs(seas_count_status_cor) > .20] #.20 is the bottom threshold for a weak correlation
+seas_count_status_correlation <- seas_count_status_cor_matrix$r[1, -1]
+seas_count_status_p <- seas_count_status_cor_matrix$P[1, -1]
 
-SG_count_status_cor <- cor.test(seas_count_status_cor_data$status_total, seas_count_status_cor_data$SG_total, method = "spearman", exact = FALSE)
+seas_count_status_df <- data.frame(rho = seas_count_status_correlation, p = seas_count_status_p)
 
-PS_count_status_cor <- cor.test(seas_count_status_cor_data$status_total, seas_count_status_cor_data$PS_total, method = "spearman", exact = FALSE)
+seas_count_status_df <- seas_count_status_df |>
+  rownames_to_column(var = "variable") |>
+  mutate(
+    rho = signif(rho, 2),
+    p = signif(p, 2),
+    "Corrected p" = if_else(p * 16 > 1, 1.0, p * 16)
+  )
 
-VG_count_status_cor <- cor.test(seas_count_status_cor_data$status_total, seas_count_status_cor_data$VG_total, method = "spearman", exact = FALSE)
+seas_count_status_table <- seas_count_status_df |>
+  gt(
+    rowname_col = "variable",
+  )|>
+    opt_stylize(style = 6, color = "blue") |>
+    tab_header(title = "Status Total & Explanation Type Frequency Correlations") |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = c(rho, p, "Corrected p"),
+      rows = p < 0.05
+    )
+  ) |>
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) |>
+  tab_footnote(
+    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+  )
 
-OR_count_status_cor <- cor.test(seas_count_status_cor_data$status_total, seas_count_status_cor_data$OR_total, method = "spearman", exact = FALSE)
+seas_count_status_table
+
+gtsave(seas_count_status_table, "02-SEAS-Study-1-Explanatory-Analyses_files/figure-html/seas_count_status_table.png")
 ```
 
-VG, SG, PS, and OR were the only explanation types whose frequencies displayed at least a weak correlation with the number of times a participant selected an excluder as being in charge. SG: rho = `r signif(unname(SG_count_status_cor$estimate), 2)` and p = `r signif(unname(SG_count_status_cor$p.value), 2)`, therefore demonstrating a weak positive association. PS: rho = `r signif(unname(PS_count_status_cor$estimate), 2)` and p = `r signif(unname(PS_count_status_cor$p.value), 2)`, also a weak positive correlation. VG: rho = `r signif(unname(VG_count_status_cor$estimate), 2)` and p = `r signif(unname(VG_count_status_cor$p.value), 2)`, a weak negative correlation. OR: rho = `r signif(unname(OR_count_status_cor$estimate), 2)` and p = `r signif(unname(OR_count_status_cor$p.value), 2)`, a weak negative correlation.
+The frequencies of responses referencing Vague Game, Specific Game, Possession, and Other each displayed a significant correlation with the number of times a participant selected the excluder as being in charge. VG: rho = `r signif(unname(seas_count_status_correlation[2]), 2)` (weak negative), p = `r signif(unname(seas_count_status_p[2]), 2)`, p with Bonferroni correction = `r signif(seas_count_status_p[2] * 16, 2)`. SG: rho = `r signif(unname(seas_count_status_correlation[3]), 2)` (weak positive), p = `r signif(unname(seas_count_status_p[3]), 2)`, p with Bonferroni correction = `r signif(seas_count_status_p[3] * 16, 2)`. PS: rho = `r signif(unname(seas_count_status_correlation[15]), 2)` (weak positive), p = `r signif(unname(seas_count_status_p[15]), 2)`, p with Bonferroni correction = `r signif(seas_count_status_p[15] * 16, 2)`. OR: rho = `r signif(unname(seas_count_status_correlation[16]), 2)` (weak negative), p = `r signif(unname(seas_count_status_p[16]), 2)`, p with Bonferroni correction = `r signif(seas_count_status_p[16] * 16, 2)`. 
 
-When applying a Bonferroni correction for the 32 different correlations calculated across both status and resource totals, SG is the only category to remain significant. P~SG~ = `r signif(unname(SG_count_status_cor$p.value), 2) * 32`, P~PS~ = `r signif(unname(PS_count_status_cor$p.value), 2) * 32`, P~VG~ = `r signif(unname(VG_count_status_cor$p.value), 2) * 32`, P~OR~ = `r signif(unname(OR_count_status_cor$p.value), 2) * 32`.
+### Resources
+```{r explain-count-resource-cor}
+seas_separated <- seas_separated |> #adding resource total score to this dataset
+  mutate(
+    resource_1 = if_else(resource_1 == "excluder", 1, 0, NA), #One participant who did not answer the first resource question
+    resource_2 = if_else(resource_2 == "excluder", 1, 0),
+    resource_3 = if_else(resource_3 == "excluder", 1, 0),
+    resource_4 = if_else(resource_4 == "excluder", 1, 0),
+    resource_total = resource_1 + resource_2 + resource_3 + resource_4
+  )
 
-```{r explain-count-resources-cor, warning = FALSE}
 seas_count_resource_cor_data <- seas_separated |>
-  mutate(across(
-    .cols = matches("^resource_.$"),
-    .fns = ~if_else(. == "excluder", 1, 0, NA)
-  )) |>
-  mutate(resource_total = resource_1 + resource_2 + resource_3 + resource_4) |>
   select(resource_total, ST_total:OR_total)
 
-seas_count_resource_cor <- cor(seas_count_resource_cor_data, method = "spearman", use = "complete.obs")["resource_total", ] #MR is NA because no one responded with this category
+seas_count_resource_cor_matrix <- rcorr(as.matrix(seas_count_resource_cor_data), type = "spearman")
 
-seas_count_resource_cor[abs(seas_count_resource_cor) > .20] #.20 is the bottom threshold for a weak correlation
+seas_count_resource_correlation <- seas_count_resource_cor_matrix$r[1, -1]
+seas_count_resource_p <- seas_count_resource_cor_matrix$P[1, -1]
 
-SG_count_resource_cor <- cor.test(seas_count_resource_cor_data$resource_total, seas_count_status_cor_data$SG_total, method = "spearman", exact = FALSE)
+seas_count_resource_df <- data.frame(rho = seas_count_resource_correlation, p = seas_count_resource_p)
 
-EX_count_resource_cor <- cor.test(seas_count_resource_cor_data$resource_total, seas_count_status_cor_data$EX_total, method = "spearman", exact = FALSE)
+seas_count_resource_df <- seas_count_resource_df |>
+  rownames_to_column(var = "variable") |>
+  mutate(
+    rho = signif(rho, 2),
+    p = signif(p, 2),
+    "Corrected p" = if_else(p * 16 > 1, 1.0, p * 16)
+  )
 
-PS_count_resource_cor <- cor.test(seas_count_resource_cor_data$resource_total, seas_count_status_cor_data$PS_total, method = "spearman", exact = FALSE)
+seas_count_resource_table <- seas_count_resource_df |>
+  gt(
+    rowname_col = "variable",
+  )|>
+    opt_stylize(style = 6, color = "pink") |>
+    tab_header(title = "Resource Total & Explanation Type Frequency Correlations") |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = c(rho, p, "Corrected p"),
+      rows = p < 0.05
+    )
+  ) |>
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) |>
+  tab_footnote(
+    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+  )
+
+seas_count_resource_table
+
+gtsave(seas_count_resource_table, "02-SEAS-Study-1-Explanatory-Analyses_files/figure-html/seas_count_resource_table.png")
 ```
 
-SG, EX, and PS were the only explanation types whose frequencies displayed at least a weak correlation with the number of times a participant selected an excluder as having more resources. SG: rho = `r signif(unname(SG_count_resource_cor$estimate), 2)` and p = `r signif(unname(SG_count_resource_cor$p.value), 2)`, therefore demonstrating a moderate positive association. EX: rho = `r signif(unname(EX_count_resource_cor$estimate), 2)` and p = `r signif(unname(EX_count_resource_cor$p.value), 2)`, a weak positive correlation. PS: rho = `r signif(unname(PS_count_resource_cor$estimate), 2)` and p = `r signif(unname(PS_count_resource_cor$p.value), 2)`, also a weak positive correlation.
-
-When applying a Bonferroni correction for the 32 different correlations calculated across both status and resource totals, SG is the only category to remain significant. P~SG~ = `r signif(unname(SG_count_resource_cor$p.value), 2) * 32`, P~EX~ = `r signif(unname(EX_count_resource_cor$p.value), 2) * 32`, P~PS~ = `r signif(unname(PS_count_resource_cor$p.value), 2) * 32`.
+The frequencies of responses referencing Specific Game, Exclusion, and Possession each displayed a significant correlation with the number of times a participant selected the excluder as having more resources. SG: rho = `r signif(unname(seas_count_resource_correlation[3]), 2)` (moderate positive), p = `r signif(unname(seas_count_resource_p[3]), 2)`, p with Bonferroni correction = `r signif(seas_count_resource_p[3] * 16, 2)`. EX: rho = `r signif(unname(seas_count_resource_correlation[4]), 2)` (weak positive), p = `r signif(unname(seas_count_resource_p[4]), 2)`, p with Bonferroni correction = `r signif(seas_count_resource_p[4] * 16, 2)`. PS: rho = `r signif(unname(seas_count_resource_correlation[15]), 2)` (weak positive), p = `r signif(unname(seas_count_resource_p[15]), 2)`, p with Bonferroni correction = `r signif(seas_count_resource_p[15] * 16, 2)`.
 
 # Did a Ppt Use Type of Explanation in Any Response?
-
 ## Initial Graphs
 ```{r explain-present-scatter-faceted}
+seas_pivoted <- seas_pivoted |>
+  mutate(
+    present = if_else(total == 0, 0, 1)
+  )
+
 seas_pivoted |>
   ggplot(aes(x = age_months, y = present, color = explanation_type, fill = explanation_type)) +
   geom_point(position = position_jitter(height = .15)) +
@@ -428,7 +507,7 @@ seas_pivoted |>
   scale_color_manual(values = wo_black) +
   facet_wrap(~explanation_type) +
   labs(
-    title = "Study 1 Types of Explanations Present in Participants' Responses", #better title/explain better
+    title = "Study 1 Presence of Explanation Types",
     x = "Age (Months)",
     y = "Responses Present Across Explanation Questions",
     color = "Explanations",
@@ -444,17 +523,20 @@ seas_pivoted |>
   scale_y_continuous(breaks = c(0, 1), labels = (c("Absent", "Present")))
 ```
 
-## Analyses
-
+## GLMMs
 ### Overall
 ```{r explain-present-lmer}
-summary(lmer(
+#CHECK
+
+seas_present_lmer <- summary(lmer(
   present ~ age_months * explanation_type + (1 | subject),
   data = seas_pivoted
 )) #Again, I thought this would be a binomial glmer but errors; however lmer output doesn't seem to match graphs
+
+seas_present_lmer
 ```
 
-In this model, the presence of a type of explanation across a participant's responses significantly differs based on age, age x PR, and age x MT.
+In this model, the presence of a type of explanation across a participant's responses significantly differs based on age (p = `r signif(seas_present_lmer$coefficients[2,5], 2)`) and age x PR (p = `r signif(seas_present_lmer$coefficients[28,5], 2)`).
 
 ### Exclusion
 ```{r EX-present-age-glm}
@@ -470,81 +552,16 @@ seas_separated <- seas_separated |>
   ) #Adding present columns to non-pivoted dataset
 
 
-summary(glm(
+seas_EX_present_age <- summary(glm(
   EX_present ~ age_months,
   data = seas_separated
 ))
+
+seas_EX_present_age
 ```
 
-Whether participants reference exclusion at least once in the study significantly differs with age.
+Whether participants reference exclusion at least once in the study significantly differs with age, t = `r round(seas_EX_present_age$coefficients[2,3], 2)`, p = `r signif(seas_EX_present_age$coefficients[2,4], 2)`.
 
-### Preferences
-```{r PR-present-age-glm}
-#Does the presence of explanations that reference preferences change with age?
-summary(glm(
-  PR_present ~ age_months,
-  data = seas_separated
-))
-```
-
-Whether participants reference preferences at least once in the study does not significantly differ with age.
-
-### Motivation
-```{r MT-present-age-glm}
-#Does the presence of explanations that reference motivations change with age?
-summary(glm(
-  MT_present ~ age_months,
-  data = seas_separated
-))
-```
-
-Whether participants reference motivations at least once in the study does not significantly differ with age.
-
-### Specific Game
-```{r SG-present-age-glm}
-#Does the presence of explanations that reference the game specifically change with age?
-summary(glm(
-  SG_present ~ age_months,
-  data = seas_separated
-))
-```
-
-Whether participants reference the game specifically at least once in the study significantly differs with age.
-
-### Vague Game
-```{r VG-present-age-glm}
-#Does the presence of explanations that reference the game vaguely change with age?
-summary(glm(
-  VG_present ~ age_months,
-  data = seas_separated
-))
-```
-
-Whether participants reference the game vaguely at least once in the study significantly differs with age.
-
-### Friends
-```{r FR-present-age-glm}
-#Does the presence of explanations that reference preferences change with age?
-summary(glm(
-  FR_present ~ age_months,
-  data = seas_separated
-))
-```
-
-Whether participants reference friends at least once in the study significantly differs with age.
-
-### Possessions
-```{r PS-present-age-glm}
-#Does the presence of explanations that reference preferences change with age?
-summary(glm(
-  PS_present ~ age_months,
-  data = seas_separated
-))
-```
-
-Whether participants reference possessions at least once in the study significantly differs with age.
-
-## Follow-Up Graphs
 ```{r EX-presence-age-scatter}
 EX_presence_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = EX_present)) +
@@ -573,6 +590,32 @@ EX_presence_age_scatter <- seas_separated |>
 
 EX_presence_age_scatter
 ```
+
+### Preferences
+```{r PR-present-age-glm}
+#Does the presence of explanations that reference preferences change with age?
+seas_PR_present_age <- summary(glm(
+  PR_present ~ age_months,
+  data = seas_separated
+))
+
+seas_PR_present_age
+```
+
+Whether participants reference preferences at least once in the study does not significantly differ with age, p = `r signif(seas_PR_present_age$coefficients[2,4], 2)`.
+
+### Specific Game
+```{r SG-present-age-glm}
+#Does the presence of explanations that reference the game specifically change with age?
+seas_SG_present_age <- summary(glm(
+  SG_present ~ age_months,
+  data = seas_separated
+))
+
+seas_SG_present_age
+```
+
+Whether participants reference the game specifically at least once in the study significantly differs with age, t = `r round(seas_SG_present_age$coefficients[2,3], 2)`, p = `r signif(seas_SG_present_age$coefficients[2,4], 2)`.
 
 ```{r SG-presence-age-scatter}
 SG_presence_age_scatter <- seas_separated |>
@@ -603,6 +646,19 @@ SG_presence_age_scatter <- seas_separated |>
 SG_presence_age_scatter
 ```
 
+### Vague Game
+```{r VG-present-age-glm}
+#Does the presence of explanations that reference the game vaguely change with age?
+seas_VG_present_age <- summary(glm(
+  VG_present ~ age_months,
+  data = seas_separated
+))
+
+seas_VG_present_age
+```
+
+Whether participants reference the game vaguely at least once in the study significantly differs with age, t = `r round(seas_VG_present_age$coefficients[2,3], 2)`, p = `r signif(seas_VG_present_age$coefficients[2,4], 2)`.
+
 ```{r VG-presence-age-scatter}
 VG_presence_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = VG_present)) +
@@ -631,6 +687,19 @@ VG_presence_age_scatter <- seas_separated |>
 
 VG_presence_age_scatter
 ```
+
+### Friends
+```{r FR-present-age-glm}
+#Does the presence of explanations that reference preferences change with age?
+seas_FR_present_age <- summary(glm(
+  FR_present ~ age_months,
+  data = seas_separated
+))
+
+seas_FR_present_age
+```
+
+Whether participants reference friends at least once in the study significantly differs with age, t = `r round(seas_FR_present_age$coefficients[2,3], 2)`, p = `r signif(seas_FR_present_age$coefficients[2,4], 2)`.
 
 ```{r FR-presence-age-scatter}
 FR_presence_age_scatter <- seas_separated |>
@@ -661,6 +730,19 @@ FR_presence_age_scatter <- seas_separated |>
 FR_presence_age_scatter
 ```
 
+### Possessions
+```{r PS-present-age-glm}
+#Does the presence of explanations that reference preferences change with age?
+seas_PR_present_age <- summary(glm(
+  PS_present ~ age_months,
+  data = seas_separated
+))
+
+seas_PR_present_age
+```
+
+Whether participants reference possessions at least once in the study significantly differs with age, t = `r round(seas_PR_present_age$coefficients[2,3], 2)`, p = `r signif(seas_PR_present_age$coefficients[2,4], 2)`.
+
 ```{r PS-presence-age-scatter}
 PS_presence_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = PS_present)) +
@@ -690,8 +772,104 @@ PS_presence_age_scatter <- seas_separated |>
 PS_presence_age_scatter
 ```
 
-# Word Count
+## Correlations
+### Status
+```{r explain-present-status-cor}
+seas_present_status_cor_data <- seas_separated |>
+  select(status_total, ST_present:OR_present)
 
+seas_present_status_cor_matrix <- rcorr(as.matrix(seas_present_status_cor_data), type = "spearman")
+
+seas_present_status_correlation <- seas_present_status_cor_matrix$r[1, -1]
+seas_present_status_p <- seas_present_status_cor_matrix$P[1, -1]
+
+seas_present_status_df <- data.frame(rho = seas_present_status_correlation, p = seas_present_status_p)
+
+seas_present_status_df <- seas_present_status_df |>
+  rownames_to_column(var = "variable") |>
+  mutate(
+    rho = signif(rho, 2),
+    p = signif(p, 2),
+    "Corrected p" = if_else(p * 16 > 1, 1.0, p * 16)
+  )
+
+seas_present_status_table <- seas_present_status_df |>
+  gt(
+    rowname_col = "variable",
+  )|>
+    opt_stylize(style = 6, color = "blue") |>
+    tab_header(title = "Status Total & Explanation Type Presence Correlations") |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = c(rho, p, "Corrected p"),
+      rows = p < 0.05
+    )
+  ) |>
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) |>
+  tab_footnote(
+    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+  )
+
+seas_present_status_table
+
+gtsave(seas_present_status_table, "02-SEAS-Study-1-Explanatory-Analyses_files/figure-html/seas_present_status_table.png")
+```
+
+The frequencies of responses referencing Specific Game, Possession, and Other each displayed a significant correlation with the number of times a participant selected the excluder as being in charge. SG: rho = `r signif(unname(seas_present_status_correlation[3]), 2)` (weak positive), p = `r signif(unname(seas_present_status_p[3]), 2)`, p with Bonferroni correction = `r signif(seas_present_status_p[3] * 16, 2)`. PS: rho = `r signif(unname(seas_present_status_correlation[15]), 2)` (weak positive), p = `r signif(unname(seas_present_status_p[15]), 2)`, p with Bonferroni correction = `r signif(seas_present_status_p[15] * 16, 2)`. OR: rho = `r signif(unname(seas_present_status_correlation[16]), 2)` (weak negative), p = `r signif(unname(seas_present_status_p[16]), 2)`, p with Bonferroni correction = `r signif(seas_present_status_p[16] * 16, 2)`. 
+
+### Resources
+```{r explain-present-resource-cor}
+seas_present_resource_cor_data <- seas_separated |>
+  select(resource_total, ST_present:OR_present)
+
+seas_present_resource_cor_matrix <- rcorr(as.matrix(seas_present_resource_cor_data), type = "spearman")
+
+seas_present_resource_correlation <- seas_present_resource_cor_matrix$r[1, -1]
+seas_present_resource_p <- seas_present_resource_cor_matrix$P[1, -1]
+
+seas_present_resource_df <- data.frame(rho = seas_present_resource_correlation, p = seas_present_resource_p)
+
+seas_present_resource_df <- seas_present_resource_df |>
+  rownames_to_column(var = "variable") |>
+  mutate(
+    rho = signif(rho, 2),
+    p = signif(p, 2),
+    "Corrected p" = if_else(p * 16 > 1, 1.0, p * 16)
+  )
+
+seas_present_resource_table <- seas_present_resource_df |>
+  gt(
+    rowname_col = "variable",
+  )|>
+    opt_stylize(style = 6, color = "pink") |>
+    tab_header(title = "Resource Total & Explanation Type Presence Correlations") |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = c(rho, p, "Corrected p"),
+      rows = p < 0.05
+    )
+  ) |>
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) |>
+  tab_footnote(
+    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+  )
+
+seas_present_resource_table
+
+gtsave(seas_present_resource_table, "02-SEAS-Study-1-Explanatory-Analyses_files/figure-html/seas_present_resource_table.png")
+```
+
+The frequencies of responses referencing Specific Game, Exclusion, and Possession each displayed a significant correlation with the number of times a participant selected the excluder as having more resources. SG: rho = `r signif(unname(seas_present_resource_correlation[3]), 2)` (moderate positive), p = `r signif(unname(seas_present_resource_p[3]), 2)`, p with Bonferroni correction = `r signif(seas_present_resource_p[3] * 16, 2)`. EX: rho = `r signif(unname(seas_present_resource_correlation[4]), 2)` (weak positive), p = `r signif(unname(seas_present_resource_p[4]), 2)`, p with Bonferroni correction = `r signif(seas_present_resource_p[4] * 16, 2)`. PS: rho = `r signif(unname(seas_present_resource_correlation[15]), 2)` (weak positive), p = `r signif(unname(seas_present_resource_p[15]), 2)`, p with Bonferroni correction = `r signif(seas_present_resource_p[15] * 16, 2)`.
+
+# Word Count
 ## Graphs
 ```{r word-scatter}
 #Scatterplot of total word count by age
@@ -730,10 +908,13 @@ seas_wordtot <- seas |>
     word_total = sum(c_across(contains("word")))) |>
   filter(!is.na(word_total))
 
-summary(glm(
+seas_word_glm <- summary(glm(
   word_total ~ age_months,
   data = seas_wordtot
 ))
+
+seas_word_glm
 ```
 
-The number of words used by participants significantly differs based on age.
+The number of words used by participants significantly differs based on age, t = `r round(seas_word_glm$coefficients[2,3], 2)`, p = `r signif(seas_word_glm$coefficients[2,4], 2)`.
+

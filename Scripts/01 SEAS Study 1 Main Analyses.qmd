@@ -382,10 +382,7 @@ We expect that children will identify the excluder as having more resources.
 #Convert excluder resource selection to numeric and calculate sum score
 seas <- seas |>
   mutate(
-    resource_1 = case_when(
-      resource_1 == "excluder" ~ 1,
-      resource_1 == "excluded" ~ 0,
-      is.na(resource_1) ~ NA), #One participant who did not answer the first resource question
+    resource_1 = if_else(resource_1 == "excluder", 1, 0, NA), #One participant who did not answer the first resource question
     resource_2 = if_else(resource_2 == "excluder", 1, 0),
     resource_3 = if_else(resource_3 == "excluder", 1, 0),
     resource_4 = if_else(resource_4 == "excluder", 1, 0),
