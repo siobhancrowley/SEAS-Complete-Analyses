@@ -562,8 +562,8 @@ seas_EX_present_age
 
 Whether participants reference exclusion at least once in the study significantly differs with age, t = `r round(seas_EX_present_age$coefficients[2,3], 2)`, p = `r signif(seas_EX_present_age$coefficients[2,4], 2)`.
 
-```{r EX-presence-age-scatter}
-EX_presence_age_scatter <- seas_separated |>
+```{r EX-present-age-scatter}
+EX_present_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = EX_present)) +
   geom_jitter() +
   stat_smooth(
@@ -588,7 +588,7 @@ EX_presence_age_scatter <- seas_separated |>
     labels = c("Not Referenced", "Exclusion Referenced")
     )
 
-EX_presence_age_scatter
+EX_present_age_scatter
 ```
 
 ### Preferences
@@ -617,8 +617,8 @@ seas_SG_present_age
 
 Whether participants reference the game specifically at least once in the study significantly differs with age, t = `r round(seas_SG_present_age$coefficients[2,3], 2)`, p = `r signif(seas_SG_present_age$coefficients[2,4], 2)`.
 
-```{r SG-presence-age-scatter}
-SG_presence_age_scatter <- seas_separated |>
+```{r SG-present-age-scatter}
+SG_present_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = SG_present)) +
   geom_jitter() +
   stat_smooth(
@@ -643,7 +643,7 @@ SG_presence_age_scatter <- seas_separated |>
     labels = c("Not Referenced", "Specific Game Referenced")
     )
 
-SG_presence_age_scatter
+SG_present_age_scatter
 ```
 
 ### Vague Game
@@ -659,8 +659,8 @@ seas_VG_present_age
 
 Whether participants reference the game vaguely at least once in the study significantly differs with age, t = `r round(seas_VG_present_age$coefficients[2,3], 2)`, p = `r signif(seas_VG_present_age$coefficients[2,4], 2)`.
 
-```{r VG-presence-age-scatter}
-VG_presence_age_scatter <- seas_separated |>
+```{r VG-present-age-scatter}
+VG_present_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = VG_present)) +
   geom_jitter() +
   stat_smooth(
@@ -685,7 +685,7 @@ VG_presence_age_scatter <- seas_separated |>
     labels = c("Not Referenced", "Vague Game Referenced")
     )
 
-VG_presence_age_scatter
+VG_present_age_scatter
 ```
 
 ### Friends
@@ -701,8 +701,8 @@ seas_FR_present_age
 
 Whether participants reference friends at least once in the study significantly differs with age, t = `r round(seas_FR_present_age$coefficients[2,3], 2)`, p = `r signif(seas_FR_present_age$coefficients[2,4], 2)`.
 
-```{r FR-presence-age-scatter}
-FR_presence_age_scatter <- seas_separated |>
+```{r FR-present-age-scatter}
+FR_present_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = FR_present)) +
   geom_jitter() +
   stat_smooth(
@@ -727,7 +727,7 @@ FR_presence_age_scatter <- seas_separated |>
     labels = c("Not Referenced", "Friendship Referenced")
     )
 
-FR_presence_age_scatter
+FR_present_age_scatter
 ```
 
 ### Possessions
@@ -743,8 +743,8 @@ seas_PR_present_age
 
 Whether participants reference possessions at least once in the study significantly differs with age, t = `r round(seas_PR_present_age$coefficients[2,3], 2)`, p = `r signif(seas_PR_present_age$coefficients[2,4], 2)`.
 
-```{r PS-presence-age-scatter}
-PS_presence_age_scatter <- seas_separated |>
+```{r PS-present-age-scatter}
+PS_present_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = PS_present)) +
   geom_jitter() +
   stat_smooth(
@@ -769,7 +769,7 @@ PS_presence_age_scatter <- seas_separated |>
     labels = c("Not Referenced", "Possession Referenced")
     )
 
-PS_presence_age_scatter
+PS_present_age_scatter
 ```
 
 ## Correlations
