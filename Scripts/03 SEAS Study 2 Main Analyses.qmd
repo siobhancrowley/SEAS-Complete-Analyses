@@ -208,10 +208,15 @@ We expect that children, on average, will accurately recall the details of the g
 ```{r mem-ttest}
 mem_ttest <- t.test(seas2$mem_check_total, mu = 3)
 mem_ttest
+
 mem_d <- cohen.d(seas2$mem_check_total, f = NA, mu = 3)
+mem_d
+
+mem_sd <- sd(seas2$mem_check_total, na.rm = TRUE)
+mem_sd
 ```
 
-We performed a t-test to assess whether participants' summed memory check scores were statistically different from chance, finding that the t statistic was equal to `r round(unname(mem_ttest$statistic), 2)` and the p-value was `r signif(unname(mem_ttest$p.value), 2)`, demonstrating that children were able to correctly recall the events of the scenarios. Cohen's d was `r round(unname(mem_d$estimate), 2)`, which is considered a `r as.character(mem_d$magnitude)` effect size.
+We performed a t-test to assess whether participants' summed memory check scores were statistically different from chance, finding that the t statistic was equal to `r round(unname(mem_ttest$statistic), 2)` and the p-value was `r signif(unname(mem_ttest$p.value), 2)` (M = `r unname(mem_ttest$estimate)`, SD = `r signif(mem_sd, 2)`), demonstrating that children were able to correctly recall the events of the scenarios. Cohen's d was `r round(unname(mem_d$estimate), 2)`, which is considered a `r as.character(mem_d$magnitude)` effect size.
 
 ### Hypothesis 2
 We expect that age will be associated with accuracy on memory check questions.
@@ -412,11 +417,13 @@ Children will view social excluders as being in charge more often than those the
 
 ```{r em-status-ttest}
 em_status_ttest <- t.test(seas2$exclusion_status_total, mu = 1)
-
 em_status_ttest
+
+em_status_sd <- sd(seas2$exclusion_status_total, na.rm = TRUE)
+em_status_sd
 ```
 
-In a one-sample t-test for the selection of the excluder over an excluded character for being in charge, t = `r round(em_status_ttest$statistic, 2)` and p = `r round(em_status_ttest$p.value, 2)`, demonstrating that children did not select the excluder more often than chance.
+In a one-sample t-test for the selection of the excluder over an excluded character for being in charge, t = `r round(em_status_ttest$statistic, 2)` and p = `r round(em_status_ttest$p.value, 2)` (M = `r unname(em_status_ttest$estimate)`, SD = `r signif(em_status_sd, 2)`), demonstrating that children did not select the excluder more often than chance.
 
 ### Hypothesis 2
 We expect that age will be associated with identifying the social excluder as being in charge.
@@ -1133,11 +1140,13 @@ We expect that children will view social excluders as being in charge more often
 
 ```{r eic-status-ttest}
 eic_status_ttest <- t.test(seas2$comp_status_total, mu = 1)
-
 eic_status_ttest
+
+eic_status_sd <- sd(seas2$comp_status_total, na.rm = TRUE)
+eic_status_sd
 ```
 
-A one-sample t-test examining children selecting the excluder over the includer as being in charge produced a test statistic of `r round(eic_status_ttest$statistic, 2)` and a p-value of `r round(eic_status_ttest$p.value, 2)`, demonstrating that they did not pick the excluder more frequently than chance.
+A one-sample t-test examining children selecting the excluder over the includer as being in charge produced a test statistic of `r round(eic_status_ttest$statistic, 2)` and a p-value of `r round(eic_status_ttest$p.value, 2)` (M = `r unname(eic_status_ttest$estimate)`, SD = `r signif(eic_status_sd, 2)`), demonstrating that they did not pick the excluder more frequently than chance.
 
 ### Hypothesis 2
 We expect that children will view social excluders as having physical resources more often than social includers.

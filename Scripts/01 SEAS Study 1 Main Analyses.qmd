@@ -127,10 +127,15 @@ To assess other factors that may potentially affect participants' performance on
 ```{r identify-ttest}
 identify_ttest <- t.test(seas$mem_check_total, mu = 2)
 identify_ttest
+
 identify_d <- cohen.d(seas$mem_check_total, f = NA, mu = 2)
+identify_d
+
+identify_sd <- sd(seas$mem_check_total, na.rm = TRUE)
+identify_sd
 ```
 
-We performed a t-test to assess whether participants' summed memory check scores were statistically different from chance, finding that the t statistic was equal to `r round(unname(identify_ttest$statistic), 2)` and the p-value was `r signif(unname(identify_ttest$p.value), 2)`, demonstrating that children were able to correctly recall the events of the scenarios. Cohen's d was `r round(unname(identify_d$estimate), 2)`, which is considered a `r as.character(identify_d$magnitude)` effect size.
+We performed a t-test to assess whether participants' summed memory check scores were statistically different from chance, finding that the t statistic was equal to `r round(unname(identify_ttest$statistic), 2)` and the p-value was `r signif(unname(identify_ttest$p.value), 2)` (M = `r unname(identify_ttest$estimate)`, SD = `r signif(identify_sd, 2)`), demonstrating that children were able to correctly recall the events of the scenarios. Cohen's d was `r round(unname(identify_d$estimate), 2)`, which is considered a `r as.character(identify_d$magnitude)` effect size. 
 
 ```{r identify-total-scatter}
 identify_total_scatter <- seas |>
@@ -299,9 +304,11 @@ We expect that children will think that social excluders are in charge more ofte
 ```{r status-ttest}
 status_ttest <- t.test(seas$status_total, mu = 2)
 status_ttest
+
+status_sd <- sd(seas$status_total, na.rm = TRUE)
 ```
 
-In this one-sample t-test, the t statistic was equal to `r round(unname(status_ttest$statistic), 2)` and the p-value `r round(unname(status_ttest$p.value), 2)`, demonstrating that participants did not select the excluder as being in charge more often than chance.
+In this one-sample t-test, the t statistic was equal to `r round(unname(status_ttest$statistic), 2)` and the p-value `r round(unname(status_ttest$p.value), 2)` (M = `r unname(status_ttest$estimate)`, SD = `r signif(status_sd, 2)`), demonstrating that participants did not select the excluder as being in charge more often than chance.
 
 ## Hypothesis 2
 We expect that age will be significantly related to children's identification of who is in charge.
@@ -503,13 +510,25 @@ social_ttest
 resource_d <- cohen.d(seas$resource_total, f = NA, mu = 2, na.rm = TRUE)
 physical_d <- cohen.d(seas$resource_physical, f = NA, mu = 1, na.rm = TRUE) 
 social_d <- cohen.d(seas$resource_social, f = NA, mu = 1)
+
+resource_d
+physical_d
+social_d
+
+resource_sd <- sd(seas$resource_total, na.rm = TRUE)
+physical_sd <- sd(seas$resource_physical, na.rm = TRUE) 
+social_sd <- sd(seas$resource_social, na.rm = TRUE)
+
+resource_sd
+physical_sd
+social_sd
 ```
 
-In this one-sample t-test of overall resources, the t statistic was `r round(unname(resource_ttest$statistic), 2)`, with a p-value of `r signif(unname(resource_ttest$p.value), 2)` and a Cohen's d of `r round(unname(resource_d$estimate), 2)` (`r as.character(resource_d$magnitude)`), demonstrating that children chose the excluder as having more resources more often than chance. 
+In this one-sample t-test of overall resources, the t statistic was `r round(unname(resource_ttest$statistic), 2)`, with a p-value of `r signif(unname(resource_ttest$p.value), 2)` (M = `r unname(resource_ttest$estimate)`, SD = `r signif(resource_sd, 2)`) and a Cohen's d of `r round(unname(resource_d$estimate), 2)` (`r as.character(resource_d$magnitude)`), demonstrating that children chose the excluder as having more resources more often than chance. 
 
-These results hold when physical and social resources are examined separately. A t-test exploring the former produces a t statistic of `r round(unname(physical_ttest$statistic), 2)` and a p-value of `r signif(unname(social_ttest$p.value), 2)` with a Cohen's d of `r round(unname(physical_d$estimate), 2)` (`r as.character(physical_d$magnitude)`).
+These results hold when physical and social resources are examined separately. A t-test exploring the former produces a t statistic of `r round(unname(physical_ttest$statistic), 2)` and a p-value of `r signif(unname(social_ttest$p.value), 2)` (M = `r unname(physical_ttest$estimate)`, SD = `r signif(physical_sd, 2)`) with a Cohen's d of `r round(unname(physical_d$estimate), 2)` (`r as.character(physical_d$magnitude)`).
 
-A t-test examining only social resources resulted in a t of `r round(unname(social_ttest$statistic), 2)` and a p-value of `r signif(unname(physical_ttest$p.value), 2)`, with a Cohen's d of `r round(unname(social_d$estimate), 2)` (`r as.character(social_d$magnitude)`).
+A t-test examining only social resources resulted in a t of `r round(unname(social_ttest$statistic), 2)` and a p-value of `r signif(unname(physical_ttest$p.value), 2)` (M = `r unname(social_ttest$estimate)`, SD = `r signif(social_sd, 2)`), with a Cohen's d of `r round(unname(social_d$estimate), 2)` (`r as.character(social_d$magnitude)`).
 
 ## Hypothesis 2
 Older children will be more likely to identify excluders as controlling resources than younger children.
