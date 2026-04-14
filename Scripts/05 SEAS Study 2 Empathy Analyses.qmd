@@ -157,8 +157,9 @@ total_cor_matrix <- rcorr(as.matrix(total_outcomes), type = "pearson")
 
 total_correlation = total_cor_matrix$r[1, -1]
 total_p = total_cor_matrix$P[1, -1]
+total_degrees = total_cor_matrix$n[1, 1] - 2 #I did confirm that all the ns were the same for the values within each of the 4 matrices
 
-total_df <- data.frame(r = total_correlation, p = total_p)
+total_df <- data.frame(r = total_correlation, p = total_p) 
 
 total_df <- total_df |>
   rownames_to_column(var = "variable") |>
@@ -190,7 +191,10 @@ total_cor_table <- total_df |>
     "Correlations were calculated with the sum scores of each respective variable"
   ) |>
   tab_footnote(
-    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+    "Corrections used the Bonferroni method, k = 9"
+  ) |>
+  tab_footnote(
+    str_glue("Degrees of freedom = {total_degrees}")
   )
 
 total_cor_table
@@ -209,6 +213,7 @@ contagion_cor_matrix <- rcorr(as.matrix(contagion_outcomes), type = "pearson")
 
 contagion_correlation = contagion_cor_matrix$r[1, -1]
 contagion_p = contagion_cor_matrix$P[1, -1]
+contagion_degrees = contagion_cor_matrix$n[1, 1] - 2
 
 contagion_df <- data.frame(r = contagion_correlation, p = contagion_p)
 
@@ -242,7 +247,10 @@ contagion_cor_table <- contagion_df |>
     "Correlations were calculated with the sum scores of each respective variable"
   ) |>
   tab_footnote(
-    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+    "Corrections used the Bonferroni method, k = 9"
+  ) |>
+  tab_footnote(
+    str_glue("Degrees of freedom = {contagion_degrees}")
   )
 
 contagion_cor_table
@@ -261,6 +269,7 @@ attention_cor_matrix <- rcorr(as.matrix(attention_outcomes), type = "pearson")
 
 attention_correlation = attention_cor_matrix$r[1, -1]
 attention_p = attention_cor_matrix$P[1, -1]
+attention_degrees = attention_cor_matrix$n[1, 1]
 
 attention_df <- data.frame(r = attention_correlation, p = attention_p)
 
@@ -291,10 +300,10 @@ attention_cor_table <- attention_df |>
     columns = everything()
   ) |> 
   tab_footnote(
-    "Correlations were calculated with the sum scores of each respective variable"
+    "Corrections used the Bonferroni method, k = 9"
   ) |>
   tab_footnote(
-    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+    str_glue("Degrees of freedom = {attention_degrees}")
   )
 
 attention_cor_table
@@ -313,6 +322,7 @@ prosocial_cor_matrix <- rcorr(as.matrix(prosocial_outcomes), type = "pearson")
 
 prosocial_correlation = prosocial_cor_matrix$r[1, -1]
 prosocial_p = prosocial_cor_matrix$P[1, -1]
+prosocial_degrees = prosocial_cor_matrix$n[1, 1]
 
 prosocial_df <- data.frame(r = prosocial_correlation, p = prosocial_p)
 
@@ -343,12 +353,11 @@ prosocial_cor_table <- prosocial_df |>
     columns = everything()
   ) |> 
   tab_footnote(
-    "Correlations were calculated with the sum scores of each respective variable"
+    "Corrections used the Bonferroni method, k = 9"
   ) |>
   tab_footnote(
-    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+    str_glue("Degrees of freedom = {prosocial_degrees}")
   )
-
 prosocial_cor_table
 
 gtsave(prosocial_cor_table, "05 SEAS Study 2 Empathy Analyses_tables/prosocial_cor_table.png")

@@ -263,61 +263,65 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>total_correlation <span class="ot">=</span> total_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>total_p <span class="ot">=</span> total_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>total_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> total_correlation, <span class="at">p =</span> total_p)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>total_df <span class="ot">&lt;-</span> total_df <span class="sc">|&gt;</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"variable"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> labels,</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">r =</span> <span class="fu">signif</span>(r, <span class="dv">2</span>),</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">signif</span>(p, <span class="dv">2</span>),</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrected p"</span> <span class="ot">=</span> <span class="fu">if_else</span>(p <span class="sc">*</span> <span class="dv">9</span> <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="fl">1.0</span>, p <span class="sc">*</span> <span class="dv">9</span>)</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>total_cor_table <span class="ot">&lt;-</span> total_df <span class="sc">|&gt;</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">rowname_col =</span> <span class="st">"variable"</span>,</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">|&gt;</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"EmQue Total Correlations"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_body</span>(</span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">columns =</span> <span class="fu">c</span>(r, p, <span class="st">"Corrected p"</span>),</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>      <span class="at">rows =</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_align</span>(</span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"center"</span>,</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>()</span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Correlations were calculated with the sum scores of each respective variable"</span></span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Significant p-values (regardless of whether corrected p was significant) have been highlighted"</span></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>total_cor_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>total_degrees <span class="ot">=</span> total_cor_matrix<span class="sc">$</span>n[<span class="dv">1</span>, <span class="dv">1</span>] <span class="sc">-</span> <span class="dv">2</span> <span class="co">#I did confirm that all the ns were the same for the values within each of the 4 matrices</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>total_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> total_correlation, <span class="at">p =</span> total_p) </span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>total_df <span class="ot">&lt;-</span> total_df <span class="sc">|&gt;</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"variable"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> labels,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">r =</span> <span class="fu">signif</span>(r, <span class="dv">2</span>),</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">signif</span>(p, <span class="dv">2</span>),</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrected p"</span> <span class="ot">=</span> <span class="fu">if_else</span>(p <span class="sc">*</span> <span class="dv">9</span> <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="fl">1.0</span>, p <span class="sc">*</span> <span class="dv">9</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>total_cor_table <span class="ot">&lt;-</span> total_df <span class="sc">|&gt;</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">rowname_col =</span> <span class="st">"variable"</span>,</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">|&gt;</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"EmQue Total Correlations"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_body</span>(</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>      <span class="at">columns =</span> <span class="fu">c</span>(r, p, <span class="st">"Corrected p"</span>),</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>      <span class="at">rows =</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_align</span>(</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"center"</span>,</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>()</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Correlations were calculated with the sum scores of each respective variable"</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrections used the Bonferroni method, k = 9"</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_glue</span>(<span class="st">"Degrees of freedom = {total_degrees}"</span>)</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>total_cor_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="lzmnmrwamu" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#lzmnmrwamu table {
+<div id="olofqkszwl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#olofqkszwl table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#lzmnmrwamu thead, #lzmnmrwamu tbody, #lzmnmrwamu tfoot, #lzmnmrwamu tr, #lzmnmrwamu td, #lzmnmrwamu th {
+#olofqkszwl thead, #olofqkszwl tbody, #olofqkszwl tfoot, #olofqkszwl tr, #olofqkszwl td, #olofqkszwl th {
   border-style: none;
 }
 
-#lzmnmrwamu p {
+#olofqkszwl p {
   margin: 0;
   padding: 0;
 }
 
-#lzmnmrwamu .gt_table {
+#olofqkszwl .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -343,12 +347,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#lzmnmrwamu .gt_caption {
+#olofqkszwl .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#lzmnmrwamu .gt_title {
+#olofqkszwl .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -360,7 +364,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#lzmnmrwamu .gt_subtitle {
+#olofqkszwl .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -372,7 +376,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#lzmnmrwamu .gt_heading {
+#olofqkszwl .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -384,13 +388,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#lzmnmrwamu .gt_bottom_border {
+#olofqkszwl .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
 }
 
-#lzmnmrwamu .gt_col_headings {
+#olofqkszwl .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -405,7 +409,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#lzmnmrwamu .gt_col_heading {
+#olofqkszwl .gt_col_heading {
   color: #FFFFFF;
   background-color: #0076BA;
   font-size: 100%;
@@ -425,7 +429,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#lzmnmrwamu .gt_column_spanner_outer {
+#olofqkszwl .gt_column_spanner_outer {
   color: #FFFFFF;
   background-color: #0076BA;
   font-size: 100%;
@@ -437,15 +441,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#lzmnmrwamu .gt_column_spanner_outer:first-child {
+#olofqkszwl .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#lzmnmrwamu .gt_column_spanner_outer:last-child {
+#olofqkszwl .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#lzmnmrwamu .gt_column_spanner {
+#olofqkszwl .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
@@ -457,11 +461,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#lzmnmrwamu .gt_spanner_row {
+#olofqkszwl .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#lzmnmrwamu .gt_group_heading {
+#olofqkszwl .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -487,7 +491,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#lzmnmrwamu .gt_empty_group_heading {
+#olofqkszwl .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -502,15 +506,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#lzmnmrwamu .gt_from_md > :first-child {
+#olofqkszwl .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#lzmnmrwamu .gt_from_md > :last-child {
+#olofqkszwl .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#lzmnmrwamu .gt_row {
+#olofqkszwl .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -529,7 +533,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#lzmnmrwamu .gt_stub {
+#olofqkszwl .gt_stub {
   color: #333333;
   background-color: #89D3FE;
   font-size: 100%;
@@ -542,7 +546,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#lzmnmrwamu .gt_stub_row_group {
+#olofqkszwl .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -556,15 +560,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#lzmnmrwamu .gt_row_group_first td {
+#olofqkszwl .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#lzmnmrwamu .gt_row_group_first th {
+#olofqkszwl .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#lzmnmrwamu .gt_summary_row {
+#olofqkszwl .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -574,16 +578,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#lzmnmrwamu .gt_first_summary_row {
+#olofqkszwl .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #5F5F5F;
 }
 
-#lzmnmrwamu .gt_first_summary_row.thick {
+#olofqkszwl .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#lzmnmrwamu .gt_last_summary_row {
+#olofqkszwl .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -593,7 +597,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#lzmnmrwamu .gt_grand_summary_row {
+#olofqkszwl .gt_grand_summary_row {
   color: #333333;
   background-color: #D5D5D5;
   text-transform: inherit;
@@ -603,7 +607,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#lzmnmrwamu .gt_first_grand_summary_row {
+#olofqkszwl .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -613,7 +617,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #5F5F5F;
 }
 
-#lzmnmrwamu .gt_last_grand_summary_row_top {
+#olofqkszwl .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -623,11 +627,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#lzmnmrwamu .gt_striped {
+#olofqkszwl .gt_striped {
   background-color: #EDF7FC;
 }
 
-#lzmnmrwamu .gt_table_body {
+#olofqkszwl .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -636,7 +640,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#lzmnmrwamu .gt_footnotes {
+#olofqkszwl .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -650,7 +654,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#lzmnmrwamu .gt_footnote {
+#olofqkszwl .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -659,7 +663,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#lzmnmrwamu .gt_sourcenotes {
+#olofqkszwl .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -673,7 +677,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#lzmnmrwamu .gt_sourcenote {
+#olofqkszwl .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -681,72 +685,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#lzmnmrwamu .gt_left {
+#olofqkszwl .gt_left {
   text-align: left;
 }
 
-#lzmnmrwamu .gt_center {
+#olofqkszwl .gt_center {
   text-align: center;
 }
 
-#lzmnmrwamu .gt_right {
+#olofqkszwl .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#lzmnmrwamu .gt_font_normal {
+#olofqkszwl .gt_font_normal {
   font-weight: normal;
 }
 
-#lzmnmrwamu .gt_font_bold {
+#olofqkszwl .gt_font_bold {
   font-weight: bold;
 }
 
-#lzmnmrwamu .gt_font_italic {
+#olofqkszwl .gt_font_italic {
   font-style: italic;
 }
 
-#lzmnmrwamu .gt_super {
+#olofqkszwl .gt_super {
   font-size: 65%;
 }
 
-#lzmnmrwamu .gt_footnote_marks {
+#olofqkszwl .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#lzmnmrwamu .gt_asterisk {
+#olofqkszwl .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#lzmnmrwamu .gt_indent_1 {
+#olofqkszwl .gt_indent_1 {
   text-indent: 5px;
 }
 
-#lzmnmrwamu .gt_indent_2 {
+#olofqkszwl .gt_indent_2 {
   text-indent: 10px;
 }
 
-#lzmnmrwamu .gt_indent_3 {
+#olofqkszwl .gt_indent_3 {
   text-indent: 15px;
 }
 
-#lzmnmrwamu .gt_indent_4 {
+#olofqkszwl .gt_indent_4 {
   text-indent: 20px;
 }
 
-#lzmnmrwamu .gt_indent_5 {
+#olofqkszwl .gt_indent_5 {
   text-indent: 25px;
 }
 
-#lzmnmrwamu .katex-display {
+#olofqkszwl .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#lzmnmrwamu div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#olofqkszwl div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -823,7 +827,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td colspan="4" class="gt_footnote">Correlations were calculated with the sum scores of each respective variable</td>
 </tr>
 <tr class="gt_footnotes even">
-<td colspan="4" class="gt_footnote">Significant p-values (regardless of whether corrected p was significant) have been highlighted</td>
+<td colspan="4" class="gt_footnote">Corrections used the Bonferroni method, k = 9</td>
+</tr>
+<tr class="gt_footnotes odd">
+<td colspan="4" class="gt_footnote">Degrees of freedom = 87</td>
 </tr>
 </tfoot>
 
@@ -833,7 +840,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(total_cor_table, <span class="st">"05 SEAS Study 2 Empathy Analyses_tables/total_cor_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/Rtmpg10dV1/file6da4840789a.html screenshot completed</code></pre>
+<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/RtmpeWG2tg/file84e463353221.html screenshot completed</code></pre>
 </div>
 </div>
 <p>EmQue total scores correlated with two variables: comparison resource selection total (r = -0.23 (weak negative), p = 0.03, p with Bonferroni correction = 0.27) and comparison resource physical selection (r = -0.27 (weak negative), p = 0.012, p with Bonferroni correction = 0.11), such that participants with higher empathy scores were less likely to select the excluder over the includer as having more resources overall and more physical resources.</p>
@@ -848,61 +855,65 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>contagion_correlation <span class="ot">=</span> contagion_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>contagion_p <span class="ot">=</span> contagion_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>contagion_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> contagion_correlation, <span class="at">p =</span> contagion_p)</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>contagion_df <span class="ot">&lt;-</span> contagion_df <span class="sc">|&gt;</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"variable"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> labels,</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">r =</span> <span class="fu">signif</span>(r, <span class="dv">2</span>),</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">signif</span>(p, <span class="dv">2</span>),</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrected p"</span> <span class="ot">=</span> <span class="fu">if_else</span>(p <span class="sc">*</span> <span class="dv">9</span> <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="fl">1.0</span>, p <span class="sc">*</span> <span class="dv">9</span>)</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>contagion_cor_table <span class="ot">&lt;-</span> contagion_df <span class="sc">|&gt;</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">rowname_col =</span> <span class="st">"variable"</span>,</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">|&gt;</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">"pink"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"EmQue Emotion Contagion Correlations"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_body</span>(</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">columns =</span> <span class="fu">c</span>(r, p, <span class="st">"Corrected p"</span>),</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">rows =</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span></span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_align</span>(</span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"center"</span>,</span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>()</span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Correlations were calculated with the sum scores of each respective variable"</span></span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Significant p-values (regardless of whether corrected p was significant) have been highlighted"</span></span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>contagion_cor_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>contagion_degrees <span class="ot">=</span> contagion_cor_matrix<span class="sc">$</span>n[<span class="dv">1</span>, <span class="dv">1</span>] <span class="sc">-</span> <span class="dv">2</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>contagion_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> contagion_correlation, <span class="at">p =</span> contagion_p)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>contagion_df <span class="ot">&lt;-</span> contagion_df <span class="sc">|&gt;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"variable"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> labels,</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">r =</span> <span class="fu">signif</span>(r, <span class="dv">2</span>),</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">signif</span>(p, <span class="dv">2</span>),</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrected p"</span> <span class="ot">=</span> <span class="fu">if_else</span>(p <span class="sc">*</span> <span class="dv">9</span> <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="fl">1.0</span>, p <span class="sc">*</span> <span class="dv">9</span>)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>contagion_cor_table <span class="ot">&lt;-</span> contagion_df <span class="sc">|&gt;</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">rowname_col =</span> <span class="st">"variable"</span>,</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">|&gt;</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">"pink"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"EmQue Emotion Contagion Correlations"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_body</span>(</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">columns =</span> <span class="fu">c</span>(r, p, <span class="st">"Corrected p"</span>),</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">rows =</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_align</span>(</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"center"</span>,</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>()</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Correlations were calculated with the sum scores of each respective variable"</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrections used the Bonferroni method, k = 9"</span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_glue</span>(<span class="st">"Degrees of freedom = {contagion_degrees}"</span>)</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>contagion_cor_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="hbwyhtwezf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#hbwyhtwezf table {
+<div id="tmmielialo" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#tmmielialo table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#hbwyhtwezf thead, #hbwyhtwezf tbody, #hbwyhtwezf tfoot, #hbwyhtwezf tr, #hbwyhtwezf td, #hbwyhtwezf th {
+#tmmielialo thead, #tmmielialo tbody, #tmmielialo tfoot, #tmmielialo tr, #tmmielialo td, #tmmielialo th {
   border-style: none;
 }
 
-#hbwyhtwezf p {
+#tmmielialo p {
   margin: 0;
   padding: 0;
 }
 
-#hbwyhtwezf .gt_table {
+#tmmielialo .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -928,12 +939,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#hbwyhtwezf .gt_caption {
+#tmmielialo .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#hbwyhtwezf .gt_title {
+#tmmielialo .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -945,7 +956,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#hbwyhtwezf .gt_subtitle {
+#tmmielialo .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -957,7 +968,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#hbwyhtwezf .gt_heading {
+#tmmielialo .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -969,13 +980,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#hbwyhtwezf .gt_bottom_border {
+#tmmielialo .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
 }
 
-#hbwyhtwezf .gt_col_headings {
+#tmmielialo .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -990,7 +1001,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#hbwyhtwezf .gt_col_heading {
+#tmmielialo .gt_col_heading {
   color: #FFFFFF;
   background-color: #CB2A7B;
   font-size: 100%;
@@ -1010,7 +1021,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#hbwyhtwezf .gt_column_spanner_outer {
+#tmmielialo .gt_column_spanner_outer {
   color: #FFFFFF;
   background-color: #CB2A7B;
   font-size: 100%;
@@ -1022,15 +1033,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#hbwyhtwezf .gt_column_spanner_outer:first-child {
+#tmmielialo .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hbwyhtwezf .gt_column_spanner_outer:last-child {
+#tmmielialo .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hbwyhtwezf .gt_column_spanner {
+#tmmielialo .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
@@ -1042,11 +1053,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#hbwyhtwezf .gt_spanner_row {
+#tmmielialo .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#hbwyhtwezf .gt_group_heading {
+#tmmielialo .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1072,7 +1083,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#hbwyhtwezf .gt_empty_group_heading {
+#tmmielialo .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1087,15 +1098,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#hbwyhtwezf .gt_from_md > :first-child {
+#tmmielialo .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hbwyhtwezf .gt_from_md > :last-child {
+#tmmielialo .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hbwyhtwezf .gt_row {
+#tmmielialo .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1114,7 +1125,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#hbwyhtwezf .gt_stub {
+#tmmielialo .gt_stub {
   color: #333333;
   background-color: #FFC6E3;
   font-size: 100%;
@@ -1127,7 +1138,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#hbwyhtwezf .gt_stub_row_group {
+#tmmielialo .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1141,15 +1152,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#hbwyhtwezf .gt_row_group_first td {
+#tmmielialo .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#hbwyhtwezf .gt_row_group_first th {
+#tmmielialo .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#hbwyhtwezf .gt_summary_row {
+#tmmielialo .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1159,16 +1170,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#hbwyhtwezf .gt_first_summary_row {
+#tmmielialo .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #5F5F5F;
 }
 
-#hbwyhtwezf .gt_first_summary_row.thick {
+#tmmielialo .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#hbwyhtwezf .gt_last_summary_row {
+#tmmielialo .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1178,7 +1189,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#hbwyhtwezf .gt_grand_summary_row {
+#tmmielialo .gt_grand_summary_row {
   color: #333333;
   background-color: #D5D5D5;
   text-transform: inherit;
@@ -1188,7 +1199,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#hbwyhtwezf .gt_first_grand_summary_row {
+#tmmielialo .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1198,7 +1209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #5F5F5F;
 }
 
-#hbwyhtwezf .gt_last_grand_summary_row_top {
+#tmmielialo .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1208,11 +1219,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#hbwyhtwezf .gt_striped {
+#tmmielialo .gt_striped {
   background-color: #FCF2F7;
 }
 
-#hbwyhtwezf .gt_table_body {
+#tmmielialo .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -1221,7 +1232,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#hbwyhtwezf .gt_footnotes {
+#tmmielialo .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1235,7 +1246,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#hbwyhtwezf .gt_footnote {
+#tmmielialo .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1244,7 +1255,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#hbwyhtwezf .gt_sourcenotes {
+#tmmielialo .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1258,7 +1269,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#hbwyhtwezf .gt_sourcenote {
+#tmmielialo .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1266,72 +1277,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#hbwyhtwezf .gt_left {
+#tmmielialo .gt_left {
   text-align: left;
 }
 
-#hbwyhtwezf .gt_center {
+#tmmielialo .gt_center {
   text-align: center;
 }
 
-#hbwyhtwezf .gt_right {
+#tmmielialo .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hbwyhtwezf .gt_font_normal {
+#tmmielialo .gt_font_normal {
   font-weight: normal;
 }
 
-#hbwyhtwezf .gt_font_bold {
+#tmmielialo .gt_font_bold {
   font-weight: bold;
 }
 
-#hbwyhtwezf .gt_font_italic {
+#tmmielialo .gt_font_italic {
   font-style: italic;
 }
 
-#hbwyhtwezf .gt_super {
+#tmmielialo .gt_super {
   font-size: 65%;
 }
 
-#hbwyhtwezf .gt_footnote_marks {
+#tmmielialo .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#hbwyhtwezf .gt_asterisk {
+#tmmielialo .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#hbwyhtwezf .gt_indent_1 {
+#tmmielialo .gt_indent_1 {
   text-indent: 5px;
 }
 
-#hbwyhtwezf .gt_indent_2 {
+#tmmielialo .gt_indent_2 {
   text-indent: 10px;
 }
 
-#hbwyhtwezf .gt_indent_3 {
+#tmmielialo .gt_indent_3 {
   text-indent: 15px;
 }
 
-#hbwyhtwezf .gt_indent_4 {
+#tmmielialo .gt_indent_4 {
   text-indent: 20px;
 }
 
-#hbwyhtwezf .gt_indent_5 {
+#tmmielialo .gt_indent_5 {
   text-indent: 25px;
 }
 
-#hbwyhtwezf .katex-display {
+#tmmielialo .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#hbwyhtwezf div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#tmmielialo div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1408,7 +1419,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td colspan="4" class="gt_footnote">Correlations were calculated with the sum scores of each respective variable</td>
 </tr>
 <tr class="gt_footnotes even">
-<td colspan="4" class="gt_footnote">Significant p-values (regardless of whether corrected p was significant) have been highlighted</td>
+<td colspan="4" class="gt_footnote">Corrections used the Bonferroni method, k = 9</td>
+</tr>
+<tr class="gt_footnotes odd">
+<td colspan="4" class="gt_footnote">Degrees of freedom = 88</td>
 </tr>
 </tfoot>
 
@@ -1418,7 +1432,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(contagion_cor_table, <span class="st">"05 SEAS Study 2 Empathy Analyses_tables/contagion_cor_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/Rtmpg10dV1/file6da4df12410.html screenshot completed</code></pre>
+<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/RtmpeWG2tg/file84e413bb25a4.html screenshot completed</code></pre>
 </div>
 </div>
 <p>There were no significant correlations with the EmQue emotion contagion subscale.</p>
@@ -1433,61 +1447,62 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>attention_correlation <span class="ot">=</span> attention_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>attention_p <span class="ot">=</span> attention_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>attention_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> attention_correlation, <span class="at">p =</span> attention_p)</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>attention_df <span class="ot">&lt;-</span> attention_df <span class="sc">|&gt;</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"variable"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> labels,</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">r =</span> <span class="fu">signif</span>(r, <span class="dv">2</span>),</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">signif</span>(p, <span class="dv">2</span>),</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrected p"</span> <span class="ot">=</span> <span class="fu">if_else</span>(p <span class="sc">*</span> <span class="dv">9</span> <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="fl">1.0</span>, p <span class="sc">*</span> <span class="dv">9</span>)</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>attention_cor_table <span class="ot">&lt;-</span> attention_df <span class="sc">|&gt;</span></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(</span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">rowname_col =</span> <span class="st">"variable"</span>,</span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">|&gt;</span></span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">"green"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"EmQue Attention to Others' Feelings Correlations"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_body</span>(</span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">columns =</span> <span class="fu">c</span>(r, p, <span class="st">"Corrected p"</span>),</span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">rows =</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span></span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_align</span>(</span>
-<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"center"</span>,</span>
-<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>()</span>
-<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
-<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
-<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Correlations were calculated with the sum scores of each respective variable"</span></span>
-<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
-<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Significant p-values (regardless of whether corrected p was significant) have been highlighted"</span></span>
-<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>attention_cor_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>attention_degrees <span class="ot">=</span> attention_cor_matrix<span class="sc">$</span>n[<span class="dv">1</span>, <span class="dv">1</span>]</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>attention_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> attention_correlation, <span class="at">p =</span> attention_p)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>attention_df <span class="ot">&lt;-</span> attention_df <span class="sc">|&gt;</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"variable"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> labels,</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">r =</span> <span class="fu">signif</span>(r, <span class="dv">2</span>),</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">signif</span>(p, <span class="dv">2</span>),</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrected p"</span> <span class="ot">=</span> <span class="fu">if_else</span>(p <span class="sc">*</span> <span class="dv">9</span> <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="fl">1.0</span>, p <span class="sc">*</span> <span class="dv">9</span>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>attention_cor_table <span class="ot">&lt;-</span> attention_df <span class="sc">|&gt;</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">rowname_col =</span> <span class="st">"variable"</span>,</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">|&gt;</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">"green"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"EmQue Attention to Others' Feelings Correlations"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_body</span>(</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">columns =</span> <span class="fu">c</span>(r, p, <span class="st">"Corrected p"</span>),</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">rows =</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_align</span>(</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"center"</span>,</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>()</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrections used the Bonferroni method, k = 9"</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_glue</span>(<span class="st">"Degrees of freedom = {attention_degrees}"</span>)</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>attention_cor_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="aeutqjeiom" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#aeutqjeiom table {
+<div id="ofxenfjcqa" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ofxenfjcqa table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#aeutqjeiom thead, #aeutqjeiom tbody, #aeutqjeiom tfoot, #aeutqjeiom tr, #aeutqjeiom td, #aeutqjeiom th {
+#ofxenfjcqa thead, #ofxenfjcqa tbody, #ofxenfjcqa tfoot, #ofxenfjcqa tr, #ofxenfjcqa td, #ofxenfjcqa th {
   border-style: none;
 }
 
-#aeutqjeiom p {
+#ofxenfjcqa p {
   margin: 0;
   padding: 0;
 }
 
-#aeutqjeiom .gt_table {
+#ofxenfjcqa .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1513,12 +1528,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#aeutqjeiom .gt_caption {
+#ofxenfjcqa .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#aeutqjeiom .gt_title {
+#ofxenfjcqa .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1530,7 +1545,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#aeutqjeiom .gt_subtitle {
+#ofxenfjcqa .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1542,7 +1557,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#aeutqjeiom .gt_heading {
+#ofxenfjcqa .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1554,13 +1569,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#aeutqjeiom .gt_bottom_border {
+#ofxenfjcqa .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
 }
 
-#aeutqjeiom .gt_col_headings {
+#ofxenfjcqa .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -1575,7 +1590,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#aeutqjeiom .gt_col_heading {
+#ofxenfjcqa .gt_col_heading {
   color: #FFFFFF;
   background-color: #038901;
   font-size: 100%;
@@ -1595,7 +1610,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#aeutqjeiom .gt_column_spanner_outer {
+#ofxenfjcqa .gt_column_spanner_outer {
   color: #FFFFFF;
   background-color: #038901;
   font-size: 100%;
@@ -1607,15 +1622,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#aeutqjeiom .gt_column_spanner_outer:first-child {
+#ofxenfjcqa .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#aeutqjeiom .gt_column_spanner_outer:last-child {
+#ofxenfjcqa .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#aeutqjeiom .gt_column_spanner {
+#ofxenfjcqa .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
@@ -1627,11 +1642,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#aeutqjeiom .gt_spanner_row {
+#ofxenfjcqa .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#aeutqjeiom .gt_group_heading {
+#ofxenfjcqa .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1657,7 +1672,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#aeutqjeiom .gt_empty_group_heading {
+#ofxenfjcqa .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1672,15 +1687,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#aeutqjeiom .gt_from_md > :first-child {
+#ofxenfjcqa .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#aeutqjeiom .gt_from_md > :last-child {
+#ofxenfjcqa .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#aeutqjeiom .gt_row {
+#ofxenfjcqa .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1699,7 +1714,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#aeutqjeiom .gt_stub {
+#ofxenfjcqa .gt_stub {
   color: #333333;
   background-color: #CAFFAF;
   font-size: 100%;
@@ -1712,7 +1727,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#aeutqjeiom .gt_stub_row_group {
+#ofxenfjcqa .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1726,15 +1741,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#aeutqjeiom .gt_row_group_first td {
+#ofxenfjcqa .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#aeutqjeiom .gt_row_group_first th {
+#ofxenfjcqa .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#aeutqjeiom .gt_summary_row {
+#ofxenfjcqa .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1744,16 +1759,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#aeutqjeiom .gt_first_summary_row {
+#ofxenfjcqa .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #5F5F5F;
 }
 
-#aeutqjeiom .gt_first_summary_row.thick {
+#ofxenfjcqa .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#aeutqjeiom .gt_last_summary_row {
+#ofxenfjcqa .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1763,7 +1778,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#aeutqjeiom .gt_grand_summary_row {
+#ofxenfjcqa .gt_grand_summary_row {
   color: #333333;
   background-color: #D5D5D5;
   text-transform: inherit;
@@ -1773,7 +1788,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#aeutqjeiom .gt_first_grand_summary_row {
+#ofxenfjcqa .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1783,7 +1798,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #5F5F5F;
 }
 
-#aeutqjeiom .gt_last_grand_summary_row_top {
+#ofxenfjcqa .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1793,11 +1808,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#aeutqjeiom .gt_striped {
+#ofxenfjcqa .gt_striped {
   background-color: #EDF6E8;
 }
 
-#aeutqjeiom .gt_table_body {
+#ofxenfjcqa .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -1806,7 +1821,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#aeutqjeiom .gt_footnotes {
+#ofxenfjcqa .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1820,7 +1835,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#aeutqjeiom .gt_footnote {
+#ofxenfjcqa .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1829,7 +1844,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#aeutqjeiom .gt_sourcenotes {
+#ofxenfjcqa .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1843,7 +1858,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#aeutqjeiom .gt_sourcenote {
+#ofxenfjcqa .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1851,72 +1866,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#aeutqjeiom .gt_left {
+#ofxenfjcqa .gt_left {
   text-align: left;
 }
 
-#aeutqjeiom .gt_center {
+#ofxenfjcqa .gt_center {
   text-align: center;
 }
 
-#aeutqjeiom .gt_right {
+#ofxenfjcqa .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#aeutqjeiom .gt_font_normal {
+#ofxenfjcqa .gt_font_normal {
   font-weight: normal;
 }
 
-#aeutqjeiom .gt_font_bold {
+#ofxenfjcqa .gt_font_bold {
   font-weight: bold;
 }
 
-#aeutqjeiom .gt_font_italic {
+#ofxenfjcqa .gt_font_italic {
   font-style: italic;
 }
 
-#aeutqjeiom .gt_super {
+#ofxenfjcqa .gt_super {
   font-size: 65%;
 }
 
-#aeutqjeiom .gt_footnote_marks {
+#ofxenfjcqa .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#aeutqjeiom .gt_asterisk {
+#ofxenfjcqa .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#aeutqjeiom .gt_indent_1 {
+#ofxenfjcqa .gt_indent_1 {
   text-indent: 5px;
 }
 
-#aeutqjeiom .gt_indent_2 {
+#ofxenfjcqa .gt_indent_2 {
   text-indent: 10px;
 }
 
-#aeutqjeiom .gt_indent_3 {
+#ofxenfjcqa .gt_indent_3 {
   text-indent: 15px;
 }
 
-#aeutqjeiom .gt_indent_4 {
+#ofxenfjcqa .gt_indent_4 {
   text-indent: 20px;
 }
 
-#aeutqjeiom .gt_indent_5 {
+#ofxenfjcqa .gt_indent_5 {
   text-indent: 25px;
 }
 
-#aeutqjeiom .katex-display {
+#ofxenfjcqa .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#aeutqjeiom div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#ofxenfjcqa div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1990,10 +2005,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody><tfoot>
 <tr class="gt_footnotes odd">
-<td colspan="4" class="gt_footnote">Correlations were calculated with the sum scores of each respective variable</td>
+<td colspan="4" class="gt_footnote">Corrections used the Bonferroni method, k = 9</td>
 </tr>
 <tr class="gt_footnotes even">
-<td colspan="4" class="gt_footnote">Significant p-values (regardless of whether corrected p was significant) have been highlighted</td>
+<td colspan="4" class="gt_footnote">Degrees of freedom = 90</td>
 </tr>
 </tfoot>
 
@@ -2003,7 +2018,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(attention_cor_table, <span class="st">"05 SEAS Study 2 Empathy Analyses_tables/attention_cor_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/Rtmpg10dV1/file6da4304f59c7.html screenshot completed</code></pre>
+<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/RtmpeWG2tg/file84e46a58735b.html screenshot completed</code></pre>
 </div>
 </div>
 <p>The EmQue attention to others’ feelings subscale scores significantly correlate with comparison physical selection totals (r = -0.25 (weak negative), p = 0.016, p with Bonferroni correction = 0.14) and no other variables, such that participants with higher attention to others’ subscale scores were less likely to select the excluder over the includer as having more physical resources.</p>
@@ -2018,61 +2033,61 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>prosocial_correlation <span class="ot">=</span> prosocial_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>prosocial_p <span class="ot">=</span> prosocial_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>prosocial_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> prosocial_correlation, <span class="at">p =</span> prosocial_p)</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>prosocial_df <span class="ot">&lt;-</span> prosocial_df <span class="sc">|&gt;</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"variable"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> labels,</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">r =</span> <span class="fu">signif</span>(r, <span class="dv">2</span>),</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">signif</span>(p, <span class="dv">2</span>),</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrected p"</span> <span class="ot">=</span> <span class="fu">if_else</span>(p <span class="sc">*</span> <span class="dv">9</span> <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="fl">1.0</span>, p <span class="sc">*</span> <span class="dv">9</span>)</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>prosocial_cor_table <span class="ot">&lt;-</span> prosocial_df <span class="sc">|&gt;</span></span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(</span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">rowname_col =</span> <span class="st">"variable"</span>,</span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">|&gt;</span></span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"EmQue Prosocial Actions Correlations"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_body</span>(</span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">columns =</span> <span class="fu">c</span>(r, p, <span class="st">"Corrected p"</span>),</span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">rows =</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span></span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_align</span>(</span>
-<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"center"</span>,</span>
-<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>()</span>
-<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
-<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
-<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Correlations were calculated with the sum scores of each respective variable"</span></span>
-<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
-<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Significant p-values (regardless of whether corrected p was significant) have been highlighted"</span></span>
-<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>prosocial_degrees <span class="ot">=</span> prosocial_cor_matrix<span class="sc">$</span>n[<span class="dv">1</span>, <span class="dv">1</span>]</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>prosocial_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> prosocial_correlation, <span class="at">p =</span> prosocial_p)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>prosocial_df <span class="ot">&lt;-</span> prosocial_df <span class="sc">|&gt;</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"variable"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> labels,</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">r =</span> <span class="fu">signif</span>(r, <span class="dv">2</span>),</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">signif</span>(p, <span class="dv">2</span>),</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrected p"</span> <span class="ot">=</span> <span class="fu">if_else</span>(p <span class="sc">*</span> <span class="dv">9</span> <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="fl">1.0</span>, p <span class="sc">*</span> <span class="dv">9</span>)</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>prosocial_cor_table <span class="ot">&lt;-</span> prosocial_df <span class="sc">|&gt;</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">rowname_col =</span> <span class="st">"variable"</span>,</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">|&gt;</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"EmQue Prosocial Actions Correlations"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_body</span>(</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">columns =</span> <span class="fu">c</span>(r, p, <span class="st">"Corrected p"</span>),</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">rows =</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_align</span>(</span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">"center"</span>,</span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">everything</span>()</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Corrections used the Bonferroni method, k = 9"</span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>(</span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_glue</span>(<span class="st">"Degrees of freedom = {prosocial_degrees}"</span>)</span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>prosocial_cor_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="tfyoaxpphg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#tfyoaxpphg table {
+<div id="uzxfeicxvf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#uzxfeicxvf table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#tfyoaxpphg thead, #tfyoaxpphg tbody, #tfyoaxpphg tfoot, #tfyoaxpphg tr, #tfyoaxpphg td, #tfyoaxpphg th {
+#uzxfeicxvf thead, #uzxfeicxvf tbody, #uzxfeicxvf tfoot, #uzxfeicxvf tr, #uzxfeicxvf td, #uzxfeicxvf th {
   border-style: none;
 }
 
-#tfyoaxpphg p {
+#uzxfeicxvf p {
   margin: 0;
   padding: 0;
 }
 
-#tfyoaxpphg .gt_table {
+#uzxfeicxvf .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -2098,12 +2113,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#tfyoaxpphg .gt_caption {
+#uzxfeicxvf .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#tfyoaxpphg .gt_title {
+#uzxfeicxvf .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2115,7 +2130,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#tfyoaxpphg .gt_subtitle {
+#uzxfeicxvf .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2127,7 +2142,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#tfyoaxpphg .gt_heading {
+#uzxfeicxvf .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2139,13 +2154,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#tfyoaxpphg .gt_bottom_border {
+#uzxfeicxvf .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
 }
 
-#tfyoaxpphg .gt_col_headings {
+#uzxfeicxvf .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -2160,7 +2175,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#tfyoaxpphg .gt_col_heading {
+#uzxfeicxvf .gt_col_heading {
   color: #FFFFFF;
   background-color: #E4220C;
   font-size: 100%;
@@ -2180,7 +2195,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#tfyoaxpphg .gt_column_spanner_outer {
+#uzxfeicxvf .gt_column_spanner_outer {
   color: #FFFFFF;
   background-color: #E4220C;
   font-size: 100%;
@@ -2192,15 +2207,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#tfyoaxpphg .gt_column_spanner_outer:first-child {
+#uzxfeicxvf .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#tfyoaxpphg .gt_column_spanner_outer:last-child {
+#uzxfeicxvf .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#tfyoaxpphg .gt_column_spanner {
+#uzxfeicxvf .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
@@ -2212,11 +2227,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#tfyoaxpphg .gt_spanner_row {
+#uzxfeicxvf .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#tfyoaxpphg .gt_group_heading {
+#uzxfeicxvf .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2242,7 +2257,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#tfyoaxpphg .gt_empty_group_heading {
+#uzxfeicxvf .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2257,15 +2272,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#tfyoaxpphg .gt_from_md > :first-child {
+#uzxfeicxvf .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#tfyoaxpphg .gt_from_md > :last-child {
+#uzxfeicxvf .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#tfyoaxpphg .gt_row {
+#uzxfeicxvf .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2284,7 +2299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#tfyoaxpphg .gt_stub {
+#uzxfeicxvf .gt_stub {
   color: #333333;
   background-color: #FFCCC7;
   font-size: 100%;
@@ -2297,7 +2312,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#tfyoaxpphg .gt_stub_row_group {
+#uzxfeicxvf .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2311,15 +2326,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#tfyoaxpphg .gt_row_group_first td {
+#uzxfeicxvf .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#tfyoaxpphg .gt_row_group_first th {
+#uzxfeicxvf .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#tfyoaxpphg .gt_summary_row {
+#uzxfeicxvf .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2329,16 +2344,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#tfyoaxpphg .gt_first_summary_row {
+#uzxfeicxvf .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #5F5F5F;
 }
 
-#tfyoaxpphg .gt_first_summary_row.thick {
+#uzxfeicxvf .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#tfyoaxpphg .gt_last_summary_row {
+#uzxfeicxvf .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2348,7 +2363,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#tfyoaxpphg .gt_grand_summary_row {
+#uzxfeicxvf .gt_grand_summary_row {
   color: #333333;
   background-color: #D5D5D5;
   text-transform: inherit;
@@ -2358,7 +2373,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#tfyoaxpphg .gt_first_grand_summary_row {
+#uzxfeicxvf .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2368,7 +2383,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #5F5F5F;
 }
 
-#tfyoaxpphg .gt_last_grand_summary_row_top {
+#uzxfeicxvf .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2378,11 +2393,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#tfyoaxpphg .gt_striped {
+#uzxfeicxvf .gt_striped {
   background-color: #FEEDEC;
 }
 
-#tfyoaxpphg .gt_table_body {
+#uzxfeicxvf .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -2391,7 +2406,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#tfyoaxpphg .gt_footnotes {
+#uzxfeicxvf .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2405,7 +2420,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#tfyoaxpphg .gt_footnote {
+#uzxfeicxvf .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -2414,7 +2429,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#tfyoaxpphg .gt_sourcenotes {
+#uzxfeicxvf .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2428,7 +2443,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#tfyoaxpphg .gt_sourcenote {
+#uzxfeicxvf .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2436,72 +2451,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#tfyoaxpphg .gt_left {
+#uzxfeicxvf .gt_left {
   text-align: left;
 }
 
-#tfyoaxpphg .gt_center {
+#uzxfeicxvf .gt_center {
   text-align: center;
 }
 
-#tfyoaxpphg .gt_right {
+#uzxfeicxvf .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#tfyoaxpphg .gt_font_normal {
+#uzxfeicxvf .gt_font_normal {
   font-weight: normal;
 }
 
-#tfyoaxpphg .gt_font_bold {
+#uzxfeicxvf .gt_font_bold {
   font-weight: bold;
 }
 
-#tfyoaxpphg .gt_font_italic {
+#uzxfeicxvf .gt_font_italic {
   font-style: italic;
 }
 
-#tfyoaxpphg .gt_super {
+#uzxfeicxvf .gt_super {
   font-size: 65%;
 }
 
-#tfyoaxpphg .gt_footnote_marks {
+#uzxfeicxvf .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#tfyoaxpphg .gt_asterisk {
+#uzxfeicxvf .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#tfyoaxpphg .gt_indent_1 {
+#uzxfeicxvf .gt_indent_1 {
   text-indent: 5px;
 }
 
-#tfyoaxpphg .gt_indent_2 {
+#uzxfeicxvf .gt_indent_2 {
   text-indent: 10px;
 }
 
-#tfyoaxpphg .gt_indent_3 {
+#uzxfeicxvf .gt_indent_3 {
   text-indent: 15px;
 }
 
-#tfyoaxpphg .gt_indent_4 {
+#uzxfeicxvf .gt_indent_4 {
   text-indent: 20px;
 }
 
-#tfyoaxpphg .gt_indent_5 {
+#uzxfeicxvf .gt_indent_5 {
   text-indent: 25px;
 }
 
-#tfyoaxpphg .katex-display {
+#uzxfeicxvf .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#tfyoaxpphg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#uzxfeicxvf div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -2575,10 +2590,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody><tfoot>
 <tr class="gt_footnotes odd">
-<td colspan="4" class="gt_footnote">Correlations were calculated with the sum scores of each respective variable</td>
+<td colspan="4" class="gt_footnote">Corrections used the Bonferroni method, k = 9</td>
 </tr>
 <tr class="gt_footnotes even">
-<td colspan="4" class="gt_footnote">Significant p-values (regardless of whether corrected p was significant) have been highlighted</td>
+<td colspan="4" class="gt_footnote">Degrees of freedom = 92</td>
 </tr>
 </tfoot>
 
@@ -2588,7 +2603,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(prosocial_cor_table, <span class="st">"05 SEAS Study 2 Empathy Analyses_tables/prosocial_cor_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/Rtmpg10dV1/file6da49bb58c2.html screenshot completed</code></pre>
+<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/RtmpeWG2tg/file84e4bd87199.html screenshot completed</code></pre>
 </div>
 </div>
 <p>There were no significant correlations with the EmQue prosocial actions subscale.</p>
