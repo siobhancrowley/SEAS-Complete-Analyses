@@ -16,6 +16,7 @@ library(readxl)
 library(tidyverse)
 library(lme4)
 library(effsize)
+library(pwr)
 library(showtext)
 library(viridis)
 library(lmerTest)
@@ -95,7 +96,7 @@ identity_count2 <- seas2 |>
 
 `r nrow(seas2_full) - 1` children participated in this study, and `r nrow(seas2)` were included in the final analysis--`r gender_count2$n[1]` boys and `r gender_count2$n[2]` girls, as well as `r gender_count2$n[3]` child who did not identify as either.
 
-There are `r age_count2$n[1]` 3-year-olds, `r age_count2$n[2]` 4-year-olds, `r age_count2$n[3]` 5-year-olds, and `r age_count2$n[4]` 6-year-olds (`r age_count2$n[1] + age_count2$n[2]` in the 3-4 group and `r age_count2$n[3] + age_count2$n[4]` in the 5-6 group).
+There are `r age_count2$n[1]` 3-year-olds, `r age_count2$n[2]` 4-year-olds, `r age_count2$n[3]` 5-year-olds, and `r age_count2$n[4]` 6-year-olds (`r age_count2$n[1] + age_count2$n[2]` in the 3-4 group and `r age_count2$n[3] + age_count2$n[4]` in the 5-6 group). Mean = `r mean(seas2$age)`, sd = `r sd(seas2$age)`.
 
 And there are `r identity_count2$n[1]` participants who identify as White or European American, `r identity_count2$n[2] + identity_count2$n[6]` as multiple races or another race/ethnicity not listed, `r identity_count2$n[3]` as Asian, `r identity_count2$n[4]` as American Indian or Alaska Native, `r identity_count2$n[5] + identity_count2$n[8]` as did not want to respond, `r identity_count2$n[7]` as Middle Eastern or North African, and `r identity_count2$n[9]` as Hispanic, Latino/Latina/Latinx, or Spanish. 
 
@@ -686,9 +687,12 @@ em_phys_excluder_count <- seas2 |>
 
 em_phys_binom <- binom.test(em_phys_excluder_count, nrow(seas2), p = 0.5)
 em_phys_binom
+
+em_phys_h <- ES.h(p1 = em_phys_excluder_count / nrow(seas2), p2 = 0.5)
+em_phys_h
 ```
 
-To examine whether children were more likely than chance to select the excluder over the excluded character as having more physical resources, we conducted a binomial test. `r em_phys_excluder_count` out of `r nrow(seas2)` selected the excluder, producing a p-value of `r signif(em_phys_binom$p.value, 2)`, demonstrating that children were more likely to select the excluder.
+To examine whether children were more likely than chance to select the excluder over the excluded character as having more physical resources, we conducted a binomial test. `r em_phys_excluder_count` out of `r nrow(seas2)` selected the excluder, producing a p-value of `r signif(em_phys_binom$p.value, 2)`, demonstrating that children were more likely to select the excluder. Cohen's h = `r em_phys_h`.
 
 ### Hypothesis 2
 We predict children will view social excluders as having more social resources than those they exclude.
@@ -702,9 +706,12 @@ em_soc_excluder_count <- seas2 |>
 
 em_soc_binom <- binom.test(em_soc_excluder_count, nrow(seas2), p = 0.5)
 em_soc_binom
+
+em_soc_h <- ES.h(p1 = em_soc_excluder_count / nrow(seas2), p2 = 0.5)
+em_soc_h
 ```
 
-Conducting the same binomial test to assess whether children were more likely than chance to select the excluder over the excluded character as having more social resources found that `r em_soc_excluder_count` out of `r nrow(seas2)` selected the excluder, producing a p-value of `r signif(em_soc_binom$p.value, 2)`, demonstrating that children were more likely to select the excluder. 
+Conducting the same binomial test to assess whether children were more likely than chance to select the excluder over the excluded character as having more social resources found that `r em_soc_excluder_count` out of `r nrow(seas2)` selected the excluder, producing a p-value of `r signif(em_soc_binom$p.value, 2)`, demonstrating that children were more likely to select the excluder. Cohen's h = `r em_soc_h`.
 
 ### Hypothesis 3
 We expect that age will be associated with identifying the excluder as having more physical resources.
@@ -1176,6 +1183,9 @@ eic_soc_excluder_count <- seas2 |>
 
 eic_soc_binom <- binom.test(eic_soc_excluder_count, nrow(seas2), p = 0.5)
 eic_soc_binom
+
+eic_soc_h <- ES.h(p1 = eic_soc_excluder_count / nrow(seas2), p2 = 0.5)
+eic_soc_h
 ```
 
 To examine whether children were more likely than chance to select the excluder over the includer as having more physical resources, we conducted a binomial test. `r unname(eic_soc_binom$statistic)` out of `r nrow(seas2)` chose the excluder, producing a p-value of `r signif(eic_soc_binom$p.value, 2)`, demonstrating that children selected the excluder less frequently than at chance (i.e. they were significantly more likely to select the includer).
