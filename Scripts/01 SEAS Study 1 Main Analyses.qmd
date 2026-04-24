@@ -142,7 +142,7 @@ identify_total_scatter <- seas |>
   ggplot(aes(x = age_months, y = mem_check_total)) +
   geom_jitter() +
   stat_smooth(
-    method = "lm", 
+    method = "glm", 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -168,8 +168,9 @@ identify_total_scatter
 identify_trial_scatter <- mem_check_pivoted |>
   ggplot(aes(x = age_months, y = response)) +
   geom_point(position = position_jitter(height = 0.1)) +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"),
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -323,8 +324,8 @@ In this linear model of the number of times the excluder was selected as in char
 status_total_scatter <- seas |>
   ggplot(aes(x = age_months, y = status_total)) +
   geom_jitter() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -350,8 +351,9 @@ status_total_scatter
 status_trial_scatter <- status_pivoted |>
   ggplot(aes(x = age_months, y = response)) +
   geom_point(position = position_jitter(height = 0.1)) +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -575,8 +577,8 @@ resource_total_scatter <- seas |>
   filter(!is.na(resource_total)) |>
   ggplot(aes(x = age_months, y = resource_total)) +
   geom_jitter() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -600,8 +602,9 @@ resource_total_scatter
 resource_trial_scatter <- resource_pivoted |>
   ggplot(aes(x = age_months, y = response)) +
   geom_point(position = position_jitter(height = 0.1)) +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -636,8 +639,8 @@ resourcetype_total_scatter <- seas |>
   filter(!is.na(excluder_select)) |>
   ggplot(aes(x = age_months, y = excluder_select, color = type, fill = type)) +
   geom_point(position = position_jitter(height = 0.1)) +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
     formula = y ~ x, 
     alpha = 0.25) +
   geom_hline(yintercept = 1, linetype = "dashed", linewidth = 1, alpha = 0.5) +
@@ -671,8 +674,9 @@ resourcetype_total_scatter
 resourcetype_trial_scatter <- resource_pivoted |>
   ggplot(aes(x = age_months, y = response, color = resource_type, fill = resource_type)) +
   geom_point(position = position_jitter(height = 0.1)) +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
     formula = y ~ x, 
     alpha = 0.25) +
   geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +

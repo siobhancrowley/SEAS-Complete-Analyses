@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -11,6 +11,9 @@
 
 <title>02 SEAS Study 1 Explanatory Analyses</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -63,15 +66,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="02 SEAS Study 1 Explanatory Analyses_files/libs/clipboard/clipboard.min.js"></script>
 <script src="02 SEAS Study 1 Explanatory Analyses_files/libs/quarto-html/quarto.js" type="module"></script>
 <script src="02 SEAS Study 1 Explanatory Analyses_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="02 SEAS Study 1 Explanatory Analyses_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="02 SEAS Study 1 Explanatory Analyses_files/libs/quarto-html/popper.min.js"></script>
 <script src="02 SEAS Study 1 Explanatory Analyses_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="02 SEAS Study 1 Explanatory Analyses_files/libs/quarto-html/anchor.min.js"></script>
 <link href="02 SEAS Study 1 Explanatory Analyses_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="02 SEAS Study 1 Explanatory Analyses_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="02 SEAS Study 1 Explanatory Analyses_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="02 SEAS Study 1 Explanatory Analyses_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="02 SEAS Study 1 Explanatory Analyses_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="02 SEAS Study 1 Explanatory Analyses_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="02 SEAS Study 1 Explanatory Analyses_files/libs/bootstrap/bootstrap-efbb37e9afcc02144ebbc7afd12a776f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
@@ -377,7 +379,7 @@ X-squared = 80.149, df = 6, p-value = 3.329e-15</code></pre>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">explanation_type =</span> <span class="fu">fct_relevel</span>(explanation_type, <span class="st">"ST"</span>, <span class="st">"VG"</span>, <span class="st">"SG"</span>, <span class="st">"EX"</span>, <span class="st">"IN"</span>, <span class="st">"NR"</span>, <span class="st">"MR"</span>, <span class="st">"AR"</span>, <span class="st">"EP"</span>, <span class="st">"EN"</span>, <span class="st">"PR"</span>, <span class="st">"EM"</span>, <span class="st">"MT"</span>, <span class="st">"FR"</span>, <span class="st">"PS"</span>, <span class="st">"OR"</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age_months, <span class="at">y =</span> total, <span class="at">color =</span> explanation_type, <span class="at">fill =</span> explanation_type)) <span class="sc">+</span></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>() <span class="sc">+</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"glm"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>explanation_type) <span class="sc">+</span></span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> wo_black) <span class="sc">+</span></span>
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> wo_black) <span class="sc">+</span></span>
@@ -591,8 +593,8 @@ Number of Fisher Scoring iterations: 2</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>EX_count_age_scatter <span class="ot">&lt;-</span> seas_separated <span class="sc">|&gt;</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age_months, <span class="at">y =</span> EX_total)) <span class="sc">+</span></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>() <span class="sc">+</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_smooth</span>(</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"lm"</span>, </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"glm"</span>, </span>
 <span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">formula =</span> y <span class="sc">~</span> x, </span>
 <span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> magma_colors[<span class="dv">3</span>], </span>
 <span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> magma_colors[<span class="dv">5</span>], </span>
@@ -695,8 +697,8 @@ Number of Fisher Scoring iterations: 2</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>SG_count_age_scatter <span class="ot">&lt;-</span> seas_separated <span class="sc">|&gt;</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age_months, <span class="at">y =</span> SG_total)) <span class="sc">+</span></span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>() <span class="sc">+</span></span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_smooth</span>(</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"lm"</span>, </span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"glm"</span>, </span>
 <span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">formula =</span> y <span class="sc">~</span> x, </span>
 <span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> magma_colors[<span class="dv">3</span>], </span>
 <span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> magma_colors[<span class="dv">5</span>], </span>
@@ -778,23 +780,23 @@ Number of Fisher Scoring iterations: 2</code></pre>
 <span id="cb34-48"><a href="#cb34-48" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-49"><a href="#cb34-49" aria-hidden="true" tabindex="-1"></a>seas_count_status_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="rcyakmeaza" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#rcyakmeaza table {
+<div id="vvbhhjantu" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#vvbhhjantu table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#rcyakmeaza thead, #rcyakmeaza tbody, #rcyakmeaza tfoot, #rcyakmeaza tr, #rcyakmeaza td, #rcyakmeaza th {
+#vvbhhjantu thead, #vvbhhjantu tbody, #vvbhhjantu tfoot, #vvbhhjantu tr, #vvbhhjantu td, #vvbhhjantu th {
   border-style: none;
 }
 
-#rcyakmeaza p {
+#vvbhhjantu p {
   margin: 0;
   padding: 0;
 }
 
-#rcyakmeaza .gt_table {
+#vvbhhjantu .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -820,12 +822,12 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#rcyakmeaza .gt_caption {
+#vvbhhjantu .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#rcyakmeaza .gt_title {
+#vvbhhjantu .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -837,7 +839,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-width: 0;
 }
 
-#rcyakmeaza .gt_subtitle {
+#vvbhhjantu .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -849,7 +851,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-top-width: 0;
 }
 
-#rcyakmeaza .gt_heading {
+#vvbhhjantu .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -861,13 +863,13 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#rcyakmeaza .gt_bottom_border {
+#vvbhhjantu .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
 }
 
-#rcyakmeaza .gt_col_headings {
+#vvbhhjantu .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -882,7 +884,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#rcyakmeaza .gt_col_heading {
+#vvbhhjantu .gt_col_heading {
   color: #FFFFFF;
   background-color: #0076BA;
   font-size: 100%;
@@ -902,7 +904,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   overflow-x: hidden;
 }
 
-#rcyakmeaza .gt_column_spanner_outer {
+#vvbhhjantu .gt_column_spanner_outer {
   color: #FFFFFF;
   background-color: #0076BA;
   font-size: 100%;
@@ -914,15 +916,15 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 4px;
 }
 
-#rcyakmeaza .gt_column_spanner_outer:first-child {
+#vvbhhjantu .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#rcyakmeaza .gt_column_spanner_outer:last-child {
+#vvbhhjantu .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#rcyakmeaza .gt_column_spanner {
+#vvbhhjantu .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
@@ -934,11 +936,11 @@ Number of Fisher Scoring iterations: 2</code></pre>
   width: 100%;
 }
 
-#rcyakmeaza .gt_spanner_row {
+#vvbhhjantu .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#rcyakmeaza .gt_group_heading {
+#vvbhhjantu .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -964,7 +966,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   text-align: left;
 }
 
-#rcyakmeaza .gt_empty_group_heading {
+#vvbhhjantu .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -979,15 +981,15 @@ Number of Fisher Scoring iterations: 2</code></pre>
   vertical-align: middle;
 }
 
-#rcyakmeaza .gt_from_md > :first-child {
+#vvbhhjantu .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#rcyakmeaza .gt_from_md > :last-child {
+#vvbhhjantu .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#rcyakmeaza .gt_row {
+#vvbhhjantu .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1006,7 +1008,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   overflow-x: hidden;
 }
 
-#rcyakmeaza .gt_stub {
+#vvbhhjantu .gt_stub {
   color: #333333;
   background-color: #89D3FE;
   font-size: 100%;
@@ -1019,7 +1021,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#rcyakmeaza .gt_stub_row_group {
+#vvbhhjantu .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1033,15 +1035,15 @@ Number of Fisher Scoring iterations: 2</code></pre>
   vertical-align: top;
 }
 
-#rcyakmeaza .gt_row_group_first td {
+#vvbhhjantu .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#rcyakmeaza .gt_row_group_first th {
+#vvbhhjantu .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#rcyakmeaza .gt_summary_row {
+#vvbhhjantu .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1051,16 +1053,16 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#rcyakmeaza .gt_first_summary_row {
+#vvbhhjantu .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #5F5F5F;
 }
 
-#rcyakmeaza .gt_first_summary_row.thick {
+#vvbhhjantu .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#rcyakmeaza .gt_last_summary_row {
+#vvbhhjantu .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1070,7 +1072,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-color: #5F5F5F;
 }
 
-#rcyakmeaza .gt_grand_summary_row {
+#vvbhhjantu .gt_grand_summary_row {
   color: #333333;
   background-color: #D5D5D5;
   text-transform: inherit;
@@ -1080,7 +1082,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#rcyakmeaza .gt_first_grand_summary_row {
+#vvbhhjantu .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1090,7 +1092,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-top-color: #5F5F5F;
 }
 
-#rcyakmeaza .gt_last_grand_summary_row_top {
+#vvbhhjantu .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1100,11 +1102,11 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-color: #5F5F5F;
 }
 
-#rcyakmeaza .gt_striped {
+#vvbhhjantu .gt_striped {
   background-color: #EDF7FC;
 }
 
-#rcyakmeaza .gt_table_body {
+#vvbhhjantu .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -1113,7 +1115,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-color: #5F5F5F;
 }
 
-#rcyakmeaza .gt_footnotes {
+#vvbhhjantu .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1127,7 +1129,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#rcyakmeaza .gt_footnote {
+#vvbhhjantu .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1136,7 +1138,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#rcyakmeaza .gt_sourcenotes {
+#vvbhhjantu .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1150,7 +1152,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#rcyakmeaza .gt_sourcenote {
+#vvbhhjantu .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1158,72 +1160,72 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#rcyakmeaza .gt_left {
+#vvbhhjantu .gt_left {
   text-align: left;
 }
 
-#rcyakmeaza .gt_center {
+#vvbhhjantu .gt_center {
   text-align: center;
 }
 
-#rcyakmeaza .gt_right {
+#vvbhhjantu .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#rcyakmeaza .gt_font_normal {
+#vvbhhjantu .gt_font_normal {
   font-weight: normal;
 }
 
-#rcyakmeaza .gt_font_bold {
+#vvbhhjantu .gt_font_bold {
   font-weight: bold;
 }
 
-#rcyakmeaza .gt_font_italic {
+#vvbhhjantu .gt_font_italic {
   font-style: italic;
 }
 
-#rcyakmeaza .gt_super {
+#vvbhhjantu .gt_super {
   font-size: 65%;
 }
 
-#rcyakmeaza .gt_footnote_marks {
+#vvbhhjantu .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#rcyakmeaza .gt_asterisk {
+#vvbhhjantu .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#rcyakmeaza .gt_indent_1 {
+#vvbhhjantu .gt_indent_1 {
   text-indent: 5px;
 }
 
-#rcyakmeaza .gt_indent_2 {
+#vvbhhjantu .gt_indent_2 {
   text-indent: 10px;
 }
 
-#rcyakmeaza .gt_indent_3 {
+#vvbhhjantu .gt_indent_3 {
   text-indent: 15px;
 }
 
-#rcyakmeaza .gt_indent_4 {
+#vvbhhjantu .gt_indent_4 {
   text-indent: 20px;
 }
 
-#rcyakmeaza .gt_indent_5 {
+#vvbhhjantu .gt_indent_5 {
   text-indent: 25px;
 }
 
-#rcyakmeaza .katex-display {
+#vvbhhjantu .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#rcyakmeaza div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#vvbhhjantu div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1349,7 +1351,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(seas_count_status_table, <span class="st">"02-SEAS-Study-1-Explanatory-Analyses_files/figure-html/seas_count_status_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/RtmpCYzyMO/file9c7c4743398.html screenshot completed</code></pre>
+<pre><code>file:///C:/Users/siobh/AppData/Local/Temp/RtmpqEPBzC/file81b0348d7325.html screenshot completed</code></pre>
 </div>
 </div>
 <p>The frequencies of responses referencing Vague Game, Specific Game, Possession, and Other each displayed a significant correlation with the number of times a participant selected the excluder as being in charge. VG: rho = -0.23 (weak negative), p = 0.022, p with Bonferroni correction = 0.36. SG: rho = 0.33 (weak positive), p = 7^{-4}, p with Bonferroni correction = 0.011. PS: rho = 0.28 (weak positive), p = 0.0055, p with Bonferroni correction = 0.088. OR: rho = -0.2 (weak negative), p = 0.041, p with Bonferroni correction = 0.66.</p>
@@ -1407,23 +1409,23 @@ Number of Fisher Scoring iterations: 2</code></pre>
 <span id="cb37-48"><a href="#cb37-48" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb37-49"><a href="#cb37-49" aria-hidden="true" tabindex="-1"></a>seas_count_resource_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="otsvenechg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#otsvenechg table {
+<div id="fdtvfxoyuy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#fdtvfxoyuy table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#otsvenechg thead, #otsvenechg tbody, #otsvenechg tfoot, #otsvenechg tr, #otsvenechg td, #otsvenechg th {
+#fdtvfxoyuy thead, #fdtvfxoyuy tbody, #fdtvfxoyuy tfoot, #fdtvfxoyuy tr, #fdtvfxoyuy td, #fdtvfxoyuy th {
   border-style: none;
 }
 
-#otsvenechg p {
+#fdtvfxoyuy p {
   margin: 0;
   padding: 0;
 }
 
-#otsvenechg .gt_table {
+#fdtvfxoyuy .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1449,12 +1451,12 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#otsvenechg .gt_caption {
+#fdtvfxoyuy .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#otsvenechg .gt_title {
+#fdtvfxoyuy .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1466,7 +1468,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-width: 0;
 }
 
-#otsvenechg .gt_subtitle {
+#fdtvfxoyuy .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1478,7 +1480,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-top-width: 0;
 }
 
-#otsvenechg .gt_heading {
+#fdtvfxoyuy .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1490,13 +1492,13 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#otsvenechg .gt_bottom_border {
+#fdtvfxoyuy .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
 }
 
-#otsvenechg .gt_col_headings {
+#fdtvfxoyuy .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -1511,7 +1513,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#otsvenechg .gt_col_heading {
+#fdtvfxoyuy .gt_col_heading {
   color: #FFFFFF;
   background-color: #CB2A7B;
   font-size: 100%;
@@ -1531,7 +1533,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   overflow-x: hidden;
 }
 
-#otsvenechg .gt_column_spanner_outer {
+#fdtvfxoyuy .gt_column_spanner_outer {
   color: #FFFFFF;
   background-color: #CB2A7B;
   font-size: 100%;
@@ -1543,15 +1545,15 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 4px;
 }
 
-#otsvenechg .gt_column_spanner_outer:first-child {
+#fdtvfxoyuy .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#otsvenechg .gt_column_spanner_outer:last-child {
+#fdtvfxoyuy .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#otsvenechg .gt_column_spanner {
+#fdtvfxoyuy .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
@@ -1563,11 +1565,11 @@ Number of Fisher Scoring iterations: 2</code></pre>
   width: 100%;
 }
 
-#otsvenechg .gt_spanner_row {
+#fdtvfxoyuy .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#otsvenechg .gt_group_heading {
+#fdtvfxoyuy .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1593,7 +1595,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   text-align: left;
 }
 
-#otsvenechg .gt_empty_group_heading {
+#fdtvfxoyuy .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1608,15 +1610,15 @@ Number of Fisher Scoring iterations: 2</code></pre>
   vertical-align: middle;
 }
 
-#otsvenechg .gt_from_md > :first-child {
+#fdtvfxoyuy .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#otsvenechg .gt_from_md > :last-child {
+#fdtvfxoyuy .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#otsvenechg .gt_row {
+#fdtvfxoyuy .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1635,7 +1637,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   overflow-x: hidden;
 }
 
-#otsvenechg .gt_stub {
+#fdtvfxoyuy .gt_stub {
   color: #333333;
   background-color: #FFC6E3;
   font-size: 100%;
@@ -1648,7 +1650,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#otsvenechg .gt_stub_row_group {
+#fdtvfxoyuy .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1662,15 +1664,15 @@ Number of Fisher Scoring iterations: 2</code></pre>
   vertical-align: top;
 }
 
-#otsvenechg .gt_row_group_first td {
+#fdtvfxoyuy .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#otsvenechg .gt_row_group_first th {
+#fdtvfxoyuy .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#otsvenechg .gt_summary_row {
+#fdtvfxoyuy .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1680,16 +1682,16 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#otsvenechg .gt_first_summary_row {
+#fdtvfxoyuy .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #5F5F5F;
 }
 
-#otsvenechg .gt_first_summary_row.thick {
+#fdtvfxoyuy .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#otsvenechg .gt_last_summary_row {
+#fdtvfxoyuy .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1699,7 +1701,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-color: #5F5F5F;
 }
 
-#otsvenechg .gt_grand_summary_row {
+#fdtvfxoyuy .gt_grand_summary_row {
   color: #333333;
   background-color: #D5D5D5;
   text-transform: inherit;
@@ -1709,7 +1711,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#otsvenechg .gt_first_grand_summary_row {
+#fdtvfxoyuy .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1719,7 +1721,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-top-color: #5F5F5F;
 }
 
-#otsvenechg .gt_last_grand_summary_row_top {
+#fdtvfxoyuy .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1729,11 +1731,11 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-color: #5F5F5F;
 }
 
-#otsvenechg .gt_striped {
+#fdtvfxoyuy .gt_striped {
   background-color: #FCF2F7;
 }
 
-#otsvenechg .gt_table_body {
+#fdtvfxoyuy .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -1742,7 +1744,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-color: #5F5F5F;
 }
 
-#otsvenechg .gt_footnotes {
+#fdtvfxoyuy .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1756,7 +1758,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#otsvenechg .gt_footnote {
+#fdtvfxoyuy .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1765,7 +1767,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#otsvenechg .gt_sourcenotes {
+#fdtvfxoyuy .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1779,7 +1781,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#otsvenechg .gt_sourcenote {
+#fdtvfxoyuy .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1787,72 +1789,72 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#otsvenechg .gt_left {
+#fdtvfxoyuy .gt_left {
   text-align: left;
 }
 
-#otsvenechg .gt_center {
+#fdtvfxoyuy .gt_center {
   text-align: center;
 }
 
-#otsvenechg .gt_right {
+#fdtvfxoyuy .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#otsvenechg .gt_font_normal {
+#fdtvfxoyuy .gt_font_normal {
   font-weight: normal;
 }
 
-#otsvenechg .gt_font_bold {
+#fdtvfxoyuy .gt_font_bold {
   font-weight: bold;
 }
 
-#otsvenechg .gt_font_italic {
+#fdtvfxoyuy .gt_font_italic {
   font-style: italic;
 }
 
-#otsvenechg .gt_super {
+#fdtvfxoyuy .gt_super {
   font-size: 65%;
 }
 
-#otsvenechg .gt_footnote_marks {
+#fdtvfxoyuy .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#otsvenechg .gt_asterisk {
+#fdtvfxoyuy .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#otsvenechg .gt_indent_1 {
+#fdtvfxoyuy .gt_indent_1 {
   text-indent: 5px;
 }
 
-#otsvenechg .gt_indent_2 {
+#fdtvfxoyuy .gt_indent_2 {
   text-indent: 10px;
 }
 
-#otsvenechg .gt_indent_3 {
+#fdtvfxoyuy .gt_indent_3 {
   text-indent: 15px;
 }
 
-#otsvenechg .gt_indent_4 {
+#fdtvfxoyuy .gt_indent_4 {
   text-indent: 20px;
 }
 
-#otsvenechg .gt_indent_5 {
+#fdtvfxoyuy .gt_indent_5 {
   text-indent: 25px;
 }
 
-#otsvenechg .katex-display {
+#fdtvfxoyuy .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#otsvenechg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#fdtvfxoyuy div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1978,7 +1980,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(seas_count_resource_table, <span class="st">"02-SEAS-Study-1-Explanatory-Analyses_files/figure-html/seas_count_resource_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/RtmpCYzyMO/file9c7c340471ba.html screenshot completed</code></pre>
+<pre><code>file:///C:/Users/siobh/AppData/Local/Temp/RtmpqEPBzC/file81b0730a1825.html screenshot completed</code></pre>
 </div>
 </div>
 <p>The frequencies of responses referencing Specific Game, Exclusion, and Possession each displayed a significant correlation with the number of times a participant selected the excluder as having more resources. SG: rho = 0.41 (moderate positive), p = 3.2^{-5}, p with Bonferroni correction = 5.1^{-4}. EX: rho = 0.23 (weak positive), p = 0.025, p with Bonferroni correction = 0.39. PS: rho = 0.2 (weak positive), p = 0.042, p with Bonferroni correction = 0.67.</p>
@@ -1998,25 +2000,29 @@ Number of Fisher Scoring iterations: 2</code></pre>
 <span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>seas_pivoted <span class="sc">|&gt;</span></span>
 <span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age_months, <span class="at">y =</span> present, <span class="at">color =</span> explanation_type, <span class="at">fill =</span> explanation_type)) <span class="sc">+</span></span>
 <span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_jitter</span>(<span class="at">height =</span> .<span class="dv">15</span>)) <span class="sc">+</span></span>
-<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
-<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> wo_black) <span class="sc">+</span></span>
-<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> wo_black) <span class="sc">+</span></span>
-<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>explanation_type) <span class="sc">+</span></span>
-<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Study 1 Presence of Explanation Types"</span>,</span>
-<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age (Months)"</span>,</span>
-<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Responses Present Across Explanation Questions"</span>,</span>
-<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Explanations"</span>,</span>
-<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Explanations"</span></span>
-<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">30</span>),</span>
-<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">20</span>),</span>
-<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
-<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">size =</span> <span class="dv">25</span>)</span>
-<span id="cb40-26"><a href="#cb40-26" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
-<span id="cb40-27"><a href="#cb40-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">labels =</span> (<span class="fu">c</span>(<span class="st">"Absent"</span>, <span class="st">"Present"</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"glm"</span>, </span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">method.args =</span> <span class="fu">list</span>(<span class="at">family =</span> <span class="st">"binomial"</span>),</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> wo_black) <span class="sc">+</span></span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> wo_black) <span class="sc">+</span></span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>explanation_type) <span class="sc">+</span></span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Study 1 Presence of Explanation Types"</span>,</span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age (Months)"</span>,</span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Responses Present Across Explanation Questions"</span>,</span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Explanations"</span>,</span>
+<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Explanations"</span></span>
+<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb40-26"><a href="#cb40-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">30</span>),</span>
+<span id="cb40-27"><a href="#cb40-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">20</span>),</span>
+<span id="cb40-28"><a href="#cb40-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb40-29"><a href="#cb40-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">size =</span> <span class="dv">25</span>)</span>
+<span id="cb40-30"><a href="#cb40-30" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
+<span id="cb40-31"><a href="#cb40-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">labels =</span> (<span class="fu">c</span>(<span class="st">"Absent"</span>, <span class="st">"Present"</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
 </div>
@@ -2186,29 +2192,30 @@ Number of Fisher Scoring iterations: 2</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>EX_present_age_scatter <span class="ot">&lt;-</span> seas_separated <span class="sc">|&gt;</span></span>
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age_months, <span class="at">y =</span> EX_present)) <span class="sc">+</span></span>
 <span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>() <span class="sc">+</span></span>
-<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_smooth</span>(</span>
-<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"lm"</span>, </span>
-<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">formula =</span> y <span class="sc">~</span> x, </span>
-<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> magma_colors[<span class="dv">3</span>], </span>
-<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> magma_colors[<span class="dv">5</span>], </span>
-<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
-<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Study 1 Explanations Referencing Exclusion by Age"</span>,</span>
-<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age (Months)"</span>,</span>
-<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span></span>
-<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">30</span>),</span>
-<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">size =</span> <span class="dv">25</span>)</span>
-<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
-<span id="cb47-21"><a href="#cb47-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
-<span id="cb47-22"><a href="#cb47-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
-<span id="cb47-23"><a href="#cb47-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Not Referenced"</span>, <span class="st">"Exclusion Referenced"</span>)</span>
-<span id="cb47-24"><a href="#cb47-24" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb47-25"><a href="#cb47-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb47-26"><a href="#cb47-26" aria-hidden="true" tabindex="-1"></a>EX_present_age_scatter</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"glm"</span>, </span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">method.args =</span> <span class="fu">list</span>(<span class="at">family =</span> <span class="st">"binomial"</span>), </span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">formula =</span> y <span class="sc">~</span> x, </span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> magma_colors[<span class="dv">3</span>], </span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> magma_colors[<span class="dv">5</span>], </span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Study 1 Explanations Referencing Exclusion by Age"</span>,</span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age (Months)"</span>,</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span></span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">30</span>),</span>
+<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">size =</span> <span class="dv">25</span>)</span>
+<span id="cb47-21"><a href="#cb47-21" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
+<span id="cb47-22"><a href="#cb47-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb47-23"><a href="#cb47-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb47-24"><a href="#cb47-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Not Referenced"</span>, <span class="st">"Exclusion Referenced"</span>)</span>
+<span id="cb47-25"><a href="#cb47-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb47-26"><a href="#cb47-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-27"><a href="#cb47-27" aria-hidden="true" tabindex="-1"></a>EX_present_age_scatter</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2285,29 +2292,30 @@ Number of Fisher Scoring iterations: 2</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>SG_present_age_scatter <span class="ot">&lt;-</span> seas_separated <span class="sc">|&gt;</span></span>
 <span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age_months, <span class="at">y =</span> SG_present)) <span class="sc">+</span></span>
 <span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>() <span class="sc">+</span></span>
-<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_smooth</span>(</span>
-<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"lm"</span>, </span>
-<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">formula =</span> y <span class="sc">~</span> x, </span>
-<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> magma_colors[<span class="dv">3</span>], </span>
-<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> magma_colors[<span class="dv">5</span>], </span>
-<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
-<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Study 1 Explanations Referencing the Game Specifically by Age"</span>,</span>
-<span id="cb52-13"><a href="#cb52-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age (Months)"</span>,</span>
-<span id="cb52-14"><a href="#cb52-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span></span>
-<span id="cb52-15"><a href="#cb52-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb52-16"><a href="#cb52-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb52-17"><a href="#cb52-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb52-18"><a href="#cb52-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">30</span>),</span>
-<span id="cb52-19"><a href="#cb52-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">size =</span> <span class="dv">25</span>)</span>
-<span id="cb52-20"><a href="#cb52-20" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
-<span id="cb52-21"><a href="#cb52-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
-<span id="cb52-22"><a href="#cb52-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
-<span id="cb52-23"><a href="#cb52-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Not Referenced"</span>, <span class="st">"Specific Game Referenced"</span>)</span>
-<span id="cb52-24"><a href="#cb52-24" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb52-25"><a href="#cb52-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb52-26"><a href="#cb52-26" aria-hidden="true" tabindex="-1"></a>SG_present_age_scatter</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"glm"</span>, </span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">method.args =</span> <span class="fu">list</span>(<span class="at">family =</span> <span class="st">"binomial"</span>),</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">formula =</span> y <span class="sc">~</span> x, </span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> magma_colors[<span class="dv">3</span>], </span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> magma_colors[<span class="dv">5</span>], </span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb52-13"><a href="#cb52-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Study 1 Explanations Referencing the Game Specifically by Age"</span>,</span>
+<span id="cb52-14"><a href="#cb52-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age (Months)"</span>,</span>
+<span id="cb52-15"><a href="#cb52-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span></span>
+<span id="cb52-16"><a href="#cb52-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb52-17"><a href="#cb52-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb52-18"><a href="#cb52-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb52-19"><a href="#cb52-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">30</span>),</span>
+<span id="cb52-20"><a href="#cb52-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">size =</span> <span class="dv">25</span>)</span>
+<span id="cb52-21"><a href="#cb52-21" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
+<span id="cb52-22"><a href="#cb52-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb52-23"><a href="#cb52-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb52-24"><a href="#cb52-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Not Referenced"</span>, <span class="st">"Specific Game Referenced"</span>)</span>
+<span id="cb52-25"><a href="#cb52-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb52-26"><a href="#cb52-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-27"><a href="#cb52-27" aria-hidden="true" tabindex="-1"></a>SG_present_age_scatter</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2353,29 +2361,30 @@ Number of Fisher Scoring iterations: 2</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>VG_present_age_scatter <span class="ot">&lt;-</span> seas_separated <span class="sc">|&gt;</span></span>
 <span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age_months, <span class="at">y =</span> VG_present)) <span class="sc">+</span></span>
 <span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>() <span class="sc">+</span></span>
-<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_smooth</span>(</span>
-<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"lm"</span>, </span>
-<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">formula =</span> y <span class="sc">~</span> x, </span>
-<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> magma_colors[<span class="dv">3</span>], </span>
-<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> magma_colors[<span class="dv">5</span>], </span>
-<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
-<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Study 1 Explanations Referencing the Game Vaguely by Age"</span>,</span>
-<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age (Months)"</span>,</span>
-<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span></span>
-<span id="cb55-15"><a href="#cb55-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb55-16"><a href="#cb55-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb55-17"><a href="#cb55-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb55-18"><a href="#cb55-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">30</span>),</span>
-<span id="cb55-19"><a href="#cb55-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">size =</span> <span class="dv">25</span>)</span>
-<span id="cb55-20"><a href="#cb55-20" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
-<span id="cb55-21"><a href="#cb55-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
-<span id="cb55-22"><a href="#cb55-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
-<span id="cb55-23"><a href="#cb55-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Not Referenced"</span>, <span class="st">"Vague Game Referenced"</span>)</span>
-<span id="cb55-24"><a href="#cb55-24" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb55-25"><a href="#cb55-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb55-26"><a href="#cb55-26" aria-hidden="true" tabindex="-1"></a>VG_present_age_scatter</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"glm"</span>, </span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">method.args =</span> <span class="fu">list</span>(<span class="at">family =</span> <span class="st">"binomial"</span>),</span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">formula =</span> y <span class="sc">~</span> x, </span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> magma_colors[<span class="dv">3</span>], </span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> magma_colors[<span class="dv">5</span>], </span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Study 1 Explanations Referencing the Game Vaguely by Age"</span>,</span>
+<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age (Months)"</span>,</span>
+<span id="cb55-15"><a href="#cb55-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span></span>
+<span id="cb55-16"><a href="#cb55-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb55-17"><a href="#cb55-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb55-18"><a href="#cb55-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb55-19"><a href="#cb55-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">30</span>),</span>
+<span id="cb55-20"><a href="#cb55-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">size =</span> <span class="dv">25</span>)</span>
+<span id="cb55-21"><a href="#cb55-21" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
+<span id="cb55-22"><a href="#cb55-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb55-23"><a href="#cb55-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb55-24"><a href="#cb55-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Not Referenced"</span>, <span class="st">"Vague Game Referenced"</span>)</span>
+<span id="cb55-25"><a href="#cb55-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb55-26"><a href="#cb55-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-27"><a href="#cb55-27" aria-hidden="true" tabindex="-1"></a>VG_present_age_scatter</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2421,29 +2430,30 @@ Number of Fisher Scoring iterations: 2</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>FR_present_age_scatter <span class="ot">&lt;-</span> seas_separated <span class="sc">|&gt;</span></span>
 <span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age_months, <span class="at">y =</span> FR_present)) <span class="sc">+</span></span>
 <span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>() <span class="sc">+</span></span>
-<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_smooth</span>(</span>
-<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"lm"</span>, </span>
-<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">formula =</span> y <span class="sc">~</span> x, </span>
-<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> magma_colors[<span class="dv">3</span>], </span>
-<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> magma_colors[<span class="dv">5</span>], </span>
-<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
-<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Study 1 Explanations Referencing Friendship by Age"</span>,</span>
-<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age (Months)"</span>,</span>
-<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span></span>
-<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb58-17"><a href="#cb58-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb58-18"><a href="#cb58-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">30</span>),</span>
-<span id="cb58-19"><a href="#cb58-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">size =</span> <span class="dv">25</span>)</span>
-<span id="cb58-20"><a href="#cb58-20" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
-<span id="cb58-21"><a href="#cb58-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
-<span id="cb58-22"><a href="#cb58-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
-<span id="cb58-23"><a href="#cb58-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Not Referenced"</span>, <span class="st">"Friendship Referenced"</span>)</span>
-<span id="cb58-24"><a href="#cb58-24" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb58-25"><a href="#cb58-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb58-26"><a href="#cb58-26" aria-hidden="true" tabindex="-1"></a>FR_present_age_scatter</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"glm"</span>, </span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">method.args =</span> <span class="fu">list</span>(<span class="at">family =</span> <span class="st">"binomial"</span>), </span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">formula =</span> y <span class="sc">~</span> x, </span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> magma_colors[<span class="dv">3</span>], </span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> magma_colors[<span class="dv">5</span>], </span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Study 1 Explanations Referencing Friendship by Age"</span>,</span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age (Months)"</span>,</span>
+<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span></span>
+<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb58-17"><a href="#cb58-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb58-18"><a href="#cb58-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb58-19"><a href="#cb58-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">30</span>),</span>
+<span id="cb58-20"><a href="#cb58-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">size =</span> <span class="dv">25</span>)</span>
+<span id="cb58-21"><a href="#cb58-21" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
+<span id="cb58-22"><a href="#cb58-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb58-23"><a href="#cb58-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb58-24"><a href="#cb58-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Not Referenced"</span>, <span class="st">"Friendship Referenced"</span>)</span>
+<span id="cb58-25"><a href="#cb58-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb58-26"><a href="#cb58-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-27"><a href="#cb58-27" aria-hidden="true" tabindex="-1"></a>FR_present_age_scatter</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2489,29 +2499,30 @@ Number of Fisher Scoring iterations: 2</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>PS_present_age_scatter <span class="ot">&lt;-</span> seas_separated <span class="sc">|&gt;</span></span>
 <span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age_months, <span class="at">y =</span> PS_present)) <span class="sc">+</span></span>
 <span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>() <span class="sc">+</span></span>
-<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_smooth</span>(</span>
-<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"lm"</span>, </span>
-<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">formula =</span> y <span class="sc">~</span> x, </span>
-<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> magma_colors[<span class="dv">3</span>], </span>
-<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> magma_colors[<span class="dv">5</span>], </span>
-<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
-<span id="cb61-10"><a href="#cb61-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb61-11"><a href="#cb61-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb61-12"><a href="#cb61-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Study 1 Explanations Referencing Possession by Age"</span>,</span>
-<span id="cb61-13"><a href="#cb61-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age (Months)"</span>,</span>
-<span id="cb61-14"><a href="#cb61-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span></span>
-<span id="cb61-15"><a href="#cb61-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb61-16"><a href="#cb61-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb61-17"><a href="#cb61-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb61-18"><a href="#cb61-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">30</span>),</span>
-<span id="cb61-19"><a href="#cb61-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">size =</span> <span class="dv">25</span>)</span>
-<span id="cb61-20"><a href="#cb61-20" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
-<span id="cb61-21"><a href="#cb61-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
-<span id="cb61-22"><a href="#cb61-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
-<span id="cb61-23"><a href="#cb61-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Not Referenced"</span>, <span class="st">"Possession Referenced"</span>)</span>
-<span id="cb61-24"><a href="#cb61-24" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb61-25"><a href="#cb61-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb61-26"><a href="#cb61-26" aria-hidden="true" tabindex="-1"></a>PS_present_age_scatter</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(</span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"glm"</span>, </span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">method.args =</span> <span class="fu">list</span>(<span class="at">family =</span> <span class="st">"binomial"</span>),</span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">formula =</span> y <span class="sc">~</span> x, </span>
+<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> magma_colors[<span class="dv">3</span>], </span>
+<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> magma_colors[<span class="dv">5</span>], </span>
+<span id="cb61-10"><a href="#cb61-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
+<span id="cb61-11"><a href="#cb61-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb61-12"><a href="#cb61-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb61-13"><a href="#cb61-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Study 1 Explanations Referencing Possession by Age"</span>,</span>
+<span id="cb61-14"><a href="#cb61-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Age (Months)"</span>,</span>
+<span id="cb61-15"><a href="#cb61-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span></span>
+<span id="cb61-16"><a href="#cb61-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb61-17"><a href="#cb61-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb61-18"><a href="#cb61-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb61-19"><a href="#cb61-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">30</span>),</span>
+<span id="cb61-20"><a href="#cb61-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"serif"</span>, <span class="at">size =</span> <span class="dv">25</span>)</span>
+<span id="cb61-21"><a href="#cb61-21" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
+<span id="cb61-22"><a href="#cb61-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb61-23"><a href="#cb61-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb61-24"><a href="#cb61-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Not Referenced"</span>, <span class="st">"Possession Referenced"</span>)</span>
+<span id="cb61-25"><a href="#cb61-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb61-26"><a href="#cb61-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-27"><a href="#cb61-27" aria-hidden="true" tabindex="-1"></a>PS_present_age_scatter</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2568,23 +2579,23 @@ Number of Fisher Scoring iterations: 2</code></pre>
 <span id="cb62-39"><a href="#cb62-39" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb62-40"><a href="#cb62-40" aria-hidden="true" tabindex="-1"></a>seas_present_status_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="tikahgxbzl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#tikahgxbzl table {
+<div id="uurtvtukav" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#uurtvtukav table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#tikahgxbzl thead, #tikahgxbzl tbody, #tikahgxbzl tfoot, #tikahgxbzl tr, #tikahgxbzl td, #tikahgxbzl th {
+#uurtvtukav thead, #uurtvtukav tbody, #uurtvtukav tfoot, #uurtvtukav tr, #uurtvtukav td, #uurtvtukav th {
   border-style: none;
 }
 
-#tikahgxbzl p {
+#uurtvtukav p {
   margin: 0;
   padding: 0;
 }
 
-#tikahgxbzl .gt_table {
+#uurtvtukav .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -2610,12 +2621,12 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#tikahgxbzl .gt_caption {
+#uurtvtukav .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#tikahgxbzl .gt_title {
+#uurtvtukav .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2627,7 +2638,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-width: 0;
 }
 
-#tikahgxbzl .gt_subtitle {
+#uurtvtukav .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2639,7 +2650,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-top-width: 0;
 }
 
-#tikahgxbzl .gt_heading {
+#uurtvtukav .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2651,13 +2662,13 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#tikahgxbzl .gt_bottom_border {
+#uurtvtukav .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
 }
 
-#tikahgxbzl .gt_col_headings {
+#uurtvtukav .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -2672,7 +2683,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#tikahgxbzl .gt_col_heading {
+#uurtvtukav .gt_col_heading {
   color: #FFFFFF;
   background-color: #0076BA;
   font-size: 100%;
@@ -2692,7 +2703,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   overflow-x: hidden;
 }
 
-#tikahgxbzl .gt_column_spanner_outer {
+#uurtvtukav .gt_column_spanner_outer {
   color: #FFFFFF;
   background-color: #0076BA;
   font-size: 100%;
@@ -2704,15 +2715,15 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 4px;
 }
 
-#tikahgxbzl .gt_column_spanner_outer:first-child {
+#uurtvtukav .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#tikahgxbzl .gt_column_spanner_outer:last-child {
+#uurtvtukav .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#tikahgxbzl .gt_column_spanner {
+#uurtvtukav .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
@@ -2724,11 +2735,11 @@ Number of Fisher Scoring iterations: 2</code></pre>
   width: 100%;
 }
 
-#tikahgxbzl .gt_spanner_row {
+#uurtvtukav .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#tikahgxbzl .gt_group_heading {
+#uurtvtukav .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2754,7 +2765,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   text-align: left;
 }
 
-#tikahgxbzl .gt_empty_group_heading {
+#uurtvtukav .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2769,15 +2780,15 @@ Number of Fisher Scoring iterations: 2</code></pre>
   vertical-align: middle;
 }
 
-#tikahgxbzl .gt_from_md > :first-child {
+#uurtvtukav .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#tikahgxbzl .gt_from_md > :last-child {
+#uurtvtukav .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#tikahgxbzl .gt_row {
+#uurtvtukav .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2796,7 +2807,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   overflow-x: hidden;
 }
 
-#tikahgxbzl .gt_stub {
+#uurtvtukav .gt_stub {
   color: #333333;
   background-color: #89D3FE;
   font-size: 100%;
@@ -2809,7 +2820,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#tikahgxbzl .gt_stub_row_group {
+#uurtvtukav .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2823,15 +2834,15 @@ Number of Fisher Scoring iterations: 2</code></pre>
   vertical-align: top;
 }
 
-#tikahgxbzl .gt_row_group_first td {
+#uurtvtukav .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#tikahgxbzl .gt_row_group_first th {
+#uurtvtukav .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#tikahgxbzl .gt_summary_row {
+#uurtvtukav .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2841,16 +2852,16 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#tikahgxbzl .gt_first_summary_row {
+#uurtvtukav .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #5F5F5F;
 }
 
-#tikahgxbzl .gt_first_summary_row.thick {
+#uurtvtukav .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#tikahgxbzl .gt_last_summary_row {
+#uurtvtukav .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2860,7 +2871,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-color: #5F5F5F;
 }
 
-#tikahgxbzl .gt_grand_summary_row {
+#uurtvtukav .gt_grand_summary_row {
   color: #333333;
   background-color: #D5D5D5;
   text-transform: inherit;
@@ -2870,7 +2881,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#tikahgxbzl .gt_first_grand_summary_row {
+#uurtvtukav .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2880,7 +2891,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-top-color: #5F5F5F;
 }
 
-#tikahgxbzl .gt_last_grand_summary_row_top {
+#uurtvtukav .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2890,11 +2901,11 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-color: #5F5F5F;
 }
 
-#tikahgxbzl .gt_striped {
+#uurtvtukav .gt_striped {
   background-color: #EDF7FC;
 }
 
-#tikahgxbzl .gt_table_body {
+#uurtvtukav .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -2903,7 +2914,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-color: #5F5F5F;
 }
 
-#tikahgxbzl .gt_footnotes {
+#uurtvtukav .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2917,7 +2928,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#tikahgxbzl .gt_footnote {
+#uurtvtukav .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -2926,7 +2937,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#tikahgxbzl .gt_sourcenotes {
+#uurtvtukav .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2940,7 +2951,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#tikahgxbzl .gt_sourcenote {
+#uurtvtukav .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2948,72 +2959,72 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#tikahgxbzl .gt_left {
+#uurtvtukav .gt_left {
   text-align: left;
 }
 
-#tikahgxbzl .gt_center {
+#uurtvtukav .gt_center {
   text-align: center;
 }
 
-#tikahgxbzl .gt_right {
+#uurtvtukav .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#tikahgxbzl .gt_font_normal {
+#uurtvtukav .gt_font_normal {
   font-weight: normal;
 }
 
-#tikahgxbzl .gt_font_bold {
+#uurtvtukav .gt_font_bold {
   font-weight: bold;
 }
 
-#tikahgxbzl .gt_font_italic {
+#uurtvtukav .gt_font_italic {
   font-style: italic;
 }
 
-#tikahgxbzl .gt_super {
+#uurtvtukav .gt_super {
   font-size: 65%;
 }
 
-#tikahgxbzl .gt_footnote_marks {
+#uurtvtukav .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#tikahgxbzl .gt_asterisk {
+#uurtvtukav .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#tikahgxbzl .gt_indent_1 {
+#uurtvtukav .gt_indent_1 {
   text-indent: 5px;
 }
 
-#tikahgxbzl .gt_indent_2 {
+#uurtvtukav .gt_indent_2 {
   text-indent: 10px;
 }
 
-#tikahgxbzl .gt_indent_3 {
+#uurtvtukav .gt_indent_3 {
   text-indent: 15px;
 }
 
-#tikahgxbzl .gt_indent_4 {
+#uurtvtukav .gt_indent_4 {
   text-indent: 20px;
 }
 
-#tikahgxbzl .gt_indent_5 {
+#uurtvtukav .gt_indent_5 {
   text-indent: 25px;
 }
 
-#tikahgxbzl .katex-display {
+#uurtvtukav .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#tikahgxbzl div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#uurtvtukav div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -3139,7 +3150,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(seas_present_status_table, <span class="st">"02-SEAS-Study-1-Explanatory-Analyses_files/figure-html/seas_present_status_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/RtmpCYzyMO/file9c7c51c764b7.html screenshot completed</code></pre>
+<pre><code>file:///C:/Users/siobh/AppData/Local/Temp/RtmpqEPBzC/file81b028481c14.html screenshot completed</code></pre>
 </div>
 </div>
 <p>The frequencies of responses referencing Specific Game, Possession, and Other each displayed a significant correlation with the number of times a participant selected the excluder as being in charge. SG: rho = 0.27 (weak positive), p = 0.0056, p with Bonferroni correction = 0.09. PS: rho = 0.25 (weak positive), p = 0.011, p with Bonferroni correction = 0.18. OR: rho = -0.2 (weak negative), p = 0.043, p with Bonferroni correction = 0.68.</p>
@@ -3188,23 +3199,23 @@ Number of Fisher Scoring iterations: 2</code></pre>
 <span id="cb65-39"><a href="#cb65-39" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb65-40"><a href="#cb65-40" aria-hidden="true" tabindex="-1"></a>seas_present_resource_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="glqrvsqlal" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#glqrvsqlal table {
+<div id="cwoanhrkku" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#cwoanhrkku table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#glqrvsqlal thead, #glqrvsqlal tbody, #glqrvsqlal tfoot, #glqrvsqlal tr, #glqrvsqlal td, #glqrvsqlal th {
+#cwoanhrkku thead, #cwoanhrkku tbody, #cwoanhrkku tfoot, #cwoanhrkku tr, #cwoanhrkku td, #cwoanhrkku th {
   border-style: none;
 }
 
-#glqrvsqlal p {
+#cwoanhrkku p {
   margin: 0;
   padding: 0;
 }
 
-#glqrvsqlal .gt_table {
+#cwoanhrkku .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -3230,12 +3241,12 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#glqrvsqlal .gt_caption {
+#cwoanhrkku .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#glqrvsqlal .gt_title {
+#cwoanhrkku .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3247,7 +3258,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-width: 0;
 }
 
-#glqrvsqlal .gt_subtitle {
+#cwoanhrkku .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3259,7 +3270,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-top-width: 0;
 }
 
-#glqrvsqlal .gt_heading {
+#cwoanhrkku .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3271,13 +3282,13 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#glqrvsqlal .gt_bottom_border {
+#cwoanhrkku .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
 }
 
-#glqrvsqlal .gt_col_headings {
+#cwoanhrkku .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -3292,7 +3303,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#glqrvsqlal .gt_col_heading {
+#cwoanhrkku .gt_col_heading {
   color: #FFFFFF;
   background-color: #CB2A7B;
   font-size: 100%;
@@ -3312,7 +3323,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   overflow-x: hidden;
 }
 
-#glqrvsqlal .gt_column_spanner_outer {
+#cwoanhrkku .gt_column_spanner_outer {
   color: #FFFFFF;
   background-color: #CB2A7B;
   font-size: 100%;
@@ -3324,15 +3335,15 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 4px;
 }
 
-#glqrvsqlal .gt_column_spanner_outer:first-child {
+#cwoanhrkku .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#glqrvsqlal .gt_column_spanner_outer:last-child {
+#cwoanhrkku .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#glqrvsqlal .gt_column_spanner {
+#cwoanhrkku .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
@@ -3344,11 +3355,11 @@ Number of Fisher Scoring iterations: 2</code></pre>
   width: 100%;
 }
 
-#glqrvsqlal .gt_spanner_row {
+#cwoanhrkku .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#glqrvsqlal .gt_group_heading {
+#cwoanhrkku .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3374,7 +3385,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   text-align: left;
 }
 
-#glqrvsqlal .gt_empty_group_heading {
+#cwoanhrkku .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3389,15 +3400,15 @@ Number of Fisher Scoring iterations: 2</code></pre>
   vertical-align: middle;
 }
 
-#glqrvsqlal .gt_from_md > :first-child {
+#cwoanhrkku .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#glqrvsqlal .gt_from_md > :last-child {
+#cwoanhrkku .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#glqrvsqlal .gt_row {
+#cwoanhrkku .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3416,7 +3427,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   overflow-x: hidden;
 }
 
-#glqrvsqlal .gt_stub {
+#cwoanhrkku .gt_stub {
   color: #333333;
   background-color: #FFC6E3;
   font-size: 100%;
@@ -3429,7 +3440,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#glqrvsqlal .gt_stub_row_group {
+#cwoanhrkku .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3443,15 +3454,15 @@ Number of Fisher Scoring iterations: 2</code></pre>
   vertical-align: top;
 }
 
-#glqrvsqlal .gt_row_group_first td {
+#cwoanhrkku .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#glqrvsqlal .gt_row_group_first th {
+#cwoanhrkku .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#glqrvsqlal .gt_summary_row {
+#cwoanhrkku .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3461,16 +3472,16 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#glqrvsqlal .gt_first_summary_row {
+#cwoanhrkku .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #5F5F5F;
 }
 
-#glqrvsqlal .gt_first_summary_row.thick {
+#cwoanhrkku .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#glqrvsqlal .gt_last_summary_row {
+#cwoanhrkku .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3480,7 +3491,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-color: #5F5F5F;
 }
 
-#glqrvsqlal .gt_grand_summary_row {
+#cwoanhrkku .gt_grand_summary_row {
   color: #333333;
   background-color: #D5D5D5;
   text-transform: inherit;
@@ -3490,7 +3501,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#glqrvsqlal .gt_first_grand_summary_row {
+#cwoanhrkku .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3500,7 +3511,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-top-color: #5F5F5F;
 }
 
-#glqrvsqlal .gt_last_grand_summary_row_top {
+#cwoanhrkku .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3510,11 +3521,11 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-color: #5F5F5F;
 }
 
-#glqrvsqlal .gt_striped {
+#cwoanhrkku .gt_striped {
   background-color: #FCF2F7;
 }
 
-#glqrvsqlal .gt_table_body {
+#cwoanhrkku .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -3523,7 +3534,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-bottom-color: #5F5F5F;
 }
 
-#glqrvsqlal .gt_footnotes {
+#cwoanhrkku .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3537,7 +3548,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#glqrvsqlal .gt_footnote {
+#cwoanhrkku .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -3546,7 +3557,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#glqrvsqlal .gt_sourcenotes {
+#cwoanhrkku .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3560,7 +3571,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#glqrvsqlal .gt_sourcenote {
+#cwoanhrkku .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -3568,72 +3579,72 @@ Number of Fisher Scoring iterations: 2</code></pre>
   padding-right: 5px;
 }
 
-#glqrvsqlal .gt_left {
+#cwoanhrkku .gt_left {
   text-align: left;
 }
 
-#glqrvsqlal .gt_center {
+#cwoanhrkku .gt_center {
   text-align: center;
 }
 
-#glqrvsqlal .gt_right {
+#cwoanhrkku .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#glqrvsqlal .gt_font_normal {
+#cwoanhrkku .gt_font_normal {
   font-weight: normal;
 }
 
-#glqrvsqlal .gt_font_bold {
+#cwoanhrkku .gt_font_bold {
   font-weight: bold;
 }
 
-#glqrvsqlal .gt_font_italic {
+#cwoanhrkku .gt_font_italic {
   font-style: italic;
 }
 
-#glqrvsqlal .gt_super {
+#cwoanhrkku .gt_super {
   font-size: 65%;
 }
 
-#glqrvsqlal .gt_footnote_marks {
+#cwoanhrkku .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#glqrvsqlal .gt_asterisk {
+#cwoanhrkku .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#glqrvsqlal .gt_indent_1 {
+#cwoanhrkku .gt_indent_1 {
   text-indent: 5px;
 }
 
-#glqrvsqlal .gt_indent_2 {
+#cwoanhrkku .gt_indent_2 {
   text-indent: 10px;
 }
 
-#glqrvsqlal .gt_indent_3 {
+#cwoanhrkku .gt_indent_3 {
   text-indent: 15px;
 }
 
-#glqrvsqlal .gt_indent_4 {
+#cwoanhrkku .gt_indent_4 {
   text-indent: 20px;
 }
 
-#glqrvsqlal .gt_indent_5 {
+#cwoanhrkku .gt_indent_5 {
   text-indent: 25px;
 }
 
-#glqrvsqlal .katex-display {
+#cwoanhrkku .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#glqrvsqlal div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#cwoanhrkku div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -3759,7 +3770,7 @@ Number of Fisher Scoring iterations: 2</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(seas_present_resource_table, <span class="st">"02-SEAS-Study-1-Explanatory-Analyses_files/figure-html/seas_present_resource_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/RtmpCYzyMO/file9c7c5c915751.html screenshot completed</code></pre>
+<pre><code>file:///C:/Users/siobh/AppData/Local/Temp/RtmpqEPBzC/file81b018883f29.html screenshot completed</code></pre>
 </div>
 </div>
 <p>The frequencies of responses referencing Specific Game, Exclusion, and Possession each displayed a significant correlation with the number of times a participant selected the excluder as having more resources. SG: rho = 0.35 (moderate positive), p = 4.6^{-4}, p with Bonferroni correction = 0.0074. EX: rho = 0.23 (weak positive), p = 0.021, p with Bonferroni correction = 0.34. PS: rho = 0.22 (weak positive), p = 0.027, p with Bonferroni correction = 0.43.</p>
@@ -3781,8 +3792,8 @@ Number of Fisher Scoring iterations: 2</code></pre>
 <span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
 <span id="cb68-9"><a href="#cb68-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age_months, <span class="at">y =</span> word_total)) <span class="sc">+</span></span>
 <span id="cb68-10"><a href="#cb68-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb68-11"><a href="#cb68-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_smooth</span>(</span>
-<span id="cb68-12"><a href="#cb68-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"lm"</span>, </span>
+<span id="cb68-11"><a href="#cb68-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(</span>
+<span id="cb68-12"><a href="#cb68-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"glm"</span>, </span>
 <span id="cb68-13"><a href="#cb68-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">formula =</span> y <span class="sc">~</span> x, </span>
 <span id="cb68-14"><a href="#cb68-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> magma_colors[<span class="dv">3</span>], </span>
 <span id="cb68-15"><a href="#cb68-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> magma_colors[<span class="dv">5</span>], </span>

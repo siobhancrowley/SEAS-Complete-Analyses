@@ -245,8 +245,8 @@ Age is significantly associated with correct memory check responses, z = `r roun
 mem_age_total_scatter <- seas2 |>
   ggplot(aes(x = age_months, y = mem_check_total)) +
   geom_point(position = position_jitter(height = 0.1)) +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -273,8 +273,9 @@ mem_age_total_scatter
 mem_age_trial_scatter <- mem_check_age_pivoted |>
   ggplot(aes(x = age_months, y = response)) +
   geom_point(position = position_jitter(height = 0.1, width = 0.5)) +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -445,8 +446,8 @@ According to a GLMM, age did not significantly influence the likelihood of selec
 em_status_total_scatter <- seas2 |>
   ggplot(aes(x = age_months, y = exclusion_status_total)) +
   geom_point(position = position_jitter(height = 0.1)) +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -471,8 +472,9 @@ em_status_total_scatter
 em_status_trial_scatter <- seas2_exclusion_pivoted |>
   ggplot(aes(x = age_months, y = status)) +
   geom_point(position = position_jitter(height = 0.1, width = 0.5)) +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"),
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -623,8 +625,8 @@ The GLMM for excluder resource selection in the exclusion main trials was rank-d
 em_resource_total_scatter <- seas2 |>
   ggplot(aes(x = age_months, y = exclusion_resource_total)) +
   geom_point(position = position_jitter(height = 0.1)) +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -649,8 +651,9 @@ em_resource_total_scatter
 em_resource_trial_scatter <- seas2_exclusion_resource_pivoted |>
   ggplot(aes(x = age_months, y = resource)) +
   geom_point(position = position_jitter(height = 0.1, width = 0.5)) +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -753,8 +756,9 @@ em_resource_type_age_scatter <- seas2 |>
   ) |> 
   ggplot(aes(x = age_months, y = response, color = resource_type, fill = resource_type)) +
   geom_point(position = position_jitter(height = 0.1)) +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"),
     formula = y ~ x, 
     alpha = 0.25) +
   geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
@@ -980,8 +984,9 @@ In this GLMM, social resources selection was significantly associated with inter
 eim_soc_ageint_scatter <- eim_soc_pivoted |>
   ggplot(aes(x = age_months, y = resource, color = interaction, fill = interaction)) +
   geom_point(position = position_jitter(height = 0.1)) +
-  stat_smooth(
-    method = "lm", 
+   geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
     formula = y ~ x, 
     alpha = 0.25) +
   geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
@@ -1021,8 +1026,9 @@ eim_resource_scatter_facet <- eim_resource_num |>
   ) |>
   ggplot(aes(x = age_months, y = resource, color = interaction, fill = interaction)) +
   geom_point(position = position_jitter(height = 0.1)) +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
     formula = y ~ x, 
     alpha = 0.25) +
   geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
@@ -1211,8 +1217,9 @@ Age was not significantly associated with selecting the excluder over the includ
 eic_status_trial_scatter <- seas2_comp_status_pivot |>
   ggplot(aes(x = age_months, y = response)) +
   geom_point(position = position_jitter(height = 0.1, width = 0.5)) +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -1270,8 +1277,9 @@ Age was not significantly associated with selecting the excluder over the includ
 eic_resrouce_age_scatter <- seas2_comp_resource_pivot |>
   ggplot(aes(x = age_months, y = resource, color = resource_type, fill = resource_type)) +
   geom_point(position = position_jitter(height = 0.1)) +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
     formula = y ~ x, 
     alpha = 0.25) +
   geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +

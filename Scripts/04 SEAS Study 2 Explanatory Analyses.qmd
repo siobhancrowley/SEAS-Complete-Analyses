@@ -241,7 +241,7 @@ seas2_pivoted |>
     explanation_type = fct_relevel(explanation_type, "ST", "VG", "SG", "EX", "IN", "NR", "MR", "AR", "EP", "EN", "PR", "EM", "MT", "FR", "PS", "OR")) |>
   ggplot(aes(x = age_months, y = total, color = explanation_type, fill = explanation_type)) +
   geom_jitter() +
-  geom_smooth(method = "lm", alpha = 0.2) +
+  geom_smooth(method = "glm", alpha = 0.2) +
   facet_wrap(~explanation_type) +
   scale_fill_manual(values = wo_black) +
   scale_color_manual(values = wo_black) +
@@ -312,8 +312,8 @@ According to this model, the number of explanations that reference exclusion dif
 EX_count_age_scatter <- seas2_separated |>
   ggplot(aes(x = age_months, y = EX_total)) +
   geom_jitter() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -370,8 +370,8 @@ According to this model, the number of explanations that reference inclusion dif
 IN_count_age_scatter <- seas2_separated |>
   ggplot(aes(x = age_months, y = IN_total)) +
   geom_jitter() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -428,8 +428,8 @@ Whether an answer references the game specifically is significantly associated w
 SG_count_age_scatter <- seas2_separated |>
   ggplot(aes(x = age_months, y = SG_total)) +
   geom_jitter() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -751,7 +751,11 @@ seas2_pivoted <- seas2_pivoted |>
 seas2_pivoted |>
   ggplot(aes(x = age_months, y = present, color = explanation_type, fill = explanation_type)) +
   geom_point(position = position_jitter(height = .15)) +
-  geom_smooth(method = "lm", alpha = 0.2) +
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
+    alpha = 0.2
+    ) +
   scale_fill_manual(values = wo_black) +
   scale_color_manual(values = wo_black) +
   facet_wrap(~explanation_type) +
@@ -813,8 +817,9 @@ Whether participants reference exclusion at least once in the study significantl
 EX_present_age_scatter <- seas2_separated |>
   ggplot(aes(x = age_months, y = EX_present)) +
   geom_jitter() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -855,8 +860,9 @@ Whether participants reference inclusion at least once in the study significantl
 IN_present_age_scatter <- seas2_separated |>
   ggplot(aes(x = age_months, y = IN_present)) +
   geom_jitter() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"),
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -897,8 +903,9 @@ Whether participants reference the game specifically at least once in the study 
 SG_present_age_scatter <- seas2_separated |>
   ggplot(aes(x = age_months, y = SG_present)) +
   geom_jitter() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"),
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -1128,8 +1135,8 @@ seas2 |>
   ungroup() |>
   ggplot(aes(x = age_months, y = word_total)) +
   geom_point() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 

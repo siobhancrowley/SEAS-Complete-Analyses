@@ -226,7 +226,7 @@ seas_pivoted |>
     explanation_type = fct_relevel(explanation_type, "ST", "VG", "SG", "EX", "IN", "NR", "MR", "AR", "EP", "EN", "PR", "EM", "MT", "FR", "PS", "OR")) |>
   ggplot(aes(x = age_months, y = total, color = explanation_type, fill = explanation_type)) +
   geom_jitter() +
-  geom_smooth(method = "lm", alpha = 0.2) +
+  geom_smooth(method = "glm", alpha = 0.2) +
   facet_wrap(~explanation_type) +
   scale_fill_manual(values = wo_black) +
   scale_color_manual(values = wo_black) +
@@ -298,8 +298,8 @@ Neither question type, age, nor the interaction between the two significantly af
 EX_count_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = EX_total)) +
   geom_jitter() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -356,8 +356,8 @@ Whether an answer references the game specifically is significantly associated w
 SG_count_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = SG_total)) +
   geom_jitter() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -502,7 +502,11 @@ seas_pivoted <- seas_pivoted |>
 seas_pivoted |>
   ggplot(aes(x = age_months, y = present, color = explanation_type, fill = explanation_type)) +
   geom_point(position = position_jitter(height = .15)) +
-  geom_smooth(method = "lm", alpha = 0.2) +
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"),
+    alpha = 0.2
+    ) +
   scale_fill_manual(values = wo_black) +
   scale_color_manual(values = wo_black) +
   facet_wrap(~explanation_type) +
@@ -566,8 +570,9 @@ Whether participants reference exclusion at least once in the study significantl
 EX_present_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = EX_present)) +
   geom_jitter() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -621,8 +626,9 @@ Whether participants reference the game specifically at least once in the study 
 SG_present_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = SG_present)) +
   geom_jitter() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"),
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -663,8 +669,9 @@ Whether participants reference the game vaguely at least once in the study signi
 VG_present_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = VG_present)) +
   geom_jitter() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"),
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -705,8 +712,9 @@ Whether participants reference friends at least once in the study significantly 
 FR_present_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = FR_present)) +
   geom_jitter() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -747,8 +755,9 @@ Whether participants reference possessions at least once in the study significan
 PS_present_age_scatter <- seas_separated |>
   ggplot(aes(x = age_months, y = PS_present)) +
   geom_jitter() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"),
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
@@ -882,8 +891,8 @@ seas |>
   ungroup() |>
   ggplot(aes(x = age_months, y = word_total)) +
   geom_point() +
-  stat_smooth(
-    method = "lm", 
+  geom_smooth(
+    method = "glm", 
     formula = y ~ x, 
     color = magma_colors[3], 
     fill = magma_colors[5], 
