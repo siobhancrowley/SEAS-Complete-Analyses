@@ -8,7 +8,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-Analyses for Study 1 of the Social Exclusion and Status Study. See our [pre-registration](https://doi.org/10.17605/OSF.IO/SF5G7) for more details.
+Analyses for Study 1 of the Social Exclusion and Status Study. See our [preregistration](https://osf.io/sf5g7/overview) for more details.
 
 # Packages
 ```{r packages, message = FALSE, warning = FALSE}
@@ -27,18 +27,6 @@ showtext_auto()
 seas_full <- read_excel("../Data/FINAL SEAS V1 Dataset.xlsx")
 
 seas <- filter(seas_full, final_data == "Y") #filtering out excluded participants
-```
-
-```{r data-prep}
-seas <- seas |>
-  mutate(
-    DOB = make_date(birth_year, birth_month, birth_day), #creating date of birth and date of test columns
-    DOT = as_date(DOT),
-    .before = DOT
-  ) |>
-  mutate(
-    age_months = interval(DOB, DOT) %/% months(1), .after = DOT #calculating age in months
-  )
 ```
 
 ```{r data-colors}

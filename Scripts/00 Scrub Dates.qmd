@@ -1,0 +1,60 @@
+---
+title: "00 Scrub Dates"
+author:
+  name: Siobhan Crowley
+date: 04/25/2026
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+# Packages 
+```{r packages, message = FALSE, warning = FALSE}
+library(readxl)
+library(writexl)
+library(tidyverse)
+```
+
+# V1
+```{r v1-load}
+seas <- read_excel("../Data/FINAL SEAS V1 Dataset.xlsx")
+```
+
+```{r v1-dates}
+seas <- seas |>
+  mutate(
+    DOB = make_date(birth_year, birth_month, birth_day), #creating date of birth and date of test columns
+    DOT = as_date(DOT),
+    .before = DOT
+  ) |>
+  mutate(
+    age_months = interval(DOB, DOT) %/% months(1), .after = DOT #calculating age in months
+  ) |> 
+  select(-c(DOB, DOT, birth_year, birth_month, birth_day))
+```
+
+```{r v1-write}
+write_xlsx(seas, "../Data/FINAL SEAS V1 Dataset.xlsx")
+```
+
+# V2
+```{r v2-load}
+seas2 <- read_excel("../Data/FINAL SEAS V2 Dataset.xlsx")
+```
+
+```{r v2-dates}
+seas2 <- seas2 |>
+  mutate(
+    DOB = make_date(birth_year, birth_month, birth_day), #creating date of birth and date of test columns
+    DOT = as_date(DOT),
+    .before = DOT
+  ) |>
+  mutate(
+    age_months = interval(DOB, DOT) %/% months(1), .after = DOT #calculating age in months
+  ) |> 
+  select(-c(DOB, DOT, birth_year, birth_month, birth_day))
+```
+
+```{r v2-write}
+write_xlsx(seas2, "../Data/FINAL SEAS V2 Dataset.xlsx")
+```

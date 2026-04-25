@@ -1,0 +1,43 @@
+---
+title: "README"
+author:
+  name: Siobhan Crowley
+output: html_document
+date: "2026-04-25"
+---
+
+**Project: Social Evaluation and Attribution Study (SEAS) Study 1 and 2 Analysis Code and Results**
+
+This repository contains the data, analysis code, results, and figures for the SEAS studies conducted at the University of Minnesota Twin Cities. View our project on [Open Science Framework](https://osf.io/ce47h/overview) for more information about our research. 
+
+The work here was conducted by Siobhan Crowley, under the supervision and with the assistance of Amanda Mae Woodward. Any questions can be directed to woodw284@umn.edu. 
+
+***Contents of the Repository***
+
+- Data
+  - Excel workbooks for the complete datasets (scrubbed of dates) for Study 1 and Study 2
+- Scripts
+  - Quarto files containing the raw code for each phase of analysis
+  - HTML files with the knitted product of the Quarto files: full code and results for each phase of analysis
+  - Libraries for the Quarto files to run (named like "Name of File_files")
+  - PNGs of all the figures produced by each Quarto file (named like "Name-of-File_files")
+  
+***Scripts***
+
+There are six scripts in this repository, numbered in the order in which each file was/should be run. 
+
+- "00 Scrub Dates"
+  - This file simply removes the dates from the original Study 1 and Study 2 datasets in order to help protect participant privacy. As the dates are no longer present in the Excel files, this script can no longer be run and only serves as a record for how exactly dates were cleaned and removed
+- "01 SEAS Study 1 Main Analyses"
+  - Preregistered analyses from the first study. See the [preregistration](https://osf.io/sf5g7/overview) for more information.
+- "02 SEAS Study 1 Explanatory Analyses"
+  - Non-preregistered exploration of participants' responses to open-ended follow-up questions asked after each forced-choice selection in the first study. 
+- "03 SEAS Study 2 Explanatory Analyses"
+  - Preregistered analyses from the second study. See the [preregistration](https://osf.io/zebgx/overview) for more information.
+- "04 SEAS Study 2 Explanatory Analyses"
+  - Non-preregistered exploration of participants' responses to open-ended follow-up questions asked after each forced-choice selection in the second study. 
+- "05 SEAS Study 2 Empathy Analyses"
+   - Non-preregistered exploration of relationships between participant responses and EmQue (Rieffe et al., 2010) measures of trait empathy in the second study.
+
+
+

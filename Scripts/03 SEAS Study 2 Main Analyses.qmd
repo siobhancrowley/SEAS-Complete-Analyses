@@ -8,7 +8,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-Analyses for Study 2 of the Social Exclusion and Status Study. See our [pre-registration](https://osf.io/zebgx/overview) for more details.
+Analyses for Study 2 of the Social Exclusion and Status Study. See our [preregistration](https://osf.io/zebgx/overview) for more details.
 
 # Packages
 ```{r packages-data, message = FALSE, warning = FALSE}
@@ -32,17 +32,6 @@ seas2 <- subset(seas2_full, final_data == "Y") # dropping excluded participants
 ```
 
 ```{r data-prep}
-#Dates
-seas2 <- seas2 |>
-  mutate(
-    DOB = make_date(birth_year, birth_month, birth_day), #creating date of birth and date of test columns
-    DOT = as_date(DOT),
-    .before = DOT
-  ) |>
-  mutate(
-    age_months = interval(DOB, DOT) %/% months(1), .after = DOT #calculating age in months
-  )
-
 #EmQue Scores
 seas2 <- seas2 |>
   mutate(across(starts_with("EQ_"), ~case_when(
