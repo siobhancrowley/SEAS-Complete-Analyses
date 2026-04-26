@@ -37,18 +37,6 @@ seas2_full <- read_excel("../Data/FINAL SEAS V2 Dataset.xlsx")
 seas2 <- subset(seas2_full, final_data == "Y") # dropping excluded participants
 ```
 
-```{r data-init-prep}
-seas2 <- seas2 |>
-  mutate(
-    DOB = make_date(birth_year, birth_month, birth_day), #creating date of birth and date of test columns
-    DOT = as_date(DOT),
-    .before = DOT
-  ) |>
-  mutate(
-    age_months = interval(DOB, DOT) %/% months(1), .after = DOT #calculating age in months
-  )
-```
-
 ```{r data-main-prep}
 #Combining any explanation code for a particular response
 seas2_united <- seas2 |>
@@ -511,6 +499,7 @@ seas2_count_exstatus_cor_matrix <- rcorr(as.matrix(seas2_count_exstatus_cor_data
 
 seas2_count_exstatus_correlation <- seas2_count_exstatus_cor_matrix$r[1, -1]
 seas2_count_exstatus_p <- seas2_count_exstatus_cor_matrix$P[1, -1]
+seas2_degrees <- seas2_count_exstatus_cor_matrix$n[1, 1] - 2 #Confirmed that ns were all the same
 
 seas2_count_exstatus_df <- data.frame(rho = seas2_count_exstatus_correlation, p = seas2_count_exstatus_p)
 
@@ -540,7 +529,10 @@ seas2_count_exstatus_table <- seas2_count_exstatus_df |>
     columns = everything()
   ) |>
   tab_footnote(
-    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+    "Corrections used the Bonferroni method, k = 16"
+  ) |>
+  tab_footnote(
+    str_glue("Degrees of freedom = {seas2_degrees}")
   )
 
 seas2_count_exstatus_table
@@ -595,7 +587,10 @@ seas2_count_compstatus_table <- seas2_count_compstatus_df |>
     columns = everything()
   ) |>
   tab_footnote(
-    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+    "Corrections used the Bonferroni method, k = 16"
+  ) |>
+  tab_footnote(
+    str_glue("Degrees of freedom = {seas2_degrees}")
   )
 
 seas2_count_compstatus_table
@@ -668,7 +663,10 @@ seas2_count_exresource_table <- seas2_count_exresource_df |>
     columns = everything()
   ) |>
   tab_footnote(
-    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+    "Corrections used the Bonferroni method, k = 16"
+  ) |>
+  tab_footnote(
+    str_glue("Degrees of freedom = {seas2_degrees}")
   )
 
 seas2_count_exresource_table
@@ -730,7 +728,10 @@ seas2_count_compresource_table <- seas2_count_compresource_df |>
     columns = everything()
   ) |>
   tab_footnote(
-    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+    "Corrections used the Bonferroni method, k = 16"
+  ) |>
+  tab_footnote(
+    str_glue("Degrees of freedom = {seas2_degrees}")
   )
 
 seas2_count_compresource_table
@@ -968,7 +969,10 @@ seas2_present_exstatus_table <- seas2_present_exstatus_df |>
     columns = everything()
   ) |>
   tab_footnote(
-    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+    "Corrections used the Bonferroni method, k = 16"
+  ) |>
+  tab_footnote(
+    str_glue("Degrees of freedom = {seas2_degrees}")
   )
 
 seas2_present_exstatus_table
@@ -1016,7 +1020,10 @@ seas2_present_compstatus_table <- seas2_present_compstatus_df |>
     columns = everything()
   ) |>
   tab_footnote(
-    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+    "Corrections used the Bonferroni method, k = 16"
+  ) |>
+  tab_footnote(
+    str_glue("Degrees of freedom = {seas2_degrees}")
   )
 
 seas2_present_compstatus_table
@@ -1064,7 +1071,10 @@ seas2_present_exresource_table <- seas2_present_exresource_df |>
     columns = everything()
   ) |>
   tab_footnote(
-    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+    "Corrections used the Bonferroni method, k = 16"
+  ) |>
+  tab_footnote(
+    str_glue("Degrees of freedom = {seas2_degrees}")
   )
 
 seas2_present_exresource_table
@@ -1112,7 +1122,10 @@ seas2_present_compresource_table <- seas2_present_compresource_df |>
     columns = everything()
   ) |>
   tab_footnote(
-    "Significant p-values (regardless of whether corrected p was significant) have been highlighted"
+    "Corrections used the Bonferroni method, k = 16"
+  ) |>
+  tab_footnote(
+    str_glue("Degrees of freedom = {seas2_degrees}")
   )
 
 seas2_present_compresource_table

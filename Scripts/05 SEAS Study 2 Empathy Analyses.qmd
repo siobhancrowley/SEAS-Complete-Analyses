@@ -28,17 +28,6 @@ seas2 <- subset(seas2_full, final_data == "Y") # dropping excluded participants
 ```
 
 ```{r data-prep}
-#Dates
-seas2 <- seas2 |>
-  mutate(
-    DOB = make_date(birth_year, birth_month, birth_day), #creating date of birth and date of test columns
-    DOT = as_date(DOT),
-    .before = DOT
-  ) |>
-  mutate(
-    age_months = interval(DOB, DOT) %/% months(1), .after = DOT #calculating age in months
-  )
-
 #EmQue Scores
 seas2 <- seas2 |>
   mutate(across(starts_with("EQ_"), ~case_when(
@@ -155,9 +144,9 @@ total_outcomes <- seas2 |>
 
 total_cor_matrix <- rcorr(as.matrix(total_outcomes), type = "pearson")
 
-total_correlation = total_cor_matrix$r[1, -1]
-total_p = total_cor_matrix$P[1, -1]
-total_degrees = total_cor_matrix$n[1, 1] - 2 #I did confirm that all the ns were the same for the values within each of the 4 matrices
+total_correlation <- total_cor_matrix$r[1, -1]
+total_p <- total_cor_matrix$P[1, -1]
+total_degrees <- total_cor_matrix$n[1, 1] - 2 #I did confirm that all the ns were the same for the values within each of the 4 matrices
 
 total_df <- data.frame(r = total_correlation, p = total_p) 
 
@@ -211,9 +200,9 @@ contagion_outcomes <- seas2 |>
 
 contagion_cor_matrix <- rcorr(as.matrix(contagion_outcomes), type = "pearson")
 
-contagion_correlation = contagion_cor_matrix$r[1, -1]
-contagion_p = contagion_cor_matrix$P[1, -1]
-contagion_degrees = contagion_cor_matrix$n[1, 1] - 2
+contagion_correlation <- contagion_cor_matrix$r[1, -1]
+contagion_p <- contagion_cor_matrix$P[1, -1]
+contagion_degrees <- contagion_cor_matrix$n[1, 1] - 2
 
 contagion_df <- data.frame(r = contagion_correlation, p = contagion_p)
 
@@ -267,9 +256,9 @@ attention_outcomes <- seas2 |>
 
 attention_cor_matrix <- rcorr(as.matrix(attention_outcomes), type = "pearson")
 
-attention_correlation = attention_cor_matrix$r[1, -1]
-attention_p = attention_cor_matrix$P[1, -1]
-attention_degrees = attention_cor_matrix$n[1, 1]
+attention_correlation <- attention_cor_matrix$r[1, -1]
+attention_p <- attention_cor_matrix$P[1, -1]
+attention_degrees <- attention_cor_matrix$n[1, 1]
 
 attention_df <- data.frame(r = attention_correlation, p = attention_p)
 
@@ -320,9 +309,9 @@ prosocial_outcomes <- seas2 |>
 
 prosocial_cor_matrix <- rcorr(as.matrix(prosocial_outcomes), type = "pearson")
 
-prosocial_correlation = prosocial_cor_matrix$r[1, -1]
-prosocial_p = prosocial_cor_matrix$P[1, -1]
-prosocial_degrees = prosocial_cor_matrix$n[1, 1]
+prosocial_correlation <- prosocial_cor_matrix$r[1, -1]
+prosocial_p <- prosocial_cor_matrix$P[1, -1]
+prosocial_degrees <- prosocial_cor_matrix$n[1, 1]
 
 prosocial_df <- data.frame(r = prosocial_correlation, p = prosocial_p)
 

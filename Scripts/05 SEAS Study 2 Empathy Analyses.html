@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -11,6 +11,9 @@
 
 <title>05 SEAS Study 2 Empathy Analyses</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -63,15 +66,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="05 SEAS Study 2 Empathy Analyses_files/libs/clipboard/clipboard.min.js"></script>
 <script src="05 SEAS Study 2 Empathy Analyses_files/libs/quarto-html/quarto.js" type="module"></script>
 <script src="05 SEAS Study 2 Empathy Analyses_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="05 SEAS Study 2 Empathy Analyses_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="05 SEAS Study 2 Empathy Analyses_files/libs/quarto-html/popper.min.js"></script>
 <script src="05 SEAS Study 2 Empathy Analyses_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="05 SEAS Study 2 Empathy Analyses_files/libs/quarto-html/anchor.min.js"></script>
 <link href="05 SEAS Study 2 Empathy Analyses_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="05 SEAS Study 2 Empathy Analyses_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="05 SEAS Study 2 Empathy Analyses_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="05 SEAS Study 2 Empathy Analyses_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="05 SEAS Study 2 Empathy Analyses_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="05 SEAS Study 2 Empathy Analyses_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="05 SEAS Study 2 Empathy Analyses_files/libs/bootstrap/bootstrap-efbb37e9afcc02144ebbc7afd12a776f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
@@ -132,121 +134,110 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>seas2 <span class="ot">&lt;-</span> <span class="fu">subset</span>(seas2_full, final_data <span class="sc">==</span> <span class="st">"Y"</span>) <span class="co"># dropping excluded participants</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Dates</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#EmQue Scores</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>seas2 <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">DOB =</span> <span class="fu">make_date</span>(birth_year, birth_month, birth_day), <span class="co">#creating date of birth and date of test columns</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">DOT =</span> <span class="fu">as_date</span>(DOT),</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> DOT</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_months =</span> <span class="fu">interval</span>(DOB, DOT) <span class="sc">%/%</span> <span class="fu">months</span>(<span class="dv">1</span>), <span class="at">.after =</span> DOT <span class="co">#calculating age in months</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#EmQue Scores</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>seas2 <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">starts_with</span>(<span class="st">"EQ_"</span>), <span class="sc">~</span><span class="fu">case_when</span>(</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    . <span class="sc">==</span> <span class="st">"Never"</span> <span class="sc">~</span> <span class="dv">0</span>,</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    . <span class="sc">==</span> <span class="st">"Sometimes"</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    . <span class="sc">==</span> <span class="st">"Often"</span> <span class="sc">~</span> <span class="dv">2</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  ))) <span class="sc">|&gt;</span> <span class="co">#convert EmQue columns to numeric</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">EQ_total =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="fu">starts_with</span>(<span class="st">"EQ_"</span>))),</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">EQ_contagion =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="fu">c</span>(EQ_1, EQ_4, EQ_7, EQ_10, EQ_13, EQ_16, EQ_19))),</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">EQ_attention =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="fu">c</span>(EQ_3, EQ_6, EQ_9, EQ_12, EQ_15, EQ_18, EQ_20))), </span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">EQ_prosocial =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="fu">c</span>(EQ_2, EQ_5, EQ_8, EQ_11, EQ_14, EQ_17))),</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">.after =</span> EQ_20</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Memory Check</span></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>seas2 <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">.cols =</span> <span class="fu">c</span>(<span class="fu">starts_with</span>(<span class="st">"mem_check"</span>), <span class="fu">starts_with</span>(<span class="st">"comp_mem_check"</span>)),</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">.fns =</span> <span class="sc">~</span><span class="fu">if_else</span>(.x <span class="sc">==</span> <span class="st">"correct"</span>, <span class="fl">0.5</span>, <span class="dv">0</span>)</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>         )) <span class="sc">|&gt;</span> <span class="co">#convert to numeric</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">mem_check_1 =</span> mem_check_1A <span class="sc">+</span> mem_check_1B,</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">mem_check_2 =</span> mem_check_2A <span class="sc">+</span> mem_check_2B,</span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_mem_check_1 =</span> comp_mem_check_1A <span class="sc">+</span> comp_mem_check_1B,</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">mem_check_3 =</span> mem_check_3A <span class="sc">+</span> mem_check_3B,</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">mem_check_4 =</span> mem_check_4A <span class="sc">+</span> mem_check_4B,</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_mem_check_2 =</span> comp_mem_check_2A <span class="sc">+</span> comp_mem_check_2B,</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">mem_check_total =</span> mem_check_1 <span class="sc">+</span> mem_check_2 <span class="sc">+</span> mem_check_3 <span class="sc">+</span> mem_check_4 <span class="sc">+</span> comp_mem_check_1 <span class="sc">+</span> comp_mem_check_2</span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>  ) <span class="co">#sum scores</span></span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Status</span></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="do">## Exclusion Trials</span></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>seas2 <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclusion_video_selection =</span> <span class="fu">case_when</span>(</span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>      interaction_1 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">~</span> status_1, </span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>      interaction_2 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">~</span> status_2</span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclusion_story_selection =</span> <span class="fu">case_when</span>(</span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>      interaction_3 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">~</span> status_3, </span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>      interaction_4 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">~</span> status_4</span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> <span class="co">#select exclusion from videos and stories</span></span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(</span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">.cols =</span> <span class="fu">c</span>(exclusion_video_selection, exclusion_story_selection),</span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">.fns =</span> <span class="sc">~</span><span class="fu">if_else</span>(.x <span class="sc">==</span> <span class="st">"excluder"</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span> <span class="co">#convert numeric</span></span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclusion_status_total =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="fu">c</span>(exclusion_video_selection, exclusion_story_selection)))</span>
-<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> <span class="co">#sum</span></span>
-<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="do">## Comparison Trials</span></span>
-<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>seas2 <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
-<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_status_1_num =</span> <span class="fu">if_else</span>(comp_status_1 <span class="sc">==</span> <span class="st">"excluder"</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
-<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_status_2_num =</span> <span class="fu">if_else</span>(comp_status_2 <span class="sc">==</span> <span class="st">"excluder"</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
-<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_status_total =</span> comp_status_1_num <span class="sc">+</span> comp_status_2_num</span>
-<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a><span class="co"># Resources</span></span>
-<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a><span class="do">## Exclusion Trials</span></span>
-<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>seas2 <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
-<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclusion_physical_selection =</span> <span class="fu">case_when</span>(</span>
-<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>      interaction_1 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_1 <span class="sc">==</span> <span class="st">"physical"</span> <span class="sc">~</span> resource_1, </span>
-<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>      interaction_2 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_2 <span class="sc">==</span> <span class="st">"physical"</span> <span class="sc">~</span> resource_2,</span>
-<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>      interaction_3 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_3 <span class="sc">==</span> <span class="st">"physical"</span> <span class="sc">~</span> resource_3,</span>
-<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>      interaction_4 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_4 <span class="sc">==</span> <span class="st">"physical"</span> <span class="sc">~</span> resource_4</span>
-<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclusion_social_selection =</span> <span class="fu">case_when</span>(</span>
-<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>      interaction_1 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_1 <span class="sc">==</span> <span class="st">"social"</span> <span class="sc">~</span> resource_1, </span>
-<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>      interaction_2 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_2 <span class="sc">==</span> <span class="st">"social"</span> <span class="sc">~</span> resource_2,</span>
-<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>      interaction_3 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_3 <span class="sc">==</span> <span class="st">"social"</span> <span class="sc">~</span> resource_3,</span>
-<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a>      interaction_4 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_4 <span class="sc">==</span> <span class="st">"social"</span> <span class="sc">~</span> resource_4</span>
-<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> <span class="co">#pull out physical and social excluder selection responses</span></span>
-<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(</span>
-<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>    <span class="at">.cols =</span> <span class="fu">c</span>(exclusion_physical_selection, exclusion_social_selection),</span>
-<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>    <span class="at">.fns =</span> <span class="sc">~</span><span class="fu">if_else</span>(.x <span class="sc">==</span> <span class="st">"excluder"</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span> <span class="co">#convert to numeric</span></span>
-<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">starts_with</span>(<span class="st">"EQ_"</span>), <span class="sc">~</span><span class="fu">case_when</span>(</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    . <span class="sc">==</span> <span class="st">"Never"</span> <span class="sc">~</span> <span class="dv">0</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    . <span class="sc">==</span> <span class="st">"Sometimes"</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    . <span class="sc">==</span> <span class="st">"Often"</span> <span class="sc">~</span> <span class="dv">2</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  ))) <span class="sc">|&gt;</span> <span class="co">#convert EmQue columns to numeric</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">EQ_total =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="fu">starts_with</span>(<span class="st">"EQ_"</span>))),</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">EQ_contagion =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="fu">c</span>(EQ_1, EQ_4, EQ_7, EQ_10, EQ_13, EQ_16, EQ_19))),</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">EQ_attention =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="fu">c</span>(EQ_3, EQ_6, EQ_9, EQ_12, EQ_15, EQ_18, EQ_20))), </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">EQ_prosocial =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="fu">c</span>(EQ_2, EQ_5, EQ_8, EQ_11, EQ_14, EQ_17))),</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">.after =</span> EQ_20</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Memory Check</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>seas2 <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">.cols =</span> <span class="fu">c</span>(<span class="fu">starts_with</span>(<span class="st">"mem_check"</span>), <span class="fu">starts_with</span>(<span class="st">"comp_mem_check"</span>)),</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">.fns =</span> <span class="sc">~</span><span class="fu">if_else</span>(.x <span class="sc">==</span> <span class="st">"correct"</span>, <span class="fl">0.5</span>, <span class="dv">0</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>         )) <span class="sc">|&gt;</span> <span class="co">#convert to numeric</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">mem_check_1 =</span> mem_check_1A <span class="sc">+</span> mem_check_1B,</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">mem_check_2 =</span> mem_check_2A <span class="sc">+</span> mem_check_2B,</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_mem_check_1 =</span> comp_mem_check_1A <span class="sc">+</span> comp_mem_check_1B,</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">mem_check_3 =</span> mem_check_3A <span class="sc">+</span> mem_check_3B,</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">mem_check_4 =</span> mem_check_4A <span class="sc">+</span> mem_check_4B,</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_mem_check_2 =</span> comp_mem_check_2A <span class="sc">+</span> comp_mem_check_2B,</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">mem_check_total =</span> mem_check_1 <span class="sc">+</span> mem_check_2 <span class="sc">+</span> mem_check_3 <span class="sc">+</span> mem_check_4 <span class="sc">+</span> comp_mem_check_1 <span class="sc">+</span> comp_mem_check_2</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="co">#sum scores</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Status</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="do">## Exclusion Trials</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>seas2 <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclusion_video_selection =</span> <span class="fu">case_when</span>(</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>      interaction_1 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">~</span> status_1, </span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>      interaction_2 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">~</span> status_2</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclusion_story_selection =</span> <span class="fu">case_when</span>(</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>      interaction_3 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">~</span> status_3, </span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>      interaction_4 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">~</span> status_4</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> <span class="co">#select exclusion from videos and stories</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">.cols =</span> <span class="fu">c</span>(exclusion_video_selection, exclusion_story_selection),</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">.fns =</span> <span class="sc">~</span><span class="fu">if_else</span>(.x <span class="sc">==</span> <span class="st">"excluder"</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span> <span class="co">#convert numeric</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclusion_status_total =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="fu">c</span>(exclusion_video_selection, exclusion_story_selection)))</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> <span class="co">#sum</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="do">## Comparison Trials</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>seas2 <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_status_1_num =</span> <span class="fu">if_else</span>(comp_status_1 <span class="sc">==</span> <span class="st">"excluder"</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_status_2_num =</span> <span class="fu">if_else</span>(comp_status_2 <span class="sc">==</span> <span class="st">"excluder"</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_status_total =</span> comp_status_1_num <span class="sc">+</span> comp_status_2_num</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="co"># Resources</span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="do">## Exclusion Trials</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>seas2 <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclusion_physical_selection =</span> <span class="fu">case_when</span>(</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>      interaction_1 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_1 <span class="sc">==</span> <span class="st">"physical"</span> <span class="sc">~</span> resource_1, </span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>      interaction_2 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_2 <span class="sc">==</span> <span class="st">"physical"</span> <span class="sc">~</span> resource_2,</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>      interaction_3 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_3 <span class="sc">==</span> <span class="st">"physical"</span> <span class="sc">~</span> resource_3,</span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>      interaction_4 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_4 <span class="sc">==</span> <span class="st">"physical"</span> <span class="sc">~</span> resource_4</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclusion_social_selection =</span> <span class="fu">case_when</span>(</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>      interaction_1 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_1 <span class="sc">==</span> <span class="st">"social"</span> <span class="sc">~</span> resource_1, </span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>      interaction_2 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_2 <span class="sc">==</span> <span class="st">"social"</span> <span class="sc">~</span> resource_2,</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>      interaction_3 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_3 <span class="sc">==</span> <span class="st">"social"</span> <span class="sc">~</span> resource_3,</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>      interaction_4 <span class="sc">==</span> <span class="st">"exclusion"</span> <span class="sc">&amp;</span> resource_type_4 <span class="sc">==</span> <span class="st">"social"</span> <span class="sc">~</span> resource_4</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> <span class="co">#pull out physical and social excluder selection responses</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(</span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>    <span class="at">.cols =</span> <span class="fu">c</span>(exclusion_physical_selection, exclusion_social_selection),</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>    <span class="at">.fns =</span> <span class="sc">~</span><span class="fu">if_else</span>(.x <span class="sc">==</span> <span class="st">"excluder"</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span> <span class="co">#convert to numeric</span></span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclusion_resource_total =</span> exclusion_physical_selection <span class="sc">+</span> exclusion_social_selection</span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="co">#create total resources score</span></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a><span class="do">## Comparison Trials</span></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>seas2 <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_physical_selection =</span> <span class="fu">if_else</span>(comp_resource_type_1 <span class="sc">==</span> <span class="st">"physical"</span>, comp_resource_1, comp_resource_2),</span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_social_selection =</span> <span class="fu">if_else</span>(comp_resource_type_1 <span class="sc">==</span> <span class="st">"social"</span>, comp_resource_1, comp_resource_2)</span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>    <span class="at">exclusion_resource_total =</span> exclusion_physical_selection <span class="sc">+</span> exclusion_social_selection</span>
-<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="co">#create total resources score</span></span>
-<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a><span class="do">## Comparison Trials</span></span>
-<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>seas2 <span class="ot">&lt;-</span> seas2 <span class="sc">|&gt;</span></span>
-<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_physical_selection =</span> <span class="fu">if_else</span>(comp_resource_type_1 <span class="sc">==</span> <span class="st">"physical"</span>, comp_resource_1, comp_resource_2),</span>
-<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_social_selection =</span> <span class="fu">if_else</span>(comp_resource_type_1 <span class="sc">==</span> <span class="st">"social"</span>, comp_resource_1, comp_resource_2)</span>
-<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
-<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>      <span class="at">.cols =</span> <span class="fu">c</span>(comp_physical_selection, comp_social_selection), </span>
-<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>      <span class="at">.fns =</span> <span class="sc">~</span><span class="fu">if_else</span>(.x <span class="sc">==</span> <span class="st">"excluder"</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_resource_total =</span> comp_physical_selection <span class="sc">+</span> comp_social_selection</span>
-<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>      <span class="at">.cols =</span> <span class="fu">c</span>(comp_physical_selection, comp_social_selection), </span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>      <span class="at">.fns =</span> <span class="sc">~</span><span class="fu">if_else</span>(.x <span class="sc">==</span> <span class="st">"excluder"</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a>    <span class="at">comp_resource_total =</span> comp_physical_selection <span class="sc">+</span> comp_social_selection</span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="empathy-correlations" class="level1">
@@ -261,9 +252,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>total_cor_matrix <span class="ot">&lt;-</span> <span class="fu">rcorr</span>(<span class="fu">as.matrix</span>(total_outcomes), <span class="at">type =</span> <span class="st">"pearson"</span>)</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>total_correlation <span class="ot">=</span> total_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>total_p <span class="ot">=</span> total_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>total_degrees <span class="ot">=</span> total_cor_matrix<span class="sc">$</span>n[<span class="dv">1</span>, <span class="dv">1</span>] <span class="sc">-</span> <span class="dv">2</span> <span class="co">#I did confirm that all the ns were the same for the values within each of the 4 matrices</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>total_correlation <span class="ot">&lt;-</span> total_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>total_p <span class="ot">&lt;-</span> total_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>total_degrees <span class="ot">&lt;-</span> total_cor_matrix<span class="sc">$</span>n[<span class="dv">1</span>, <span class="dv">1</span>] <span class="sc">-</span> <span class="dv">2</span> <span class="co">#I did confirm that all the ns were the same for the values within each of the 4 matrices</span></span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>total_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> total_correlation, <span class="at">p =</span> total_p) </span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
@@ -305,23 +296,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>total_cor_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="olofqkszwl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#olofqkszwl table {
+<div id="ivskdbhckb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ivskdbhckb table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#olofqkszwl thead, #olofqkszwl tbody, #olofqkszwl tfoot, #olofqkszwl tr, #olofqkszwl td, #olofqkszwl th {
+#ivskdbhckb thead, #ivskdbhckb tbody, #ivskdbhckb tfoot, #ivskdbhckb tr, #ivskdbhckb td, #ivskdbhckb th {
   border-style: none;
 }
 
-#olofqkszwl p {
+#ivskdbhckb p {
   margin: 0;
   padding: 0;
 }
 
-#olofqkszwl .gt_table {
+#ivskdbhckb .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -347,12 +338,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#olofqkszwl .gt_caption {
+#ivskdbhckb .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#olofqkszwl .gt_title {
+#ivskdbhckb .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -364,7 +355,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#olofqkszwl .gt_subtitle {
+#ivskdbhckb .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -376,7 +367,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#olofqkszwl .gt_heading {
+#ivskdbhckb .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -388,13 +379,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#olofqkszwl .gt_bottom_border {
+#ivskdbhckb .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
 }
 
-#olofqkszwl .gt_col_headings {
+#ivskdbhckb .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -409,7 +400,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#olofqkszwl .gt_col_heading {
+#ivskdbhckb .gt_col_heading {
   color: #FFFFFF;
   background-color: #0076BA;
   font-size: 100%;
@@ -429,7 +420,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#olofqkszwl .gt_column_spanner_outer {
+#ivskdbhckb .gt_column_spanner_outer {
   color: #FFFFFF;
   background-color: #0076BA;
   font-size: 100%;
@@ -441,15 +432,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#olofqkszwl .gt_column_spanner_outer:first-child {
+#ivskdbhckb .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#olofqkszwl .gt_column_spanner_outer:last-child {
+#ivskdbhckb .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#olofqkszwl .gt_column_spanner {
+#ivskdbhckb .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
@@ -461,11 +452,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#olofqkszwl .gt_spanner_row {
+#ivskdbhckb .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#olofqkszwl .gt_group_heading {
+#ivskdbhckb .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -491,7 +482,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#olofqkszwl .gt_empty_group_heading {
+#ivskdbhckb .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -506,15 +497,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#olofqkszwl .gt_from_md > :first-child {
+#ivskdbhckb .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#olofqkszwl .gt_from_md > :last-child {
+#ivskdbhckb .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#olofqkszwl .gt_row {
+#ivskdbhckb .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -533,7 +524,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#olofqkszwl .gt_stub {
+#ivskdbhckb .gt_stub {
   color: #333333;
   background-color: #89D3FE;
   font-size: 100%;
@@ -546,7 +537,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#olofqkszwl .gt_stub_row_group {
+#ivskdbhckb .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -560,15 +551,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#olofqkszwl .gt_row_group_first td {
+#ivskdbhckb .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#olofqkszwl .gt_row_group_first th {
+#ivskdbhckb .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#olofqkszwl .gt_summary_row {
+#ivskdbhckb .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -578,16 +569,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#olofqkszwl .gt_first_summary_row {
+#ivskdbhckb .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #5F5F5F;
 }
 
-#olofqkszwl .gt_first_summary_row.thick {
+#ivskdbhckb .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#olofqkszwl .gt_last_summary_row {
+#ivskdbhckb .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -597,7 +588,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#olofqkszwl .gt_grand_summary_row {
+#ivskdbhckb .gt_grand_summary_row {
   color: #333333;
   background-color: #D5D5D5;
   text-transform: inherit;
@@ -607,7 +598,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#olofqkszwl .gt_first_grand_summary_row {
+#ivskdbhckb .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -617,7 +608,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #5F5F5F;
 }
 
-#olofqkszwl .gt_last_grand_summary_row_top {
+#ivskdbhckb .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -627,11 +618,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#olofqkszwl .gt_striped {
+#ivskdbhckb .gt_striped {
   background-color: #EDF7FC;
 }
 
-#olofqkszwl .gt_table_body {
+#ivskdbhckb .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -640,7 +631,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#olofqkszwl .gt_footnotes {
+#ivskdbhckb .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -654,7 +645,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#olofqkszwl .gt_footnote {
+#ivskdbhckb .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -663,7 +654,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#olofqkszwl .gt_sourcenotes {
+#ivskdbhckb .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -677,7 +668,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#olofqkszwl .gt_sourcenote {
+#ivskdbhckb .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -685,72 +676,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#olofqkszwl .gt_left {
+#ivskdbhckb .gt_left {
   text-align: left;
 }
 
-#olofqkszwl .gt_center {
+#ivskdbhckb .gt_center {
   text-align: center;
 }
 
-#olofqkszwl .gt_right {
+#ivskdbhckb .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#olofqkszwl .gt_font_normal {
+#ivskdbhckb .gt_font_normal {
   font-weight: normal;
 }
 
-#olofqkszwl .gt_font_bold {
+#ivskdbhckb .gt_font_bold {
   font-weight: bold;
 }
 
-#olofqkszwl .gt_font_italic {
+#ivskdbhckb .gt_font_italic {
   font-style: italic;
 }
 
-#olofqkszwl .gt_super {
+#ivskdbhckb .gt_super {
   font-size: 65%;
 }
 
-#olofqkszwl .gt_footnote_marks {
+#ivskdbhckb .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#olofqkszwl .gt_asterisk {
+#ivskdbhckb .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#olofqkszwl .gt_indent_1 {
+#ivskdbhckb .gt_indent_1 {
   text-indent: 5px;
 }
 
-#olofqkszwl .gt_indent_2 {
+#ivskdbhckb .gt_indent_2 {
   text-indent: 10px;
 }
 
-#olofqkszwl .gt_indent_3 {
+#ivskdbhckb .gt_indent_3 {
   text-indent: 15px;
 }
 
-#olofqkszwl .gt_indent_4 {
+#ivskdbhckb .gt_indent_4 {
   text-indent: 20px;
 }
 
-#olofqkszwl .gt_indent_5 {
+#ivskdbhckb .gt_indent_5 {
   text-indent: 25px;
 }
 
-#olofqkszwl .katex-display {
+#ivskdbhckb .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#olofqkszwl div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#ivskdbhckb div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -840,7 +831,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(total_cor_table, <span class="st">"05 SEAS Study 2 Empathy Analyses_tables/total_cor_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/RtmpeWG2tg/file84e463353221.html screenshot completed</code></pre>
+<pre><code>file:///C:/Users/siobh/AppData/Local/Temp/RtmpaymtoD/file9ce8116827f0.html screenshot completed</code></pre>
 </div>
 </div>
 <p>EmQue total scores correlated with two variables: comparison resource selection total (r = -0.23 (weak negative), p = 0.03, p with Bonferroni correction = 0.27) and comparison resource physical selection (r = -0.27 (weak negative), p = 0.012, p with Bonferroni correction = 0.11), such that participants with higher empathy scores were less likely to select the excluder over the includer as having more resources overall and more physical resources.</p>
@@ -853,9 +844,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>contagion_cor_matrix <span class="ot">&lt;-</span> <span class="fu">rcorr</span>(<span class="fu">as.matrix</span>(contagion_outcomes), <span class="at">type =</span> <span class="st">"pearson"</span>)</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>contagion_correlation <span class="ot">=</span> contagion_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>contagion_p <span class="ot">=</span> contagion_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>contagion_degrees <span class="ot">=</span> contagion_cor_matrix<span class="sc">$</span>n[<span class="dv">1</span>, <span class="dv">1</span>] <span class="sc">-</span> <span class="dv">2</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>contagion_correlation <span class="ot">&lt;-</span> contagion_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>contagion_p <span class="ot">&lt;-</span> contagion_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>contagion_degrees <span class="ot">&lt;-</span> contagion_cor_matrix<span class="sc">$</span>n[<span class="dv">1</span>, <span class="dv">1</span>] <span class="sc">-</span> <span class="dv">2</span></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>contagion_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> contagion_correlation, <span class="at">p =</span> contagion_p)</span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
@@ -897,23 +888,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>contagion_cor_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="tmmielialo" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#tmmielialo table {
+<div id="yoqomogjhe" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#yoqomogjhe table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#tmmielialo thead, #tmmielialo tbody, #tmmielialo tfoot, #tmmielialo tr, #tmmielialo td, #tmmielialo th {
+#yoqomogjhe thead, #yoqomogjhe tbody, #yoqomogjhe tfoot, #yoqomogjhe tr, #yoqomogjhe td, #yoqomogjhe th {
   border-style: none;
 }
 
-#tmmielialo p {
+#yoqomogjhe p {
   margin: 0;
   padding: 0;
 }
 
-#tmmielialo .gt_table {
+#yoqomogjhe .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -939,12 +930,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#tmmielialo .gt_caption {
+#yoqomogjhe .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#tmmielialo .gt_title {
+#yoqomogjhe .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -956,7 +947,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#tmmielialo .gt_subtitle {
+#yoqomogjhe .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -968,7 +959,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#tmmielialo .gt_heading {
+#yoqomogjhe .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -980,13 +971,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#tmmielialo .gt_bottom_border {
+#yoqomogjhe .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
 }
 
-#tmmielialo .gt_col_headings {
+#yoqomogjhe .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -1001,7 +992,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#tmmielialo .gt_col_heading {
+#yoqomogjhe .gt_col_heading {
   color: #FFFFFF;
   background-color: #CB2A7B;
   font-size: 100%;
@@ -1021,7 +1012,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#tmmielialo .gt_column_spanner_outer {
+#yoqomogjhe .gt_column_spanner_outer {
   color: #FFFFFF;
   background-color: #CB2A7B;
   font-size: 100%;
@@ -1033,15 +1024,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#tmmielialo .gt_column_spanner_outer:first-child {
+#yoqomogjhe .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#tmmielialo .gt_column_spanner_outer:last-child {
+#yoqomogjhe .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#tmmielialo .gt_column_spanner {
+#yoqomogjhe .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
@@ -1053,11 +1044,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#tmmielialo .gt_spanner_row {
+#yoqomogjhe .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#tmmielialo .gt_group_heading {
+#yoqomogjhe .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1083,7 +1074,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#tmmielialo .gt_empty_group_heading {
+#yoqomogjhe .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1098,15 +1089,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#tmmielialo .gt_from_md > :first-child {
+#yoqomogjhe .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#tmmielialo .gt_from_md > :last-child {
+#yoqomogjhe .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#tmmielialo .gt_row {
+#yoqomogjhe .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1125,7 +1116,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#tmmielialo .gt_stub {
+#yoqomogjhe .gt_stub {
   color: #333333;
   background-color: #FFC6E3;
   font-size: 100%;
@@ -1138,7 +1129,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#tmmielialo .gt_stub_row_group {
+#yoqomogjhe .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1152,15 +1143,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#tmmielialo .gt_row_group_first td {
+#yoqomogjhe .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#tmmielialo .gt_row_group_first th {
+#yoqomogjhe .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#tmmielialo .gt_summary_row {
+#yoqomogjhe .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1170,16 +1161,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#tmmielialo .gt_first_summary_row {
+#yoqomogjhe .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #5F5F5F;
 }
 
-#tmmielialo .gt_first_summary_row.thick {
+#yoqomogjhe .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#tmmielialo .gt_last_summary_row {
+#yoqomogjhe .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1189,7 +1180,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#tmmielialo .gt_grand_summary_row {
+#yoqomogjhe .gt_grand_summary_row {
   color: #333333;
   background-color: #D5D5D5;
   text-transform: inherit;
@@ -1199,7 +1190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#tmmielialo .gt_first_grand_summary_row {
+#yoqomogjhe .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1209,7 +1200,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #5F5F5F;
 }
 
-#tmmielialo .gt_last_grand_summary_row_top {
+#yoqomogjhe .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1219,11 +1210,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#tmmielialo .gt_striped {
+#yoqomogjhe .gt_striped {
   background-color: #FCF2F7;
 }
 
-#tmmielialo .gt_table_body {
+#yoqomogjhe .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -1232,7 +1223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#tmmielialo .gt_footnotes {
+#yoqomogjhe .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1246,7 +1237,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#tmmielialo .gt_footnote {
+#yoqomogjhe .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1255,7 +1246,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#tmmielialo .gt_sourcenotes {
+#yoqomogjhe .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1269,7 +1260,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#tmmielialo .gt_sourcenote {
+#yoqomogjhe .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1277,72 +1268,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#tmmielialo .gt_left {
+#yoqomogjhe .gt_left {
   text-align: left;
 }
 
-#tmmielialo .gt_center {
+#yoqomogjhe .gt_center {
   text-align: center;
 }
 
-#tmmielialo .gt_right {
+#yoqomogjhe .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#tmmielialo .gt_font_normal {
+#yoqomogjhe .gt_font_normal {
   font-weight: normal;
 }
 
-#tmmielialo .gt_font_bold {
+#yoqomogjhe .gt_font_bold {
   font-weight: bold;
 }
 
-#tmmielialo .gt_font_italic {
+#yoqomogjhe .gt_font_italic {
   font-style: italic;
 }
 
-#tmmielialo .gt_super {
+#yoqomogjhe .gt_super {
   font-size: 65%;
 }
 
-#tmmielialo .gt_footnote_marks {
+#yoqomogjhe .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#tmmielialo .gt_asterisk {
+#yoqomogjhe .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#tmmielialo .gt_indent_1 {
+#yoqomogjhe .gt_indent_1 {
   text-indent: 5px;
 }
 
-#tmmielialo .gt_indent_2 {
+#yoqomogjhe .gt_indent_2 {
   text-indent: 10px;
 }
 
-#tmmielialo .gt_indent_3 {
+#yoqomogjhe .gt_indent_3 {
   text-indent: 15px;
 }
 
-#tmmielialo .gt_indent_4 {
+#yoqomogjhe .gt_indent_4 {
   text-indent: 20px;
 }
 
-#tmmielialo .gt_indent_5 {
+#yoqomogjhe .gt_indent_5 {
   text-indent: 25px;
 }
 
-#tmmielialo .katex-display {
+#yoqomogjhe .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#tmmielialo div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#yoqomogjhe div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1432,7 +1423,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(contagion_cor_table, <span class="st">"05 SEAS Study 2 Empathy Analyses_tables/contagion_cor_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/RtmpeWG2tg/file84e413bb25a4.html screenshot completed</code></pre>
+<pre><code>file:///C:/Users/siobh/AppData/Local/Temp/RtmpaymtoD/file9ce867e948f7.html screenshot completed</code></pre>
 </div>
 </div>
 <p>There were no significant correlations with the EmQue emotion contagion subscale.</p>
@@ -1445,9 +1436,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>attention_cor_matrix <span class="ot">&lt;-</span> <span class="fu">rcorr</span>(<span class="fu">as.matrix</span>(attention_outcomes), <span class="at">type =</span> <span class="st">"pearson"</span>)</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>attention_correlation <span class="ot">=</span> attention_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>attention_p <span class="ot">=</span> attention_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>attention_degrees <span class="ot">=</span> attention_cor_matrix<span class="sc">$</span>n[<span class="dv">1</span>, <span class="dv">1</span>]</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>attention_correlation <span class="ot">&lt;-</span> attention_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>attention_p <span class="ot">&lt;-</span> attention_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>attention_degrees <span class="ot">&lt;-</span> attention_cor_matrix<span class="sc">$</span>n[<span class="dv">1</span>, <span class="dv">1</span>]</span>
 <span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>attention_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> attention_correlation, <span class="at">p =</span> attention_p)</span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
@@ -1486,23 +1477,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>attention_cor_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="ofxenfjcqa" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#ofxenfjcqa table {
+<div id="aibawaqvvm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#aibawaqvvm table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#ofxenfjcqa thead, #ofxenfjcqa tbody, #ofxenfjcqa tfoot, #ofxenfjcqa tr, #ofxenfjcqa td, #ofxenfjcqa th {
+#aibawaqvvm thead, #aibawaqvvm tbody, #aibawaqvvm tfoot, #aibawaqvvm tr, #aibawaqvvm td, #aibawaqvvm th {
   border-style: none;
 }
 
-#ofxenfjcqa p {
+#aibawaqvvm p {
   margin: 0;
   padding: 0;
 }
 
-#ofxenfjcqa .gt_table {
+#aibawaqvvm .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1528,12 +1519,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#ofxenfjcqa .gt_caption {
+#aibawaqvvm .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ofxenfjcqa .gt_title {
+#aibawaqvvm .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1545,7 +1536,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#ofxenfjcqa .gt_subtitle {
+#aibawaqvvm .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1557,7 +1548,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#ofxenfjcqa .gt_heading {
+#aibawaqvvm .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1569,13 +1560,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#ofxenfjcqa .gt_bottom_border {
+#aibawaqvvm .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
 }
 
-#ofxenfjcqa .gt_col_headings {
+#aibawaqvvm .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -1590,7 +1581,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#ofxenfjcqa .gt_col_heading {
+#aibawaqvvm .gt_col_heading {
   color: #FFFFFF;
   background-color: #038901;
   font-size: 100%;
@@ -1610,7 +1601,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#ofxenfjcqa .gt_column_spanner_outer {
+#aibawaqvvm .gt_column_spanner_outer {
   color: #FFFFFF;
   background-color: #038901;
   font-size: 100%;
@@ -1622,15 +1613,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#ofxenfjcqa .gt_column_spanner_outer:first-child {
+#aibawaqvvm .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ofxenfjcqa .gt_column_spanner_outer:last-child {
+#aibawaqvvm .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ofxenfjcqa .gt_column_spanner {
+#aibawaqvvm .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
@@ -1642,11 +1633,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#ofxenfjcqa .gt_spanner_row {
+#aibawaqvvm .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#ofxenfjcqa .gt_group_heading {
+#aibawaqvvm .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1672,7 +1663,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#ofxenfjcqa .gt_empty_group_heading {
+#aibawaqvvm .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1687,15 +1678,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#ofxenfjcqa .gt_from_md > :first-child {
+#aibawaqvvm .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ofxenfjcqa .gt_from_md > :last-child {
+#aibawaqvvm .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ofxenfjcqa .gt_row {
+#aibawaqvvm .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1714,7 +1705,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#ofxenfjcqa .gt_stub {
+#aibawaqvvm .gt_stub {
   color: #333333;
   background-color: #CAFFAF;
   font-size: 100%;
@@ -1727,7 +1718,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ofxenfjcqa .gt_stub_row_group {
+#aibawaqvvm .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1741,15 +1732,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#ofxenfjcqa .gt_row_group_first td {
+#aibawaqvvm .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ofxenfjcqa .gt_row_group_first th {
+#aibawaqvvm .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#ofxenfjcqa .gt_summary_row {
+#aibawaqvvm .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1759,16 +1750,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ofxenfjcqa .gt_first_summary_row {
+#aibawaqvvm .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #5F5F5F;
 }
 
-#ofxenfjcqa .gt_first_summary_row.thick {
+#aibawaqvvm .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ofxenfjcqa .gt_last_summary_row {
+#aibawaqvvm .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1778,7 +1769,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#ofxenfjcqa .gt_grand_summary_row {
+#aibawaqvvm .gt_grand_summary_row {
   color: #333333;
   background-color: #D5D5D5;
   text-transform: inherit;
@@ -1788,7 +1779,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ofxenfjcqa .gt_first_grand_summary_row {
+#aibawaqvvm .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1798,7 +1789,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #5F5F5F;
 }
 
-#ofxenfjcqa .gt_last_grand_summary_row_top {
+#aibawaqvvm .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1808,11 +1799,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#ofxenfjcqa .gt_striped {
+#aibawaqvvm .gt_striped {
   background-color: #EDF6E8;
 }
 
-#ofxenfjcqa .gt_table_body {
+#aibawaqvvm .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -1821,7 +1812,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#ofxenfjcqa .gt_footnotes {
+#aibawaqvvm .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1835,7 +1826,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#ofxenfjcqa .gt_footnote {
+#aibawaqvvm .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1844,7 +1835,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ofxenfjcqa .gt_sourcenotes {
+#aibawaqvvm .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1858,7 +1849,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#ofxenfjcqa .gt_sourcenote {
+#aibawaqvvm .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1866,72 +1857,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ofxenfjcqa .gt_left {
+#aibawaqvvm .gt_left {
   text-align: left;
 }
 
-#ofxenfjcqa .gt_center {
+#aibawaqvvm .gt_center {
   text-align: center;
 }
 
-#ofxenfjcqa .gt_right {
+#aibawaqvvm .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ofxenfjcqa .gt_font_normal {
+#aibawaqvvm .gt_font_normal {
   font-weight: normal;
 }
 
-#ofxenfjcqa .gt_font_bold {
+#aibawaqvvm .gt_font_bold {
   font-weight: bold;
 }
 
-#ofxenfjcqa .gt_font_italic {
+#aibawaqvvm .gt_font_italic {
   font-style: italic;
 }
 
-#ofxenfjcqa .gt_super {
+#aibawaqvvm .gt_super {
   font-size: 65%;
 }
 
-#ofxenfjcqa .gt_footnote_marks {
+#aibawaqvvm .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#ofxenfjcqa .gt_asterisk {
+#aibawaqvvm .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ofxenfjcqa .gt_indent_1 {
+#aibawaqvvm .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ofxenfjcqa .gt_indent_2 {
+#aibawaqvvm .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ofxenfjcqa .gt_indent_3 {
+#aibawaqvvm .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ofxenfjcqa .gt_indent_4 {
+#aibawaqvvm .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ofxenfjcqa .gt_indent_5 {
+#aibawaqvvm .gt_indent_5 {
   text-indent: 25px;
 }
 
-#ofxenfjcqa .katex-display {
+#aibawaqvvm .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#ofxenfjcqa div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#aibawaqvvm div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -2018,7 +2009,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(attention_cor_table, <span class="st">"05 SEAS Study 2 Empathy Analyses_tables/attention_cor_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/RtmpeWG2tg/file84e46a58735b.html screenshot completed</code></pre>
+<pre><code>file:///C:/Users/siobh/AppData/Local/Temp/RtmpaymtoD/file9ce83e6640d.html screenshot completed</code></pre>
 </div>
 </div>
 <p>The EmQue attention to others’ feelings subscale scores significantly correlate with comparison physical selection totals (r = -0.25 (weak negative), p = 0.016, p with Bonferroni correction = 0.14) and no other variables, such that participants with higher attention to others’ subscale scores were less likely to select the excluder over the includer as having more physical resources.</p>
@@ -2031,9 +2022,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>prosocial_cor_matrix <span class="ot">&lt;-</span> <span class="fu">rcorr</span>(<span class="fu">as.matrix</span>(prosocial_outcomes), <span class="at">type =</span> <span class="st">"pearson"</span>)</span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>prosocial_correlation <span class="ot">=</span> prosocial_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>prosocial_p <span class="ot">=</span> prosocial_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>prosocial_degrees <span class="ot">=</span> prosocial_cor_matrix<span class="sc">$</span>n[<span class="dv">1</span>, <span class="dv">1</span>]</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>prosocial_correlation <span class="ot">&lt;-</span> prosocial_cor_matrix<span class="sc">$</span>r[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>prosocial_p <span class="ot">&lt;-</span> prosocial_cor_matrix<span class="sc">$</span>P[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>prosocial_degrees <span class="ot">&lt;-</span> prosocial_cor_matrix<span class="sc">$</span>n[<span class="dv">1</span>, <span class="dv">1</span>]</span>
 <span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>prosocial_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">r =</span> prosocial_correlation, <span class="at">p =</span> prosocial_p)</span>
 <span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
@@ -2071,23 +2062,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>prosocial_cor_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="uzxfeicxvf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#uzxfeicxvf table {
+<div id="mlmzfqrpnd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#mlmzfqrpnd table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#uzxfeicxvf thead, #uzxfeicxvf tbody, #uzxfeicxvf tfoot, #uzxfeicxvf tr, #uzxfeicxvf td, #uzxfeicxvf th {
+#mlmzfqrpnd thead, #mlmzfqrpnd tbody, #mlmzfqrpnd tfoot, #mlmzfqrpnd tr, #mlmzfqrpnd td, #mlmzfqrpnd th {
   border-style: none;
 }
 
-#uzxfeicxvf p {
+#mlmzfqrpnd p {
   margin: 0;
   padding: 0;
 }
 
-#uzxfeicxvf .gt_table {
+#mlmzfqrpnd .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -2113,12 +2104,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#uzxfeicxvf .gt_caption {
+#mlmzfqrpnd .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#uzxfeicxvf .gt_title {
+#mlmzfqrpnd .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2130,7 +2121,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#uzxfeicxvf .gt_subtitle {
+#mlmzfqrpnd .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2142,7 +2133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#uzxfeicxvf .gt_heading {
+#mlmzfqrpnd .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2154,13 +2145,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#uzxfeicxvf .gt_bottom_border {
+#mlmzfqrpnd .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
 }
 
-#uzxfeicxvf .gt_col_headings {
+#mlmzfqrpnd .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -2175,7 +2166,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#uzxfeicxvf .gt_col_heading {
+#mlmzfqrpnd .gt_col_heading {
   color: #FFFFFF;
   background-color: #E4220C;
   font-size: 100%;
@@ -2195,7 +2186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#uzxfeicxvf .gt_column_spanner_outer {
+#mlmzfqrpnd .gt_column_spanner_outer {
   color: #FFFFFF;
   background-color: #E4220C;
   font-size: 100%;
@@ -2207,15 +2198,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#uzxfeicxvf .gt_column_spanner_outer:first-child {
+#mlmzfqrpnd .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#uzxfeicxvf .gt_column_spanner_outer:last-child {
+#mlmzfqrpnd .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#uzxfeicxvf .gt_column_spanner {
+#mlmzfqrpnd .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #5F5F5F;
@@ -2227,11 +2218,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#uzxfeicxvf .gt_spanner_row {
+#mlmzfqrpnd .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#uzxfeicxvf .gt_group_heading {
+#mlmzfqrpnd .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2257,7 +2248,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#uzxfeicxvf .gt_empty_group_heading {
+#mlmzfqrpnd .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2272,15 +2263,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#uzxfeicxvf .gt_from_md > :first-child {
+#mlmzfqrpnd .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#uzxfeicxvf .gt_from_md > :last-child {
+#mlmzfqrpnd .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#uzxfeicxvf .gt_row {
+#mlmzfqrpnd .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2299,7 +2290,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#uzxfeicxvf .gt_stub {
+#mlmzfqrpnd .gt_stub {
   color: #333333;
   background-color: #FFCCC7;
   font-size: 100%;
@@ -2312,7 +2303,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#uzxfeicxvf .gt_stub_row_group {
+#mlmzfqrpnd .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2326,15 +2317,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#uzxfeicxvf .gt_row_group_first td {
+#mlmzfqrpnd .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#uzxfeicxvf .gt_row_group_first th {
+#mlmzfqrpnd .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#uzxfeicxvf .gt_summary_row {
+#mlmzfqrpnd .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2344,16 +2335,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#uzxfeicxvf .gt_first_summary_row {
+#mlmzfqrpnd .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #5F5F5F;
 }
 
-#uzxfeicxvf .gt_first_summary_row.thick {
+#mlmzfqrpnd .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#uzxfeicxvf .gt_last_summary_row {
+#mlmzfqrpnd .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2363,7 +2354,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#uzxfeicxvf .gt_grand_summary_row {
+#mlmzfqrpnd .gt_grand_summary_row {
   color: #333333;
   background-color: #D5D5D5;
   text-transform: inherit;
@@ -2373,7 +2364,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#uzxfeicxvf .gt_first_grand_summary_row {
+#mlmzfqrpnd .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2383,7 +2374,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #5F5F5F;
 }
 
-#uzxfeicxvf .gt_last_grand_summary_row_top {
+#mlmzfqrpnd .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2393,11 +2384,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#uzxfeicxvf .gt_striped {
+#mlmzfqrpnd .gt_striped {
   background-color: #FEEDEC;
 }
 
-#uzxfeicxvf .gt_table_body {
+#mlmzfqrpnd .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #5F5F5F;
@@ -2406,7 +2397,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #5F5F5F;
 }
 
-#uzxfeicxvf .gt_footnotes {
+#mlmzfqrpnd .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2420,7 +2411,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#uzxfeicxvf .gt_footnote {
+#mlmzfqrpnd .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -2429,7 +2420,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#uzxfeicxvf .gt_sourcenotes {
+#mlmzfqrpnd .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2443,7 +2434,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#uzxfeicxvf .gt_sourcenote {
+#mlmzfqrpnd .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2451,72 +2442,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#uzxfeicxvf .gt_left {
+#mlmzfqrpnd .gt_left {
   text-align: left;
 }
 
-#uzxfeicxvf .gt_center {
+#mlmzfqrpnd .gt_center {
   text-align: center;
 }
 
-#uzxfeicxvf .gt_right {
+#mlmzfqrpnd .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#uzxfeicxvf .gt_font_normal {
+#mlmzfqrpnd .gt_font_normal {
   font-weight: normal;
 }
 
-#uzxfeicxvf .gt_font_bold {
+#mlmzfqrpnd .gt_font_bold {
   font-weight: bold;
 }
 
-#uzxfeicxvf .gt_font_italic {
+#mlmzfqrpnd .gt_font_italic {
   font-style: italic;
 }
 
-#uzxfeicxvf .gt_super {
+#mlmzfqrpnd .gt_super {
   font-size: 65%;
 }
 
-#uzxfeicxvf .gt_footnote_marks {
+#mlmzfqrpnd .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#uzxfeicxvf .gt_asterisk {
+#mlmzfqrpnd .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#uzxfeicxvf .gt_indent_1 {
+#mlmzfqrpnd .gt_indent_1 {
   text-indent: 5px;
 }
 
-#uzxfeicxvf .gt_indent_2 {
+#mlmzfqrpnd .gt_indent_2 {
   text-indent: 10px;
 }
 
-#uzxfeicxvf .gt_indent_3 {
+#mlmzfqrpnd .gt_indent_3 {
   text-indent: 15px;
 }
 
-#uzxfeicxvf .gt_indent_4 {
+#mlmzfqrpnd .gt_indent_4 {
   text-indent: 20px;
 }
 
-#uzxfeicxvf .gt_indent_5 {
+#mlmzfqrpnd .gt_indent_5 {
   text-indent: 25px;
 }
 
-#uzxfeicxvf .katex-display {
+#mlmzfqrpnd .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#uzxfeicxvf div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#mlmzfqrpnd div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -2603,7 +2594,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gtsave</span>(prosocial_cor_table, <span class="st">"05 SEAS Study 2 Empathy Analyses_tables/prosocial_cor_table.png"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>file:///C:/Users/Siobhan/AppData/Local/Temp/RtmpeWG2tg/file84e4bd87199.html screenshot completed</code></pre>
+<pre><code>file:///C:/Users/siobh/AppData/Local/Temp/RtmpaymtoD/file9ce83b0e47d.html screenshot completed</code></pre>
 </div>
 </div>
 <p>There were no significant correlations with the EmQue prosocial actions subscale.</p>
