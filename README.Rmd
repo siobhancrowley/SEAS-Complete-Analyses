@@ -3,7 +3,7 @@ title: "README"
 author:
   name: Siobhan Crowley
 output: html_document
-date: "2026-04-25"
+date: "2026-06-09"
 ---
 
 **Project: Social Evaluation and Attribution Study (SEAS) Study 1 and 2 Analysis Code and Results**
@@ -15,16 +15,16 @@ The work here was conducted by Siobhan Crowley, under the supervision and with t
 ***Contents of the Repository***
 
 - Data
-  - Excel workbooks for the complete datasets (scrubbed of dates) for Study 1 and Study 2
-- Scripts
-  - Quarto files containing the raw code for each phase of analysis
+  - Deidentified Excel sheets including the complete datasets for Study 1 and Study 2
+- Scripts & Results
+  - Quarto files containing the code for each phase of analysis
   - HTML files with the knitted product of the Quarto files: full code and results for each phase of analysis
   - Libraries for the Quarto files to run (named like "Name of File_files")
   - PNGs of all the figures produced by each Quarto file (named like "Name-of-File_files")
   
-***Scripts***
+***Scripts & Results***
 
-There are six scripts in this repository, numbered in the order in which each file was/should be run. 
+There are seven phases of scripts/results in this repository, numbered in the order in which each file was/should be run. Except for 00, which is just a Quarto file, each phase of analysis is represented by a folder, within which is the Quarto file, HTML file, libraries subfolder, and PNG subfolder for that stage.
 
 - "00 Scrub Dates"
   - This file simply removes the dates from the original Study 1 and Study 2 datasets in order to help protect participant privacy. As the dates are no longer present in the Excel files, this script can no longer be run and only serves as a record for how exactly dates were cleaned and removed
@@ -38,6 +38,8 @@ There are six scripts in this repository, numbered in the order in which each fi
   - Non-preregistered exploration of participants' responses to open-ended follow-up questions asked after each forced-choice selection in the second study. 
 - "05 SEAS Study 2 Empathy Analyses"
    - Non-preregistered exploration of relationships between participant responses and EmQue (Rieffe et al., 2010) measures of trait empathy in the second study.
+- "06 SEAS Demographic Tables"
+  - Creates a table summarizing key demographic information in Study 1 and Study 2. This information was then put into a Word document for formatting.
 
 
 

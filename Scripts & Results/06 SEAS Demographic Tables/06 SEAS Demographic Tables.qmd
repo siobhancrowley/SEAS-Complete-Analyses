@@ -1,0 +1,184 @@
+---
+title: "06 SEAS Demographic Tables"
+format: html
+author: Siobhan Crowley
+date: 06/09/2026
+editor: source
+editor_options: 
+  chunk_output_type: console
+---
+
+Producing a table with demographic information for SEAS Study 1 and Study 2. For formatting purposes, this information was then transferred to a table in Word.
+
+# Packages
+```{r packages, message = FALSE, warning = FALSE}
+library(readxl)
+library(tidyverse)
+library(gt)
+```
+
+# Data Preparation
+```{r data-load}
+#SEAS
+seas_full <- read_excel("../../Data/FINAL SEAS V1 Dataset.xlsx")
+
+seas <- filter(seas_full, final_data == "Y") #filtering out excluded participants
+
+#SEAS 2
+seas2_full <- read_excel("../../Data/FINAL SEAS V2 Dataset.xlsx")
+
+seas2 <- subset(seas2_full, final_data == "Y") #filtering out excluded participants
+```
+
+# Table Prep
+```{r levels}
+identity_levels = c("White", "Asian", "Native American", "Middle Eastern", "Pacific Islander",  "Hispanic/Latine", "Mixed", "Other/Did Not Want to Respond")
+```
+
+```{r seas-prep}
+seas_age <- seas |> 
+   count(age) %>%
+   mutate(
+     percent = n / sum(n) * 100,
+     full_expression = str_glue("{n} ({format(percent, nsmall = 2)}%)")
+   ) |>
+   pull(full_expression)
+
+seas_gender <- seas |>
+   mutate(gender = fct_expand(gender, "other")) |>
+   count(gender, .drop = FALSE) |>
+   mutate(
+     percent = n / sum(n) * 100,
+     full_expression = str_glue("{n} ({format(percent, nsmall = 2, trim = TRUE)}%)")
+   ) |>
+   pull(full_expression)
+
+seas_identity <- seas |>
+   mutate(
+     identity = if_else(str_length(identity) > 3, "MX", identity) #Re-classifying anyone with more than one selection as "mixed race"
+     ) |> 
+   mutate(
+     identity = case_when(
+       identity == "EA" ~ "White",
+       identity == "AS" ~ "Asian",
+       identity == "AI" ~ "Native American",
+       identity == "ME" ~ "Middle Eastern",
+       identity == "PI" ~ "Pacific Islander",
+       identity == "HLS" ~ "Hispanic/Latine",
+       identity == "MX" ~ "Mixed",
+       identity == "OR" ~ "Other/Did Not Want to Respond",
+       identity == "NA" ~ "Other/Did Not Want to Respond",
+       is.na(identity) ~ "Other/Did Not Want to Respond"
+     ),
+     identity = factor(identity, levels = identity_levels)
+   ) |>
+   count(identity, .drop = FALSE) |>
+   mutate(
+     percent = n / sum(n) * 100,
+     full_expression = str_glue("{n} ({format(percent, nsmall = 2, trim = TRUE)}%)")
+   ) |>
+   pull(full_expression)
+
+seas_siblings <- seas |>
+   summarize(
+     mean = mean(siblings),
+     sd = sd(siblings),
+     full_expression = str_glue("{mean} ({round(sd, 2)})")
+   ) |> 
+   pull(full_expression)
+```
+
+```{r seas2-prep}
+seas2_age <- seas2 |> 
+   count(age) %>%
+   mutate(
+     percent = n / sum(n) * 100,
+     full_expression = str_glue("{n} ({round(percent, 2)}%)")
+   ) |> 
+   pull(full_expression)
+
+seas2_gender <- seas2 |>
+   count(gender) |>
+   mutate(
+     percent = n / sum(n) * 100,
+     full_expression = str_glue("{n} ({round(percent, 2)}%)")
+   ) |>
+   pull(full_expression)
+
+seas2_identity <- seas2 |>
+   mutate(
+     identity = if_else(str_length(identity) > 3, "MX", identity) #Re-classifying anyone with more than one selection as "mixed race"
+     ) |> 
+   mutate(
+     identity = case_when(
+       identity == "EA" ~ "White",
+       identity == "AS" ~ "Asian",
+       identity == "AI" ~ "Native American",
+       identity == "ME" ~ "Middle Eastern",
+       identity == "PI" ~ "Pacific Islander",
+       identity == "HLS" ~ "Hispanic/Latine",
+       identity == "MX" ~ "Mixed",
+       identity == "OR" ~ "Other/Did Not Want to Respond",
+       identity == "NA" ~ "Other/Did Not Want to Respond",
+       is.na(identity) ~ "Other/Did Not Want to Respond"
+     ),
+     identity = factor(identity, levels = identity_levels)
+   ) |>
+   count(identity, .drop = FALSE) |>
+   mutate(
+     percent = n / sum(n) * 100,
+     full_expression = str_glue("{n} ({round(percent, 2)}%)")
+   ) |>
+   pull(full_expression)
+
+seas2_siblings <- seas2 |>
+   summarize(
+     mean = mean(siblings, na.rm = TRUE),
+     sd = sd(siblings, na.rm = TRUE),
+     full_expression = str_glue("{round(mean, 2)} ({format(round(sd, 2), nsmall = 2)})")
+   ) |>
+   pull(full_expression)
+```
+
+# Create Table
+```{r demo-tibble}
+labels <- c("3", "4", "5", "6", "Boy", "Girl", "Other", identity_levels, "Siblings")
+
+demo_tibble <- tibble(
+   group = c("Age n (%)", "Age n (%)", "Age n (%)", "Age n (%)", "Gender n (%)", "Gender n (%)", "Gender n (%)", "Race/Ethnicity n (%)", "Race/Ethnicity n (%)", "Race/Ethnicity n (%)", "Race/Ethnicity n (%)", "Race/Ethnicity n (%)", "Race/Ethnicity n (%)", "Race/Ethnicity n (%)", "Race/Ethnicity n (%)", "Siblings mean (sd)"),
+   labels = labels,
+   "Study 1" = c(seas_age, seas_gender, seas_identity, seas_siblings),
+   "Study 2" = c(seas2_age, seas2_gender, seas2_identity, seas2_siblings)
+ )
+```
+
+```{r demo-table}
+demo_table <- demo_tibble |>
+   gt(
+     rowname_col = "labels",
+     groupname_col = "group"
+   ) |>
+    tab_header(
+     title = md("**Table 1**"),
+     subtitle = md("*Demographic Characteristics of Participants*")
+   ) |>
+     tab_options(
+     table.border.top.color = "transparent",
+     table.border.bottom.color = "transparent",
+     heading.border.bottom.color = "transparent",
+     column_labels.border.top.width = px(3),
+     column_labels.border.top.color = "black",
+     column_labels.border.bottom.width = px(1),
+     column_labels.border.bottom.color = "black",
+     table_body.border.bottom.width = px(3),
+     table_body.border.bottom.color = "black"
+   ) |>
+   cols_align(
+     align = "left",
+     columns = 1
+   )
+
+demo_table
+
+gtsave(demo_table, "demo_table.png")
+```

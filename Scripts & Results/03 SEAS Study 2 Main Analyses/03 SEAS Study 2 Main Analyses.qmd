@@ -1,0 +1,1426 @@
+---
+title: "SEAS Study 2 Main Analyses"
+author:
+  name: Siobhan Crowley
+date: 06/09/2026
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+Analyses for Study 2 of the Social Exclusion and Status Study. See our [preregistration](https://osf.io/zebgx/overview) for more details.
+
+Note: The path specified in the data load command (in line 29 of data-load chunk) may need to be modified depending on your operating system and local environment set-up in order to function properly.
+
+# Packages
+```{r packages-data, message = FALSE, warning = FALSE}
+library(readxl)
+library(lme4)
+library(effsize)
+library(pwr)
+library(showtext)
+library(viridis)
+library(lmerTest)
+library(tidyverse)
+
+showtext_auto()
+```
+
+# Data Preparation
+```{r data-load}
+seas2_full <- read_excel("../../Data/FINAL SEAS V2 Dataset.xlsx")
+
+seas2 <- subset(seas2_full, final_data == "Y") # dropping excluded participants
+```
+
+```{r data-prep}
+#EmQue Scores
+seas2 <- seas2 |>
+  mutate(across(starts_with("EQ_"), ~case_when(
+    . == "Never" ~ 0,
+    . == "Sometimes" ~ 1,
+    . == "Often" ~ 2
+  ))) |> #convert EmQue columns to numeric
+  rowwise() |>
+  mutate(
+      EQ_total = sum(c_across(starts_with("EQ_"))),
+      EQ_contagion = sum(c_across(c(EQ_1, EQ_4, EQ_7, EQ_10, EQ_13, EQ_16, EQ_19))),
+      EQ_attention = sum(c_across(c(EQ_3, EQ_6, EQ_9, EQ_12, EQ_15, EQ_18, EQ_20))), 
+      EQ_prosocial = sum(c_across(c(EQ_2, EQ_5, EQ_8, EQ_11, EQ_14, EQ_17))),
+      .after = EQ_20
+    ) |>
+  ungroup()
+
+#Adding Side variable from CB
+seas2 <- seas2 |>
+  mutate(
+    side = if_else(CB %in% c(1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31), "left", "right"),
+    .after = CB
+  )
+```
+
+```{r data-colors}
+magma_colors <- c("#000004FF", "#180F3EFF", "#451077FF", "#721F81FF", "#9F2F7FFF", "#CD4071FF", "#F1605DFF", "#FD9567FF", "#FEC98DFF", "#FCFDBFFF") #from magma(10)
+```
+
+# Demographics
+```{r demo}
+#Gender
+gender_count2 <- seas2 |>
+  group_by(gender) |>
+  summarise(n = n())
+
+#Age
+age_count2 <- seas2 |> 
+  group_by(age) |>
+  summarize(n = n())
+
+#Race/Ethnicity
+identity_count2 <- seas2 |>
+  mutate(
+    identity = if_else(str_length(identity) > 3, "MX", identity)
+  ) |>
+  group_by(identity) |>
+  summarise(n = n()) |>
+  arrange(desc(n))
+```
+
+`r nrow(seas2_full) - 1` children participated in this study, and `r nrow(seas2)` were included in the final analysis--`r gender_count2$n[1]` boys and `r gender_count2$n[2]` girls, as well as `r gender_count2$n[3]` child who did not identify as either.
+
+There are `r age_count2$n[1]` 3-year-olds, `r age_count2$n[2]` 4-year-olds, `r age_count2$n[3]` 5-year-olds, and `r age_count2$n[4]` 6-year-olds (`r age_count2$n[1] + age_count2$n[2]` in the 3-4 group and `r age_count2$n[3] + age_count2$n[4]` in the 5-6 group). Mean = `r mean(seas2$age)`, sd = `r sd(seas2$age)`.
+
+And there are `r identity_count2$n[1]` participants who identify as White or European American, `r identity_count2$n[2] + identity_count2$n[6]` as multiple races or another race/ethnicity not listed, `r identity_count2$n[3]` as Asian, `r identity_count2$n[4]` as American Indian or Alaska Native, `r identity_count2$n[5] + identity_count2$n[8]` as did not want to respond, `r identity_count2$n[7]` as Middle Eastern or North African, and `r identity_count2$n[9]` as Hispanic, Latino/Latina/Latinx, or Spanish. 
+
+# 1. Do children correctly identify the social excluder?
+```{r mem-prep}
+#Convert memory check results to numeric and calculate sum score
+seas2 <- seas2 |>
+  mutate(across(
+    .cols = c(starts_with("mem_check"), starts_with("comp_mem_check")),
+    .fns = ~if_else(.x == "correct", 0.5, 0)
+         )) |> #convert to numeric
+  mutate(
+    mem_check_1 = mem_check_1A + mem_check_1B,
+    mem_check_2 = mem_check_2A + mem_check_2B,
+    comp_mem_check_1 = comp_mem_check_1A + comp_mem_check_1B,
+    mem_check_3 = mem_check_3A + mem_check_3B,
+    mem_check_4 = mem_check_4A + mem_check_4B,
+    comp_mem_check_2 = comp_mem_check_2A + comp_mem_check_2B,
+    mem_check_total = mem_check_1 + mem_check_2 + mem_check_3 + mem_check_4 + comp_mem_check_1 + comp_mem_check_2, 
+    mem_check_main = mem_check_1 + mem_check_2 + mem_check_3 + mem_check_4,
+    mem_check_comp = comp_mem_check_1 + comp_mem_check_2
+  ) #sum scores
+```
+
+## Preliminary Analysis
+```{r mem-glmm}
+#Main Trials
+mem_check_main <- seas2 |>
+  mutate(              #duplicating type and interaction columns so pivoting mem_check is easier
+    type_1A = type_1,
+    type_2A = type_2,
+    type_3A = type_3,
+    type_4A = type_4,
+    interaction_1A = interaction_1,
+    interaction_2A = interaction_2,
+    interaction_3A = interaction_3,
+    interaction_4A = interaction_4,
+    type_1B = type_1A,
+    type_2B = type_2A,
+    type_3B = type_3A,
+    type_4B = type_4A,
+    interaction_1B = interaction_1A,
+    interaction_2B = interaction_2A,
+    interaction_3B = interaction_3A,
+    interaction_4B = interaction_4A,
+  ) |>
+   select(subject, gender, age_months, siblings, EQ_total, side, matches("^type_..$"), matches("^interaction_..$"), matches("^mem_check_..$")) |>
+  pivot_longer(
+    cols = c(starts_with("type"), starts_with("interaction"), matches("^mem_check_..$")), 
+    names_to = c(".value", "trial"),
+    names_pattern = "(.*)_(.).?$"
+  ) |>
+  mutate(
+    mem_check = if_else(mem_check == 0.5, 1, 0)
+  )
+
+# summary(glmer(
+#   mem_check ~ trial + type + interaction + gender + siblings + age_months + EQ_total + (1 | subject),
+#   data = mem_check_main, 
+#   family = "binomial"
+# )) #rank-deficient; dropped type, siblings, EmQue, and gender in that order until converged
+
+mem_glmm_main <- summary(glmer(
+  mem_check ~ trial + interaction + age_months + (1 | subject),
+  data = mem_check_main, 
+  family = "binomial"
+))
+  
+mem_glmm_main
+
+#Comparison Trials
+mem_check_comp <- seas2 |>
+   select(subject, gender, age_months, siblings, EQ_total, side, matches("^comp_mem_check_..$")) |>
+  pivot_longer(
+    cols = matches("^comp_mem_check_..$"), 
+    names_to = c(".value", "trial"),
+    names_pattern = "comp_(mem_check)_(.).?$"
+  ) |>
+  mutate(
+    mem_check = if_else(mem_check == 0.5, 1, 0)
+  )
+
+# summary(glmer(
+#   mem_check ~ trial + gender + siblings + age_months + EQ_total + (1 | subject),
+#   data = mem_check_comp, 
+#   family = "binomial"
+# )) #rank-deficient; dropped siblings, EQ_total, and gender in that order
+
+
+mem_glmm_comp <- summary(glmer(
+  mem_check ~ trial + age_months + (1 | subject),
+  data = mem_check_comp, 
+  family = "binomial"
+)) 
+
+mem_glmm_comp
+```
+
+To test whether other factors influenced performance on the memory check questions, we created a pair of generalized linear mixed models 
+(GLMMs) to examine the memory check questions for the main trials and those for the comparison trials.
+
+The original model for main trials was rank-deficient; type, siblings, EmQue total, and gender were removed in that order until the model converged--the final model contained trial, interaction (exclusion/inclusion), and age in months. Of these, only age was significant (z = `r round(mem_glmm_main$coefficients[6,3], 2)`, p = `r signif(mem_glmm_main$coefficients[6,4], 2)`), indicating that children were more likely to correctly answer the main trial memory check questions as they got older. 
+
+The model for the comparison trials also did not converge initially, and siblings, EmQue total, and gender were removed until the model converged--only trial and age were present in this model, and only age was significant (z = `r round(mem_glmm_comp$coefficients[3,3], 2)`, p = `r signif(mem_glmm_comp$coefficients[3,4], 2)`).
+
+## Main Analyses
+### Hypothesis 1
+We expect that children, on average, will accurately recall the details of the game.
+
+```{r mem-ttest}
+mem_ttest <- t.test(seas2$mem_check_total, mu = 3)
+mem_ttest
+
+mem_d <- cohen.d(seas2$mem_check_total, f = NA, mu = 3)
+mem_d
+
+mem_sd <- sd(seas2$mem_check_total, na.rm = TRUE)
+mem_sd
+```
+
+We performed a t-test to assess whether participants' summed memory check scores were statistically different from chance, finding that the t statistic was equal to `r round(unname(mem_ttest$statistic), 2)` and the p-value was `r signif(unname(mem_ttest$p.value), 2)` (M = `r unname(mem_ttest$estimate)`, SD = `r signif(mem_sd, 2)`), demonstrating that children were able to correctly recall the events of the scenarios. Cohen's d was `r round(unname(mem_d$estimate), 2)`, which is considered a `r as.character(mem_d$magnitude)` effect size.
+
+### Hypothesis 2
+We expect that age will be associated with accuracy on memory check questions.
+
+```{r mem-age-glmm}
+mem_check_age_pivoted <- seas2 |>
+  select(subject, age_months, matches("^mem_check_..$"), matches("^comp_mem_check_..$")) |>
+  pivot_longer(mem_check_1A:comp_mem_check_2B, names_to = "trial", values_to = "response") |> #has both main and comp mem, since only checking age
+  mutate(
+    response = if_else(response == 0.5, 1, 0) #converting 0.5 to 1, so each memory check trial has a binary outcome
+  )
+
+mem_age_glmm <- summary(glmer(
+  response ~ age_months + (1 | subject),
+  data = mem_check_age_pivoted,
+  family = "binomial"
+))
+
+mem_age_glmm
+```
+
+Age is significantly associated with correct memory check responses, z = `r round(mem_age_glmm$coefficients[2,3], 2)`, p = `r signif(mem_age_glmm$coefficients[2,4], 2)`, such that older participants were more likely to respond correctly.
+
+```{r mem-age-total-scatter}
+mem_age_total_scatter <- seas2 |>
+  ggplot(aes(x = age_months, y = mem_check_total)) +
+  geom_point(position = position_jitter(height = 0.1)) +
+  geom_smooth(
+    method = "glm", 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 3, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 2 Memory Check Performance",
+    x = "Age (Months)",
+    y = "Correct Memory Responses"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  coord_cartesian(ylim = c(0, 6))
+
+#NOTE: the rows removed are the children who did not fill out the demographic information
+
+mem_age_total_scatter
+```
+
+```{r mem-age-trial-scatter}
+mem_age_trial_scatter <- mem_check_age_pivoted |>
+  ggplot(aes(x = age_months, y = response)) +
+  geom_point(position = position_jitter(height = 0.1, width = 0.5)) +
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 2 Memory Check Performance",
+    x = "Age (Months)",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(
+    breaks = c(0, 1),
+    labels = c("Incorrect", "Correct")
+  )
+
+mem_age_trial_scatter
+```
+
+```{r mem-age-box}
+mem_age_boxplot <- seas2 |>
+  ggplot(aes(x = as.factor(age), y = mem_check_total, fill = as.factor(age))) +
+  geom_boxplot(fill = c(magma_colors[3], magma_colors[5], magma_colors[7], magma_colors[9])) +
+  geom_hline(yintercept = 3, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 2 Memory Check Performance",
+    x = "Age (Years)",
+    y = "Correct Memory Responses"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  coord_cartesian(ylim = c(0, 6))
+
+mem_age_boxplot
+```
+
+```{r mem-age-col}
+mem_column <- seas2 |>
+  ggplot(aes(x = as.factor(age), y = mem_check_total)) +
+  stat_summary(
+    fun = "mean",
+    geom = "bar",
+    position = position_dodge(width = 0.9),
+    fill = "#CD4071FF"
+  ) +
+  stat_summary(
+    fun.data = "mean_cl_normal",
+    geom = "errorbar",
+    width = 0.2,
+    linewidth = 0.5,
+    position = position_dodge(width = 0.9)
+  ) +
+  labs(
+    title = "Study 2 Memory Check Performance",
+    x = "Age (Years)",
+    y = "Correct Memory Responses"
+  ) +
+  geom_hline(yintercept = 3, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25),
+        ) +
+    scale_y_continuous(breaks = c(0, 1, 2, 3, 4, 5, 6))
+
+mem_column
+```
+
+# 2. Do children use information about social exclusion to determine who is in charge?
+```{r em-status-prep}
+#Create selected excluder over excluded sum scores
+seas2 <- seas2 |>
+  mutate(
+    exclusion_video_selection = case_when(
+      interaction_1 == "exclusion" ~ status_1, 
+      interaction_2 == "exclusion" ~ status_2
+    ),
+    exclusion_story_selection = case_when(
+      interaction_3 == "exclusion" ~ status_3, 
+      interaction_4 == "exclusion" ~ status_4
+    )
+  ) |> #select exclusion from videos and stories
+  mutate(across(
+    .cols = c(exclusion_video_selection, exclusion_story_selection),
+    .fns = ~if_else(.x == "excluder", 1, 0)
+  )) |> #convert numeric
+  rowwise() |>
+  mutate(
+    exclusion_status_total = sum(c_across(c(exclusion_video_selection, exclusion_story_selection)))
+  ) |> #sum
+  ungroup()
+```
+
+## Preliminary Analysis
+```{r em-status-glmm}
+#General pivot for all the main trial questions
+seas2_main_pivoted <- seas2 |>
+  select(-contains("comp")) |>
+  pivot_longer(
+    cols = c(starts_with("type"), starts_with("interaction"), starts_with("status")), 
+    names_to = c(".value", "trial"),
+    names_pattern = "(.*)_(.)"
+    )
+
+#Pivot of just exclusion interactions
+seas2_exclusion_pivoted <- seas2_main_pivoted |>
+  filter(interaction == "exclusion") |>
+  mutate(
+    status = if_else(status == "excluder", 1, 0)
+  )
+
+#Binomial GLMM
+
+# summary(glmer(
+#   status ~ trial + type + age_months + gender + siblings + EQ_total + (1 | subject),
+#   data = seas2_exclusion_pivoted,
+#   family = "binomial"
+# )) #rank-deficient; removed type, siblings, EQ_total, and gender in that order
+
+em_status_glmm <- summary(glmer(
+  status ~ trial + age_months + (1 | subject),
+  data = seas2_exclusion_pivoted,
+  family = "binomial"
+))
+
+em_status_glmm
+```
+
+The original GLMM to assess excluder selection in the main exclusion trials was rank-deficient; type, siblings, EmQue total, and gender were removed for the model to converge. Neither trial nor age in months were significant in the final model.
+
+## Main Analyses
+### Hypothesis 1
+Children will view social excluders as being in charge more often than those they exclude.
+
+```{r em-status-ttest}
+em_status_ttest <- t.test(seas2$exclusion_status_total, mu = 1)
+em_status_ttest
+
+em_status_sd <- sd(seas2$exclusion_status_total, na.rm = TRUE)
+em_status_sd
+```
+
+In a one-sample t-test for the selection of the excluder over an excluded character for being in charge, t = `r round(em_status_ttest$statistic, 2)` and p = `r round(em_status_ttest$p.value, 2)` (M = `r unname(em_status_ttest$estimate)`, SD = `r signif(em_status_sd, 2)`), demonstrating that children did not select the excluder more often than chance.
+
+### Hypothesis 2
+We expect that age will be associated with identifying the social excluder as being in charge.
+
+```{r em-status-age-glmm}
+em_status_age_glmm <- summary(glmer(
+  status ~ age_months + (1 | subject),
+  data = seas2_exclusion_pivoted,
+  family = "binomial"
+))
+
+em_status_age_glmm
+```
+
+According to a GLMM, age did not significantly influence the likelihood of selecting the excluder over the excluded character as being in charge, p = `r signif(em_status_age_glmm$coefficients[2,4], 2)`.
+
+```{r em-status-total-scatter}
+em_status_total_scatter <- seas2 |>
+  ggplot(aes(x = age_months, y = exclusion_status_total)) +
+  geom_point(position = position_jitter(height = 0.1)) +
+  geom_smooth(
+    method = "glm", 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 1, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 2 Excluder Status Selection for Main Trials",
+    x = "Age (Months)",
+    y = "Excluder Selection"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(breaks = c(0, 1, 2))
+
+em_status_total_scatter
+```
+
+```{r em-status-trial-scatter}
+em_status_trial_scatter <- seas2_exclusion_pivoted |>
+  ggplot(aes(x = age_months, y = status)) +
+  geom_point(position = position_jitter(height = 0.1, width = 0.5)) +
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"),
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 2 Excluder Status Selection for Main Trials",
+    x = "Age (Months)",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(
+    breaks = c(0, 1),
+    labels = c("Excluded", "Excluder")
+  )
+
+em_status_trial_scatter
+```
+
+```{r em-status-boxplot}
+em_status_boxplot <- seas2 |>
+  ggplot(aes(x = as.factor(age), y = exclusion_status_total, fill = as.factor(age))) +
+  geom_boxplot(fill = c(magma_colors[3], magma_colors[5], magma_colors[7], magma_colors[9])) +
+  geom_hline(yintercept = 1, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 2 Excluder Status Selection for Main Trials",
+    x = "Age (Years)",
+    y = "Excluder Selection"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  coord_cartesian(ylim = c(0, 2)) +
+  scale_y_continuous(breaks = c(0, 1, 2))
+
+em_status_boxplot
+```
+
+```{r em-status-col}
+em_status_column <- seas2 |>
+  ggplot(aes(x = as.factor(age), y = exclusion_status_total)) +
+  stat_summary(
+    fun = "mean",
+    geom = "bar",
+    position = position_dodge(width = 0.9),
+    fill = "#CD4071FF"
+  ) +
+  stat_summary(
+    fun.data = "mean_cl_normal",
+    geom = "errorbar",
+    width = 0.2,
+    linewidth = 0.5,
+    position = position_dodge(width = 0.9)
+  ) +
+  labs(
+    title = "Study 2 Excluder Status Selection for Main Trials",
+    x = "Age (Years)",
+    y = "Excluder Selection"
+  ) +
+  geom_hline(yintercept = 1, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25),
+        ) +
+    scale_y_continuous(breaks = c(0, 1, 2)) +
+  coord_cartesian(ylim = c(0, 2))
+
+em_status_column
+```
+
+# 3. Do children use information about social exclusion to determine who possesses resources?
+```{r em-resources-prep}
+#Created selected excluder over excluder sum scores for resources
+seas2 <- seas2 |>
+  mutate(
+    exclusion_physical_selection = case_when(
+      interaction_1 == "exclusion" & resource_type_1 == "physical" ~ resource_1, 
+      interaction_2 == "exclusion" & resource_type_2 == "physical" ~ resource_2,
+      interaction_3 == "exclusion" & resource_type_3 == "physical" ~ resource_3,
+      interaction_4 == "exclusion" & resource_type_4 == "physical" ~ resource_4
+    ),
+    exclusion_social_selection = case_when(
+      interaction_1 == "exclusion" & resource_type_1 == "social" ~ resource_1, 
+      interaction_2 == "exclusion" & resource_type_2 == "social" ~ resource_2,
+      interaction_3 == "exclusion" & resource_type_3 == "social" ~ resource_3,
+      interaction_4 == "exclusion" & resource_type_4 == "social" ~ resource_4
+    )
+  ) |> #pull out physical and social excluder selection responses
+  mutate(across(
+    .cols = c(exclusion_physical_selection, exclusion_social_selection),
+    .fns = ~if_else(.x == "excluder", 1, 0)
+  )) |> #convert to numeric
+  rowwise() |>
+  mutate(
+    exclusion_resource_total = exclusion_physical_selection + exclusion_social_selection
+  ) |>
+  ungroup() #create total resources score
+```
+
+## Preliminary Analysis
+```{r em-resources-glmm}
+#CHECK
+
+#General resource pivot for all the main trial questions
+seas2_main_resource_pivoted <- seas2 |>
+  select(-contains("comp")) |>
+  pivot_longer(
+    cols = c(starts_with("type"), starts_with("interaction"), matches("resource_type_.$"), matches("resource_.$")), 
+    names_to = c(".value", "trial"),
+    names_pattern = "(.*)_(.)"
+    )
+
+#Pivot of just exclusion interactions
+seas2_exclusion_resource_pivoted <- seas2_main_resource_pivoted |>
+  filter(interaction == "exclusion") |>
+  mutate(
+    resource = if_else(resource == "excluder", 1, 0)
+  )
+
+#Binomial GLMM
+
+# summary(glmer(
+#   resource ~ trial + type + resource_type + age_months + gender + siblings + EQ_total + (1 | subject),
+#   data = seas2_exclusion_resource_pivoted,
+#   family = "binomial"
+# )) #rank-deficient; removed type, siblings, EQ_total, and gender in that order
+
+
+em_resource_glmm <- summary(glmer(
+  resource ~ trial + resource_type + age_months + (1 | subject),
+  data = seas2_exclusion_resource_pivoted,
+  family = "binomial"
+))
+
+em_resource_glmm
+```
+
+The GLMM for excluder resource selection in the exclusion main trials was rank-deficient; type, siblings, EmQue total and gender were removed. In the final model, trial (Trial 2: z = `r round(em_resource_glmm$coefficients[2,3], 2)`, p = `r signif(em_resource_glmm$coefficients[2,4], 2)`; Trial 3: z = `r round(em_resource_glmm$coefficients[3,3], 2)`, p = `r signif(em_resource_glmm$coefficients[3,4], 2)`; Trial 4: z = `r round(em_resource_glmm$coefficients[4,3], 2)`, p = `r signif(em_resource_glmm$coefficients[4,4], 2)`) and age (z = `r round(em_resource_glmm$coefficients[6,3], 2)`, p = `r signif(em_resource_glmm$coefficients[6,4], 2)`) were significant, but resource type was not. This suggests that participants were more likely to choose the excluder as having more resources in earlier trials and as they get older.
+
+```{r em-resource-total-scatter}
+em_resource_total_scatter <- seas2 |>
+  ggplot(aes(x = age_months, y = exclusion_resource_total)) +
+  geom_point(position = position_jitter(height = 0.1)) +
+  geom_smooth(
+    method = "glm", 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 1, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 2 Excluder Resource Selection for Main Trials",
+    x = "Age (Months)",
+    y = "Excluder Selection"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(breaks = c(0, 1, 2))
+
+em_resource_total_scatter
+```
+
+```{r em-resource-trial-scatter}
+em_resource_trial_scatter <- seas2_exclusion_resource_pivoted |>
+  ggplot(aes(x = age_months, y = resource)) +
+  geom_point(position = position_jitter(height = 0.1, width = 0.5)) +
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 2 Excluder Resource Selection for Main Trials",
+    x = "Age (Months)",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(
+    breaks = c(0, 1),
+    labels = c("Excluded", "Excluder")
+  )
+
+em_resource_trial_scatter
+```
+
+## Main Analyses
+### Hypothesis 1
+We expect that children will view social excluders as having more physical resources than those they exclude.
+
+```{r em-physresources-binom}
+em_phys_excluder_count <- seas2 |>
+  group_by(exclusion_physical_selection) |>
+  summarize(n = n()) |>
+  filter(exclusion_physical_selection == 1) |>
+  pull(n) #extracts the number of children who selected the excluder for the physical resources exclusion question
+
+em_phys_binom <- binom.test(em_phys_excluder_count, nrow(seas2), p = 0.5)
+em_phys_binom
+
+em_phys_h <- ES.h(p1 = em_phys_excluder_count / nrow(seas2), p2 = 0.5)
+em_phys_h
+```
+
+To examine whether children were more likely than chance to select the excluder over the excluded character as having more physical resources, we conducted a binomial test. `r em_phys_excluder_count` out of `r nrow(seas2)` selected the excluder, producing a p-value of `r signif(em_phys_binom$p.value, 2)`, demonstrating that children were more likely to select the excluder. Cohen's h = `r em_phys_h`.
+
+### Hypothesis 2
+We predict children will view social excluders as having more social resources than those they exclude.
+
+```{r em-socresources-binom}
+em_soc_excluder_count <- seas2 |>
+  group_by(exclusion_social_selection) |>
+  summarize(n = n()) |>
+  filter(exclusion_social_selection == 1) |>
+  pull(n) #extracts the number of children who selected the excluder for the physical resources exclusion question
+
+em_soc_binom <- binom.test(em_soc_excluder_count, nrow(seas2), p = 0.5)
+em_soc_binom
+
+em_soc_h <- ES.h(p1 = em_soc_excluder_count / nrow(seas2), p2 = 0.5)
+em_soc_h
+```
+
+Conducting the same binomial test to assess whether children were more likely than chance to select the excluder over the excluded character as having more social resources found that `r em_soc_excluder_count` out of `r nrow(seas2)` selected the excluder, producing a p-value of `r signif(em_soc_binom$p.value, 2)`, demonstrating that children were more likely to select the excluder. Cohen's h = `r em_soc_h`.
+
+### Hypothesis 3
+We expect that age will be associated with identifying the excluder as having more physical resources.
+
+```{r em-physresources-age-glm}
+em_phys_age_glm <- summary(glm(
+  exclusion_physical_selection ~ age_months,
+  data = seas2,
+  family = "binomial"
+))
+
+em_phys_age_glm
+```
+
+Age is significantly associated with selecting the excluder over the excluded character as having more physical resources, z = `r round(em_phys_age_glm$coefficients[2,3], 2)`, p = `r signif(em_phys_age_glm$coefficients[2,4], 2)`.
+
+### Hypothesis 4
+We expect that age will be associated with identifying the excluder as having more social resources.
+
+```{r em-socresources-age-glm}
+em_soc_age_glm <- summary(glm(
+  exclusion_social_selection ~ age_months,
+  data = seas2,
+  family = "binomial"
+))
+
+em_soc_age_glm
+```
+
+Age is significantly associated with selecting the excluder over the excluded character as having more social resources, z = `r round(em_soc_age_glm$coefficients[2,3], 2)`, p = `r signif(em_soc_age_glm$coefficients[2,4], 2)`.
+
+```{r em-resources-type-age-scatter}
+em_resource_type_age_scatter <- seas2 |>
+  pivot_longer(
+    cols = c(exclusion_physical_selection, exclusion_social_selection), 
+    names_to = "resource_type", 
+    names_pattern = ".*_(.*)_.*",
+    values_to = "response"
+  ) |> 
+  ggplot(aes(x = age_months, y = response, color = resource_type, fill = resource_type)) +
+  geom_point(position = position_jitter(height = 0.1)) +
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"),
+    formula = y ~ x, 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  scale_color_manual(
+    values = c(magma_colors[3], magma_colors[7]), 
+    labels = c("Physical", "Social")) +
+  scale_fill_manual(
+    values = c(magma_colors[3], magma_colors[7]),
+    labels = c("Physical", "Social")) +
+  labs(
+    title = "Study 2 Excluder Resource Selection for Main Trials",
+    x = "Age (Months)",
+    y = NULL,
+    color = NULL,
+    fill = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25),
+    legend.position = "top"
+        ) +
+  scale_y_continuous(
+    breaks = c(0, 1),
+    labels = c("Excluded", "Excluder"))
+
+em_resource_type_age_scatter
+```
+
+```{r em-physoc-col}
+em_physoc_column <- seas2 |>
+  pivot_longer(c("exclusion_physical_selection", "exclusion_social_selection"), names_to = "resource_total_type", names_pattern = "exclusion_(.*)_selection", values_to = "excluder_select") |> 
+  ggplot(aes(x = as.factor(age), y = excluder_select, fill = resource_total_type)) +
+  stat_summary(
+    fun = "mean",
+    geom = "bar",
+    position = position_dodge(width = 0.9)
+  ) +
+  stat_summary(
+    fun.data = "mean_cl_normal",
+    geom = "errorbar",
+    width = 0.2,
+    linewidth = 0.5,
+    position = position_dodge(width = 0.9)
+  ) +
+  labs(
+    title = "Study 2 Excluder Resource Selection for Main Trials",
+    x = "Age (Years)",
+    y = "Excluder Selection",
+    fill = NULL
+  ) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  scale_fill_manual(
+    values = c(magma_colors[3], magma_colors[7]),
+    labels = c("Physical", "Social")) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+    scale_y_continuous(breaks = c(0, 1)) +
+  coord_cartesian(ylim = c(0, 1))
+
+em_physoc_column
+```
+
+# 4. Do children use information about social inclusion and exclusion differently to determine who is in charge or possesses resources?
+```{r eim-prep}
+#Create selected includer over included sum scores for status
+seas2 <- seas2 |>
+  mutate(
+    inclusion_video_selection = case_when(
+      interaction_1 == "inclusion" ~ status_1, 
+      interaction_2 == "inclusion" ~ status_2
+    ),
+    inclusion_story_selection = case_when(
+      interaction_3 == "inclusion" ~ status_3, 
+      interaction_4 == "inclusion" ~ status_4
+    )
+  ) |> #select exclusion from videos and stories
+  mutate(across(
+    .cols = c(inclusion_video_selection, inclusion_story_selection),
+    .fns = ~if_else(.x == "includer", 1, 0)
+  )) |> #convert numeric
+  rowwise() |>
+  mutate(
+    inclusion_selection_total = sum(c_across(c(inclusion_video_selection, inclusion_story_selection)))
+  ) |> #sum
+  ungroup()
+
+#Created selected includer over included sum scores for resources
+seas2 <- seas2 |>
+  mutate(
+    inclusion_physical_selection = case_when(
+      interaction_1 == "inclusion" & resource_type_1 == "physical" ~ resource_1, 
+      interaction_2 == "inclusion" & resource_type_2 == "physical" ~ resource_2,
+      interaction_3 == "inclusion" & resource_type_3 == "physical" ~ resource_3,
+      interaction_4 == "inclusion" & resource_type_4 == "physical" ~ resource_4
+    ),
+    inclusion_social_selection = case_when(
+      interaction_1 == "inclusion" & resource_type_1 == "social" ~ resource_1, 
+      interaction_2 == "inclusion" & resource_type_2 == "social" ~ resource_2,
+      interaction_3 == "inclusion" & resource_type_3 == "social" ~ resource_3,
+      interaction_4 == "inclusion" & resource_type_4 == "social" ~ resource_4
+    )
+  ) |> #pull out physical and social excluder selection responses
+  mutate(across(
+    .cols = c(inclusion_physical_selection, inclusion_social_selection),
+    .fns = ~if_else(.x == "includer", 1, 0)
+  )) |> #convert to numeric
+  rowwise() |>
+  mutate(
+    inclusion_resource_total = inclusion_physical_selection + inclusion_social_selection
+  ) |>
+  ungroup() #create total resources score
+```
+
+## Preliminary Analysis
+```{r eim-status-glmm}
+eim_status_num <- seas2_main_pivoted |>
+  mutate(
+    status = if_else(status %in% c("excluder", "includer"), 1, 0)
+  )
+
+# summary(glmer(
+#   status ~ trial + type + interaction + age_months + gender + siblings + EQ_total + (1 | subject),
+#   data = eim_status_num,
+#   family = "binomial"
+# )) #rank-deficient; removed type and siblings
+
+eim_status_glmm <- summary(glmer(
+  status ~ trial + interaction + gender + EQ_total + age_months + (1 | subject),
+  data = eim_status_num,
+  family = "binomial"
+))
+
+eim_status_glmm
+```
+
+The GLMM examining status selection across all main trials was initially rank-deficient, and type and siblings were removed to make it converge. The final model included trial, interaction, gender, EmQue total, and age; none of these were significant.
+
+```{r eim-resources-glmm}
+eim_resource_num <- seas2_main_resource_pivoted |>
+  mutate(
+    resource = if_else(resource %in% c("excluder", "includer"), 1, 0)
+  )
+
+# summary(glmer(
+#   resource ~ trial + type + resource_type + interaction + gender + siblings + EQ_total + age_months + (1 | subject),
+#   data = eim_resource_num,
+#   family = "binomial"
+# )) #rank-deficient; removed type, siblings, EQ_total, and gender in that order
+
+eim_resource_glmm <- summary(glmer(
+    resource ~ trial + resource_type + interaction + age_months + (1 | subject),
+    data = eim_resource_num,
+    family = "binomial"
+))
+
+eim_resource_glmm
+```
+
+The GLMM for resource selection across all main trials was also initially rank-deficient, and type, siblings, EmQue total, and gender were removed in that order to make it converge. The final model included trial, resource type, interaction (exclusion/inclusion), and age; of these, interaction (z = `r round(eim_resource_glmm$coefficients[6,3], 2)`, p = `r signif(eim_resource_glmm$coefficients[6,4], 2)`) and age (z = `r round(eim_resource_glmm$coefficients[7,3], 2)`, p = `r signif(eim_resource_glmm$coefficients[7,4], 2)`) were significant.
+
+## Main Analyses
+### Hypothesis 1
+We expect that children will view social excluders as in charge over excluded characters more often than they see includers as in charge over included characters.
+
+```{r eim-status-condage-glmm}
+eim_status_condage_glmm <- summary(glmer(
+  status ~ interaction * age_months + (1 | subject),
+  data = eim_status_num,
+  family = "binomial"
+))
+
+eim_status_condage_glmm
+```
+
+A GLMM found no significant associations with status selection and condition (exclusion/inclusion), age, or an interaction between those two factors.
+
+### Hypothesis 2
+We predict that children will view social excluders as having physical resources over excluded characters more often than they see includers as having physical resources over included characters.
+
+```{r eim-physresources-glmm}
+#CHECK, singular
+
+eim_phys_pivoted <- eim_resource_num |>
+  filter(resource_type == "physical")
+
+eim_phys_glmm <- summary(glmer(
+  resource ~ interaction * age_months + (1 | subject),
+  data = eim_phys_pivoted,
+  family = "binomial"
+))
+
+eim_phys_glmm
+```
+
+In this GLMM, physical resources selection was significantly associated with age (z = `r round(eim_phys_glmm$coefficients[3,3], 2)`, p = `r signif(eim_phys_glmm$coefficients[3,4], 2)`), but not interaction or interaction x age.
+
+### Hypothesis 3
+We expect that children will view social excluders as having social resources over excluded characters more often than they see includers as having physical resources over included characters.
+
+```{r eim-socresources-glmm}
+#CHECK, singular
+
+eim_soc_pivoted <- eim_resource_num |>
+  filter(resource_type == "social")
+
+eim_soc_glmm <- summary(glmer(
+  resource ~ interaction * age_months + (1 | subject),
+  data = eim_soc_pivoted,
+  family = "binomial"
+))
+
+eim_soc_glmm
+```
+
+In this GLMM, social resources selection was significantly associated with interaction (z = `r round(eim_soc_glmm$coefficients[2,3], 2)`, p = `r signif(eim_soc_glmm$coefficients[2,4], 2)`, more likely to select target character (excluder/includer) when scenario depicted inclusion), age (z = `r round(eim_soc_glmm$coefficients[3,3], 2)`, p = `r signif(eim_soc_glmm$coefficients[3,4], 2)`, more likely to select target when participant was older), and interaction x age (z = `r round(eim_soc_glmm$coefficients[4,3], 2)`, p = `r signif(eim_soc_glmm$coefficients[4,4], 2)`, less likely to select target when participant was older and the scenario depicted inclusion).
+
+```{r eim-socresources-ageint-scatter}
+eim_soc_ageint_scatter <- eim_soc_pivoted |>
+  ggplot(aes(x = age_months, y = resource, color = interaction, fill = interaction)) +
+  geom_point(position = position_jitter(height = 0.1)) +
+   geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
+    formula = y ~ x, 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  scale_color_manual(
+    values = c(magma_colors[3], magma_colors[7]), 
+    labels = c("Exclusion", "Inclusion")) +
+  scale_fill_manual(
+    values = c(magma_colors[3], magma_colors[7]),
+    labels = c("Exclusion", "Inclusion")) +
+  labs(
+    title = "Study 2 Social Resource Selection for Main Trials",
+    x = "Age (Months)",
+    y = NULL,
+    color = NULL,
+    fill = NULL,
+    caption = "Note. In Exclusion trials, 1 represents the Excluder and 0 the Excluded Character; in Inclusion trials, 1 represnts the Includer and 0 the Included Character."
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25),
+    legend.position = "top"
+        ) +
+  scale_y_continuous(
+    breaks = c(0, 1))
+
+eim_soc_ageint_scatter
+```
+
+```{r eim-resource-ageint-scatter-faceted}
+eim_resource_scatter_facet <- eim_resource_num |>
+  mutate(
+    resource_type = fct_recode(resource_type, 
+      Physical = "physical",
+      Social = "social"
+    )
+  ) |>
+  ggplot(aes(x = age_months, y = resource, color = interaction, fill = interaction)) +
+  geom_point(position = position_jitter(height = 0.1)) +
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
+    formula = y ~ x, 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  facet_wrap(~resource_type) +
+  scale_color_manual(
+    values = c(magma_colors[3], magma_colors[7]), 
+    labels = c("Exclusion", "Inclusion")) +
+  scale_fill_manual(
+    values = c(magma_colors[3], magma_colors[7]),
+    labels = c("Exclusion", "Inclusion")) +
+  labs(
+    title = "Study 2 Resource Selection for Main Trials",
+    x = "Age (Months)",
+    y = NULL,
+    color = NULL,
+    fill = NULL,
+    caption = "Note. In Exclusion trials, 1 represents the Excluder and 0 the Excluded Character; in Inclusion trials, 1 represnts the Includer and 0 the Included Character."
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    plot.caption = element_text(hjust = 0.5),
+    text = element_text(family = "serif", size = 25),
+    legend.position = "top"
+        ) +
+  scale_y_continuous(
+    breaks = c(0, 1))
+
+eim_resource_scatter_facet
+```
+
+
+# 5. Do children view social excluders and includers differently in determinations of status and physical and social resource possession?
+```{r eic-status-prep}
+#Create selected excluder over includer sum scores for status
+seas2 <- seas2 |>
+  mutate(
+    comp_status_1_num = if_else(comp_status_1 == "excluder", 1, 0),
+    comp_status_2_num = if_else(comp_status_2 == "excluder", 1, 0),
+    comp_status_total = comp_status_1_num + comp_status_2_num
+  )
+```
+
+```{r eic-resources-prep}
+#Create selected excluder over includer for resources
+seas2 <- seas2 |>
+  mutate(
+    comp_physical_selection = if_else(comp_resource_type_1 == "physical", comp_resource_1, comp_resource_2),
+    comp_social_selection = if_else(comp_resource_type_1 == "social", comp_resource_1, comp_resource_2)
+  ) |>
+  mutate(
+    across(
+      .cols = c(comp_physical_selection, comp_social_selection), 
+      .fns = ~if_else(.x == "excluder", 1, 0)
+    ),
+    comp_resource_total = comp_physical_selection + comp_social_selection
+  )
+```
+
+## Preliminary Analyses
+```{r eic-status-glmm}
+#CHECK, singular
+
+#Pivot for comparison status
+seas2_comp_status_pivot <- seas2 |>
+  select(subject, gender, age_months, siblings, EQ_total, side, comp_status_1_num, comp_status_2_num) |>
+  pivot_longer(
+    cols = c(comp_status_1_num, comp_status_2_num),
+    names_pattern = "comp_status_(.)_num",
+    names_to = "trial",
+    values_to = "response"
+    )
+
+# summary(glmer(
+#   response ~ trial + gender + siblings + EQ_total + age_months + (1 | subject),
+#   data = seas2_comp_status_pivot,
+#   family = "binomial"
+# )) #warning messges; removed siblings, EQ_total, and gender in order
+
+
+eic_status_glmm <- summary(glmer(
+  response ~ trial + age_months + (1 | subject),
+  data = seas2_comp_status_pivot,
+  family = "binomial"
+))
+
+eic_status_glmm
+```
+
+The GLMM assessing status selection in the comparison trials initially produced errors as the variance-covariance matrix computed from finite-difference Hessian was not positive definite or contained NA values. In this order, siblings, EmQue total, and gender were removed. The final model contained trial and age in months, but neither of these were significant.
+
+```{r eic-resources-glmm}
+#CHECK, singular
+
+#Pivot for comparison resource
+seas2_comp_resource_pivot <- seas2 |>
+  select(subject, gender, age_months, siblings, side, EQ_total, starts_with("comp_resource_type"), matches("comp_resource_.$")) |>
+  pivot_longer(
+    cols = c(matches("comp_resource_type_."), matches("comp_resource_.$")),
+    names_to = c(".value", "trial"),
+    names_pattern = "comp_(.*)_(.)"
+  ) |>
+  mutate(
+    resource = if_else(resource == "excluder", 1, 0)
+  )
+
+#Binomial GLMM
+eic_resource_glmm <- summary(glmer(
+  resource ~ trial + resource_type + siblings + gender + EQ_total + age_months + (1 | subject),
+  data = seas2_comp_resource_pivot,
+  family = "binomial"
+)) 
+
+eic_resource_glmm
+```
+
+The GLMM examining resource selection in the comparison trials contained trial, resource type, siblings, gender, EmQue total, and age in months, but none of these were significant.
+
+## Main Analyses
+### Hypothesis 1
+We expect that children will view social excluders as being in charge more often than social includers.
+
+```{r eic-status-ttest}
+eic_status_ttest <- t.test(seas2$comp_status_total, mu = 1)
+eic_status_ttest
+
+eic_status_sd <- sd(seas2$comp_status_total, na.rm = TRUE)
+eic_status_sd
+```
+
+A one-sample t-test examining children selecting the excluder over the includer as being in charge produced a test statistic of `r round(eic_status_ttest$statistic, 2)` and a p-value of `r round(eic_status_ttest$p.value, 2)` (M = `r unname(eic_status_ttest$estimate)`, SD = `r signif(eic_status_sd, 2)`), demonstrating that they did not pick the excluder more frequently than chance.
+
+### Hypothesis 2
+We expect that children will view social excluders as having physical resources more often than social includers.
+
+```{r eic-physresources-binom}
+eic_phys_excluder_count <- seas2 |>
+  group_by(comp_physical_selection) |>
+  summarize(n = n()) |>
+  filter(comp_physical_selection == 1) |>
+  pull(n) #extracts the number of children who selected the excluder for the physical resources comparison question
+
+eic_phys_binom <- binom.test(eic_phys_excluder_count, nrow(seas2), p = 0.5)
+eic_phys_binom
+```
+
+To examine whether children were more likely than chance to select the excluder over the includer as having more physical resources, we conducted a binomial test. `r unname(eic_phys_binom$statistic)` out of `r nrow(seas2)` chose the excluder, producing a p-value of `r round(eic_phys_binom$p.value, 2)`, demonstrating that children did not select the excluder more than at chance.
+
+### Hypothesis 3
+We predict children will view social excluders as having social resources more often than social includers.
+
+```{r eic-socresources-binom}
+eic_soc_excluder_count <- seas2 |>
+  group_by(comp_social_selection) |>
+  summarize(n = n()) |>
+  filter(comp_social_selection == 1) |>
+  pull(n) #extracts the number of children who selected the excluder for the physical resources comparison question
+
+eic_soc_binom <- binom.test(eic_soc_excluder_count, nrow(seas2), p = 0.5)
+eic_soc_binom
+
+eic_soc_h <- ES.h(p1 = eic_soc_excluder_count / nrow(seas2), p2 = 0.5)
+eic_soc_h
+```
+
+To examine whether children were more likely than chance to select the excluder over the includer as having more physical resources, we conducted a binomial test. `r unname(eic_soc_binom$statistic)` out of `r nrow(seas2)` chose the excluder, producing a p-value of `r signif(eic_soc_binom$p.value, 2)`, demonstrating that children selected the excluder less frequently than at chance (i.e. they were significantly more likely to select the includer).
+
+### Hypothesis 4
+We predict that age will be associated with identifying the social excluder as being in charge more often than the includer.
+
+```{r eic-status-age-glmm}
+#CHECK, singular
+
+eic_status_age_glmm <- summary(glmer(
+  response ~ age_months + (1 | subject),
+  data = seas2_comp_status_pivot,
+  family = "binomial"
+))
+
+eic_status_age_glmm
+```
+
+Age was not significantly associated with selecting the excluder over the includer as being in charge, p = `r signif(eic_status_age_glmm$coefficients[2,4], 2)`.
+
+```{r eic-status-trial-scatter}
+eic_status_trial_scatter <- seas2_comp_status_pivot |>
+  ggplot(aes(x = age_months, y = response)) +
+  geom_point(position = position_jitter(height = 0.1, width = 0.5)) +
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 2 Excluder Status Selection for Comparison Trials",
+    x = "Age (Months)",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(
+    breaks = c(0, 1),
+    labels = c("Includer", "Excluder")
+  )
+
+eic_status_trial_scatter
+```
+
+### Hypothesis 5
+We expect age will be associated with identifying the social excluder as having physical resources more often.
+
+```{r eic-physresources-age-glm}
+eic_phys_age_glm <- summary(glm(
+  comp_physical_selection ~ age_months,
+  data = seas2,
+  family = "binomial"
+))
+
+eic_phys_age_glm
+```
+
+Age was not significantly associated with selecting the excluder over the includer as having more physical resources, p = `r signif(eic_phys_age_glm$coefficients[2,4], 2)`.
+
+### Hypothesis 6
+We expect that age will be associated with identifying the social excluder as having social resources more often.
+
+```{r eic-socresources-age-glm}
+eic_soc_age_glm <- summary(glm(
+  comp_social_selection ~ age_months,
+  data = seas2,
+  family = "binomial"
+))
+
+eic_soc_age_glm
+```
+
+Age was not significantly associated with selecting the excluder over the includer as having more social resources, p = `r signif(eic_soc_age_glm$coefficients[2,4], 2)`.
+
+```{r eic-resources-age-scatter}
+eic_resrouce_age_scatter <- seas2_comp_resource_pivot |>
+  ggplot(aes(x = age_months, y = resource, color = resource_type, fill = resource_type)) +
+  geom_point(position = position_jitter(height = 0.1)) +
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
+    formula = y ~ x, 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  scale_color_manual(
+    values = c(magma_colors[3], magma_colors[7]), 
+    labels = c("Physical", "Social")) +
+  scale_fill_manual(
+    values = c(magma_colors[3], magma_colors[7]),
+    labels = c("Physical", "Social")) +
+  labs(
+    title = "Study 2 Resource Selection for Comparison Trials",
+    x = "Age (Months)",
+    y = NULL,
+    color = NULL,
+    fill = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25),
+    legend.position = "top"
+        ) +
+  scale_y_continuous(
+    breaks = c(0, 1),
+    labels = c("Includer", "Excluder"))
+
+eic_resrouce_age_scatter
+```
+
+```{r eic-status-boxplot}
+eic_status_boxplot <- seas2 |>
+  ggplot(aes(x = as.factor(age), y = comp_status_total, fill = as.factor(age))) +
+  geom_boxplot(fill = c(magma_colors[3], magma_colors[5], magma_colors[7], magma_colors[9])) +
+  geom_hline(yintercept = 1, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 2 Excluder Status Selection for Comparison Trials",
+    x = "Age (Years)",
+    y = "Excluder Selection"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  coord_cartesian(ylim = c(0, 2)) +
+  scale_y_continuous(breaks = c(0, 1, 2))
+
+eic_status_boxplot
+```
+
+```{r eic-status-col}
+eic_status_column <- seas2 |>
+  ggplot(aes(x = as.factor(age), y = comp_status_total)) +
+  stat_summary(
+    fun = "mean",
+    geom = "bar",
+    position = position_dodge(width = 0.9),
+    fill = "#CD4071FF"
+  ) +
+  stat_summary(
+    fun.data = "mean_cl_normal",
+    geom = "errorbar",
+    width = 0.2,
+    linewidth = 0.5,
+    position = position_dodge(width = 0.9)
+  ) +
+  labs(
+    title = "Study 2 Excluder Status Selection for Comparison Trials",
+    x = "Age (Years)",
+    y = "Excluder Selection"
+  ) +
+  geom_hline(yintercept = 1, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25),
+        ) +
+    scale_y_continuous(breaks = c(0, 1, 2)) +
+  coord_cartesian(ylim = c(0, 2))
+
+eic_status_column
+```
+
+```{r eic-resource-col}
+eic_resource_column <- seas2 |>
+  ggplot(aes(x = as.factor(age), y = comp_resource_total)) +
+  stat_summary(
+    fun = "mean",
+    geom = "bar",
+    position = position_dodge(width = 0.9),
+    fill = "#CD4071FF"
+  ) +
+  stat_summary(
+    fun.data = "mean_cl_normal",
+    geom = "errorbar",
+    width = 0.2,
+    linewidth = 0.5,
+    position = position_dodge(width = 0.9)
+  ) +
+  labs(
+    title = "Study 2 Excluder Resources Selection for Comparison Trials",
+    x = "Age (Years)",
+    y = "Excluder Selection"
+  ) +
+  geom_hline(yintercept = 1, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25),
+        ) +
+    scale_y_continuous(breaks = c(0, 1, 2)) +
+  coord_cartesian(ylim = c(0, 2))
+
+eic_resource_column
+```
+
+```{r eic-physoc-col}
+eic_physoc_column <- seas2 |>
+  pivot_longer(c("comp_physical_selection", "comp_social_selection"), names_to = "resource_total_type", names_pattern = "comp_(.*)_selection", values_to = "excluder_select") |> 
+  ggplot(aes(x = as.factor(age), y = excluder_select, fill = resource_total_type)) +
+  stat_summary(
+    fun = "mean",
+    geom = "bar",
+    position = position_dodge(width = 0.9)
+  ) +
+  stat_summary(
+    fun.data = "mean_cl_normal",
+    geom = "errorbar",
+    width = 0.2,
+    linewidth = 0.5,
+    position = position_dodge(width = 0.9)
+  ) +
+  labs(
+    title = "Study 2 Excluder Resource Selection for Comparison Trials",
+    x = "Age (Years)",
+    y = "Excluder Selection",
+    fill = NULL
+  ) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  scale_fill_manual(
+    values = c(magma_colors[3], magma_colors[7]),
+    labels = c("Physical", "Social")) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+    scale_y_continuous(breaks = c(0, 1)) +
+  coord_cartesian(ylim = c(0, 1))
+
+eic_physoc_column
+```
