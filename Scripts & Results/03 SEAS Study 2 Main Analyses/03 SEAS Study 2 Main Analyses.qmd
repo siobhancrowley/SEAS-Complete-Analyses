@@ -158,6 +158,18 @@ mem_glmm_main <- summary(glmer(
   
 mem_glmm_main
 
+mem_age_main <- glmer(
+  mem_check ~ age_months + (1 | subject),
+  data = mem_check_main, 
+  family = "binomial"
+)
+
+summary(mem_age_main)
+
+confint(mem_age_main, method = "Wald", parm = "age_months") #fixed effect confidence interval
+
+exp(fixef(mem_age_main)) #odds ratio
+
 #Comparison Trials
 mem_check_comp <- seas2 |>
    select(subject, gender, age_months, siblings, EQ_total, side, matches("^comp_mem_check_..$")) |>
@@ -184,55 +196,71 @@ mem_glmm_comp <- summary(glmer(
 )) 
 
 mem_glmm_comp
+
+mem_age_comp <- glmer(
+  mem_check ~ age_months + (1 | subject),
+  data = mem_check_comp, 
+  family = "binomial"
+)
+
+summary(mem_age_comp)
+
+confint(mem_age_comp, method = "Wald", parm = "age_months") #fixed effect confidence interval
+
+exp(fixef(mem_age_comp)) #odds ratio
 ```
 
 To test whether other factors influenced performance on the memory check questions, we created a pair of generalized linear mixed models 
 (GLMMs) to examine the memory check questions for the main trials and those for the comparison trials.
 
-The original model for main trials was rank-deficient; type, siblings, EmQue total, and gender were removed in that order until the model converged--the final model contained trial, interaction (exclusion/inclusion), and age in months. Of these, only age was significant (z = `r round(mem_glmm_main$coefficients[6,3], 2)`, p = `r signif(mem_glmm_main$coefficients[6,4], 2)`), indicating that children were more likely to correctly answer the main trial memory check questions as they got older. 
+The original model for main trials was rank-deficient; type, siblings, EmQue total, and gender were removed in that order until the model converged--the final model contained trial, interaction (exclusion/inclusion), and age in months. Of these, only age was significant (z = `r round(summary(mem_age_main)$coefficients[2,3], 2)`, p = `r signif(summary(mem_age_main)$coefficients[2,4], 2)`), indicating that children were more likely to correctly answer the main trial memory check questions as they got older. 
 
-The model for the comparison trials also did not converge initially, and siblings, EmQue total, and gender were removed until the model converged--only trial and age were present in this model, and only age was significant (z = `r round(mem_glmm_comp$coefficients[3,3], 2)`, p = `r signif(mem_glmm_comp$coefficients[3,4], 2)`).
+The model for the comparison trials also did not converge initially, and siblings, EmQue total, and gender were removed until the model converged--only trial and age were present in this model, and only age was significant (z = `r round(summary(mem_age_comp)$coefficients[2,3], 2)`, p = `r signif(summary(mem_age_comp)$coefficients[2, 4], 2)`).
 
 ## Main Analyses
 ### Hypothesis 1
 We expect that children, on average, will accurately recall the details of the game.
 
-```{r mem-ttest}
-mem_ttest <- t.test(seas2$mem_check_total, mu = 3)
-mem_ttest
+```{r mem-main-ttest}
+mem_main_ttest <- t.test(seas2$mem_check_main, mu = 2)
+mem_main_ttest
 
-mem_d <- cohen.d(seas2$mem_check_total, f = NA, mu = 3)
-mem_d
+mem_main_d <- cohen.d(seas2$mem_check_main, f = NA, mu = 2)
+mem_main_d
 
-mem_sd <- sd(seas2$mem_check_total, na.rm = TRUE)
-mem_sd
+mem_main_sd <- sd(seas2$mem_check_main, na.rm = TRUE)
+mem_main_sd
 ```
 
-We performed a t-test to assess whether participants' summed memory check scores were statistically different from chance, finding that the t statistic was equal to `r round(unname(mem_ttest$statistic), 2)` and the p-value was `r signif(unname(mem_ttest$p.value), 2)` (M = `r unname(mem_ttest$estimate)`, SD = `r signif(mem_sd, 2)`), demonstrating that children were able to correctly recall the events of the scenarios. Cohen's d was `r round(unname(mem_d$estimate), 2)`, which is considered a `r as.character(mem_d$magnitude)` effect size.
+We performed a t-test to assess whether participants' summed memory check scores for the main trials were statistically different from chance, finding that the t statistic was equal to `r round(unname(mem_main_ttest$statistic), 2)` and the p-value was `r signif(unname(mem_main_ttest$p.value), 2)` (M = `r unname(mem_main_ttest$estimate)`, SD = `r signif(mem_main_sd, 2)`), demonstrating that children were able to correctly recall the events of the scenarios. Cohen's d was `r round(unname(mem_main_d$estimate), 2)`, which is considered a `r as.character(mem_main_d$magnitude)` effect size.
+
+```{r mem-comp-ttest}
+mem_comp_ttest <- t.test(seas2$mem_check_comp, mu = 1)
+mem_comp_ttest
+
+mem_comp_d <- cohen.d(seas2$mem_check_comp, f = NA, mu = 1)
+mem_comp_d
+
+mem_comp_sd <- sd(seas2$mem_check_comp, na.rm = TRUE)
+mem_comp_sd
+```
+
+Another t-test was performed for the memory check questions in the comparison trials, and the t statistic was equal to `r round(unname(mem_comp_ttest$statistic), 2)` and the p-value was `r signif(unname(mem_comp_ttest$p.value), 2)` (M = `r unname(mem_comp_ttest$estimate)`, SD = `r signif(mem_comp_sd, 2)`), demonstrating that children were able to correctly recall the events of the scenarios. Cohen's d was `r round(unname(mem_comp_d$estimate), 2)`, which is considered a `r as.character(mem_comp_d$magnitude)` effect size.
 
 ### Hypothesis 2
 We expect that age will be associated with accuracy on memory check questions.
 
-```{r mem-age-glmm}
-mem_check_age_pivoted <- seas2 |>
-  select(subject, age_months, matches("^mem_check_..$"), matches("^comp_mem_check_..$")) |>
-  pivot_longer(mem_check_1A:comp_mem_check_2B, names_to = "trial", values_to = "response") |> #has both main and comp mem, since only checking age
-  mutate(
-    response = if_else(response == 0.5, 1, 0) #converting 0.5 to 1, so each memory check trial has a binary outcome
-  )
+```{r mem-age-glmms}
+#Calculated during preliminary models section
+summary(mem_age_main)
 
-mem_age_glmm <- summary(glmer(
-  response ~ age_months + (1 | subject),
-  data = mem_check_age_pivoted,
-  family = "binomial"
-))
-
-mem_age_glmm
+summary(mem_age_comp)
 ```
 
-Age is significantly associated with correct memory check responses, z = `r round(mem_age_glmm$coefficients[2,3], 2)`, p = `r signif(mem_age_glmm$coefficients[2,4], 2)`, such that older participants were more likely to respond correctly.
+Age is significantly associated with correct memory check responses in the main trials, z = `r round(summary(mem_age_main)$coefficients[2,3], 2)`, p = `r signif(summary(mem_age_main)$coefficients[2,4], 2)`, and in the comparison trials, z = `r round(summary(mem_age_comp)$coefficients[2,3], 2)`, p = `r signif(summary(mem_age_comp)$coefficients[2,4], 2)`, in both cases such that older participants were more likely to respond correctly.
 
 ```{r mem-age-total-scatter}
+#for all trials
 mem_age_total_scatter <- seas2 |>
   ggplot(aes(x = age_months, y = mem_check_total)) +
   geom_point(position = position_jitter(height = 0.1)) +
@@ -261,8 +289,9 @@ mem_age_total_scatter
 ```
 
 ```{r mem-age-trial-scatter}
-mem_age_trial_scatter <- mem_check_age_pivoted |>
-  ggplot(aes(x = age_months, y = response)) +
+#for main trials
+mem_age_trial_scatter <- mem_check_main |>
+  ggplot(aes(x = age_months, y = mem_check)) +
   geom_point(position = position_jitter(height = 0.1, width = 0.5)) +
   geom_smooth(
     method = "glm", 
@@ -273,7 +302,7 @@ mem_age_trial_scatter <- mem_check_age_pivoted |>
     alpha = 0.25) +
   geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
   labs(
-    title = "Study 2 Memory Check Performance",
+    title = "Study 2 Main Trials Memory Check Performance",
     x = "Age (Months)",
     y = NULL
   ) +
@@ -291,6 +320,7 @@ mem_age_trial_scatter
 ```
 
 ```{r mem-age-box}
+#for all trials
 mem_age_boxplot <- seas2 |>
   ggplot(aes(x = as.factor(age), y = mem_check_total, fill = as.factor(age))) +
   geom_boxplot(fill = c(magma_colors[3], magma_colors[5], magma_colors[7], magma_colors[9])) +
@@ -311,6 +341,7 @@ mem_age_boxplot
 ```
 
 ```{r mem-age-col}
+#for all trials
 mem_column <- seas2 |>
   ggplot(aes(x = as.factor(age), y = mem_check_total)) +
   stat_summary(
@@ -422,16 +453,18 @@ In a one-sample t-test for the selection of the excluder over an excluded charac
 We expect that age will be associated with identifying the social excluder as being in charge.
 
 ```{r em-status-age-glmm}
-em_status_age_glmm <- summary(glmer(
+em_status_age_glmm <- glmer(
   status ~ age_months + (1 | subject),
   data = seas2_exclusion_pivoted,
   family = "binomial"
-))
+)
 
-em_status_age_glmm
+summary(em_status_age_glmm)
+
+confint(em_status_age_glmm, method = "Wald", parm = "age_months") #fixed effect confidence interval
 ```
 
-According to a GLMM, age did not significantly influence the likelihood of selecting the excluder over the excluded character as being in charge, p = `r signif(em_status_age_glmm$coefficients[2,4], 2)`.
+According to a GLMM, age did not significantly influence the likelihood of selecting the excluder over the excluded character as being in charge, p = `r signif(summary(em_status_age_glmm)$coefficients[2,4], 2)`.
 
 ```{r em-status-total-scatter}
 em_status_total_scatter <- seas2 |>
@@ -608,9 +641,21 @@ em_resource_glmm <- summary(glmer(
 ))
 
 em_resource_glmm
+
+em_resource_final <- glmer(
+  resource ~ trial + age_months + (1 | subject),
+  data = seas2_exclusion_resource_pivoted,
+  family = "binomial"
+)
+
+summary(em_resource_final)
+
+confint(em_resource_final, method = "Wald") #fixed effect confidence interval
+
+exp(fixef(em_resource_final)) #odds ratio
 ```
 
-The GLMM for excluder resource selection in the exclusion main trials was rank-deficient; type, siblings, EmQue total and gender were removed. In the final model, trial (Trial 2: z = `r round(em_resource_glmm$coefficients[2,3], 2)`, p = `r signif(em_resource_glmm$coefficients[2,4], 2)`; Trial 3: z = `r round(em_resource_glmm$coefficients[3,3], 2)`, p = `r signif(em_resource_glmm$coefficients[3,4], 2)`; Trial 4: z = `r round(em_resource_glmm$coefficients[4,3], 2)`, p = `r signif(em_resource_glmm$coefficients[4,4], 2)`) and age (z = `r round(em_resource_glmm$coefficients[6,3], 2)`, p = `r signif(em_resource_glmm$coefficients[6,4], 2)`) were significant, but resource type was not. This suggests that participants were more likely to choose the excluder as having more resources in earlier trials and as they get older.
+The GLMM for excluder resource selection in the exclusion main trials was rank-deficient; type, siblings, EmQue total and gender were removed. In the final model, trial (Trial 2: z = `r round(summary(em_resource_final)$coefficients[2,3], 2)`, p = `r signif(summary(em_resource_final)$coefficients[2,4], 2)`; Trial 3: z = `r round(summary(em_resource_final)$coefficients[3,3], 2)`, p = `r signif(summary(em_resource_final)$coefficients[3,4], 2)`; Trial 4: z = `r round(summary(em_resource_final)$coefficients[4,3], 2)`, p = `r signif(summary(em_resource_final)$coefficients[4,4], 2)`) and age (z = `r round(summary(em_resource_final)$coefficients[5,3], 2)`, p = `r signif(summary(em_resource_final)$coefficients[5,4], 2)`) were significant, but resource type was not. This suggests that participants were more likely to choose the excluder as having more resources in earlier trials and as they get older.
 
 ```{r em-resource-total-scatter}
 em_resource_total_scatter <- seas2 |>
@@ -920,13 +965,15 @@ The GLMM for resource selection across all main trials was also initially rank-d
 We expect that children will view social excluders as in charge over excluded characters more often than they see includers as in charge over included characters.
 
 ```{r eim-status-condage-glmm}
-eim_status_condage_glmm <- summary(glmer(
+eim_status_condage_glmm <- glmer(
   status ~ interaction * age_months + (1 | subject),
   data = eim_status_num,
   family = "binomial"
-))
+)
 
-eim_status_condage_glmm
+summary(eim_status_condage_glmm)
+
+confint(eim_status_condage_glmm, method = "Wald", parm = "interactioninclusion") #interaction confidence interval
 ```
 
 A GLMM found no significant associations with status selection and condition (exclusion/inclusion), age, or an interaction between those two factors.
@@ -940,16 +987,18 @@ We predict that children will view social excluders as having physical resources
 eim_phys_pivoted <- eim_resource_num |>
   filter(resource_type == "physical")
 
-eim_phys_glmm <- summary(glmer(
+eim_phys_glmm <- glmer(
   resource ~ interaction * age_months + (1 | subject),
   data = eim_phys_pivoted,
   family = "binomial"
-))
+)
 
-eim_phys_glmm
+summary(eim_phys_glmm)
+
+confint(eim_phys_glmm, method = "Wald", parm = "interactioninclusion") #interaction confidence interval
 ```
 
-In this GLMM, physical resources selection was significantly associated with age (z = `r round(eim_phys_glmm$coefficients[3,3], 2)`, p = `r signif(eim_phys_glmm$coefficients[3,4], 2)`), but not interaction or interaction x age.
+In this GLMM, physical resources selection was significantly associated with age (z = `r round(summary(eim_phys_glmm)$coefficients[3,3], 2)`, p = `r signif(summary(eim_phys_glmm)$coefficients[3,4], 2)`), but not interaction or interaction x age.
 
 ### Hypothesis 3
 We expect that children will view social excluders as having social resources over excluded characters more often than they see includers as having physical resources over included characters.
@@ -960,16 +1009,20 @@ We expect that children will view social excluders as having social resources ov
 eim_soc_pivoted <- eim_resource_num |>
   filter(resource_type == "social")
 
-eim_soc_glmm <- summary(glmer(
+eim_soc_glmm <- glmer(
   resource ~ interaction * age_months + (1 | subject),
   data = eim_soc_pivoted,
   family = "binomial"
-))
+)
 
-eim_soc_glmm
+summary(eim_soc_glmm)
+
+confint(eim_soc_glmm, method = "Wald", parm = "interactioninclusion") #interaction confidence interval
+
+exp(fixef(eim_soc_glmm)) #odds ratio
 ```
 
-In this GLMM, social resources selection was significantly associated with interaction (z = `r round(eim_soc_glmm$coefficients[2,3], 2)`, p = `r signif(eim_soc_glmm$coefficients[2,4], 2)`, more likely to select target character (excluder/includer) when scenario depicted inclusion), age (z = `r round(eim_soc_glmm$coefficients[3,3], 2)`, p = `r signif(eim_soc_glmm$coefficients[3,4], 2)`, more likely to select target when participant was older), and interaction x age (z = `r round(eim_soc_glmm$coefficients[4,3], 2)`, p = `r signif(eim_soc_glmm$coefficients[4,4], 2)`, less likely to select target when participant was older and the scenario depicted inclusion).
+In this GLMM, social resources selection was significantly associated with interaction (z = `r round(summary(eim_soc_glmm)$coefficients[2,3], 2)`, p = `r signif(summary(eim_soc_glmm)$coefficients[2,4], 2)`, more likely to select target character (excluder/includer) when scenario depicted inclusion), age (z = `r round(summary(eim_soc_glmm)$coefficients[3,3], 2)`, p = `r signif(summary(eim_soc_glmm)$coefficients[3,4], 2)`, more likely to select target when participant was older), and interaction x age (z = `r round(summary(eim_soc_glmm)$coefficients[4,3], 2)`, p = `r signif(summary(eim_soc_glmm)$coefficients[4,4], 2)`, less likely to select target when participant was older and the scenario depicted inclusion).
 
 ```{r eim-socresources-ageint-scatter}
 eim_soc_ageint_scatter <- eim_soc_pivoted |>
@@ -1105,8 +1158,6 @@ eic_status_glmm <- summary(glmer(
   data = seas2_comp_status_pivot,
   family = "binomial"
 ))
-
-eic_status_glmm
 ```
 
 The GLMM assessing status selection in the comparison trials initially produced errors as the variance-covariance matrix computed from finite-difference Hessian was not positive definite or contained NA values. In this order, siblings, EmQue total, and gender were removed. The final model contained trial and age in months, but neither of these were significant.
@@ -1193,16 +1244,18 @@ We predict that age will be associated with identifying the social excluder as b
 ```{r eic-status-age-glmm}
 #CHECK, singular
 
-eic_status_age_glmm <- summary(glmer(
+eic_status_age_glmm <- glmer(
   response ~ age_months + (1 | subject),
   data = seas2_comp_status_pivot,
   family = "binomial"
-))
+)
 
-eic_status_age_glmm
+summary(eic_status_age_glmm)
+
+confint(eic_status_age_glmm, method = "Wald", parm = "age_months") #age confidence interval
 ```
 
-Age was not significantly associated with selecting the excluder over the includer as being in charge, p = `r signif(eic_status_age_glmm$coefficients[2,4], 2)`.
+Age was not significantly associated with selecting the excluder over the includer as being in charge, p = `r signif(summary(eic_status_age_glmm)$coefficients[2,4], 2)`.
 
 ```{r eic-status-trial-scatter}
 eic_status_trial_scatter <- seas2_comp_status_pivot |>
@@ -1238,31 +1291,35 @@ eic_status_trial_scatter
 We expect age will be associated with identifying the social excluder as having physical resources more often.
 
 ```{r eic-physresources-age-glm}
-eic_phys_age_glm <- summary(glm(
+eic_phys_age_glm <- glm(
   comp_physical_selection ~ age_months,
   data = seas2,
   family = "binomial"
-))
+)
 
-eic_phys_age_glm
+summary(eic_phys_age_glm)
+
+confint(eic_phys_age_glm, method = "Wald", parm = "age_months") #age confidence interval
 ```
 
-Age was not significantly associated with selecting the excluder over the includer as having more physical resources, p = `r signif(eic_phys_age_glm$coefficients[2,4], 2)`.
+Age was not significantly associated with selecting the excluder over the includer as having more physical resources, p = `r signif(summary(eic_phys_age_glm)$coefficients[2,4], 2)`.
 
 ### Hypothesis 6
 We expect that age will be associated with identifying the social excluder as having social resources more often.
 
 ```{r eic-socresources-age-glm}
-eic_soc_age_glm <- summary(glm(
+eic_soc_age_glm <- glm(
   comp_social_selection ~ age_months,
   data = seas2,
   family = "binomial"
-))
+)
 
-eic_soc_age_glm
+summary(eic_soc_age_glm)
+
+confint(eic_soc_age_glm, method = "Wald", parm = "age_months") #age confidence interval
 ```
 
-Age was not significantly associated with selecting the excluder over the includer as having more social resources, p = `r signif(eic_soc_age_glm$coefficients[2,4], 2)`.
+Age was not significantly associated with selecting the excluder over the includer as having more social resources, p = `r signif(summary(eic_soc_age_glm)$coefficients[2,4], 2)`.
 
 ```{r eic-resources-age-scatter}
 eic_resrouce_age_scatter <- seas2_comp_resource_pivot |>

@@ -271,15 +271,19 @@ In this model, SG x age (p = `r signif(seas2_count_lmer$coefficients[30,5], 2)`)
 ### Exclusion
 ```{r EX-count-age-glm}
 #Does the frequency of explanations that reference exclusion change with age?
-seas2_EX_count_age <- summary(glm(
+seas2_EX_count_age <- glm(
   EX_total ~ age_months,
   data = seas2_separated
-))
+)
 
-seas2_EX_count_age
+summary(seas2_EX_count_age)
+
+confint(seas2_EX_count_age, method = "Wald", parm = "age_months") #fixed effect confidence interval
+
+exp(coef(seas2_EX_count_age)) #odds ratio
 ```
 
-The number of explanations that reference exclusion given by participants does significantly differ by age, t = `r round(seas2_EX_count_age$coefficients[2,3], 2)`, p = `r signif(seas2_EX_count_age$coefficients[2,4], 2)`, such that as age increases, so does the frequency of responses referencing exclusion.
+The number of explanations that reference exclusion given by participants does significantly differ by age, t = `r round(summary(seas2_EX_count_age)$coefficients[2,3], 2)`, p = `r signif(summary(seas2_EX_count_age)$coefficients[2,4], 2)`, such that as age increases, so does the frequency of responses referencing exclusion.
 
 ```{r EX-count-QType-glm}
 #Does whether a response references exclusion depend on the question type (status or resources), age, or the interaction thereof?
@@ -329,15 +333,19 @@ EX_count_age_scatter
 ### Inclusion
 ```{r IN-count-age-glm}
 #Does the frequency of explanations that reference inclusion change with age?
-seas2_IN_count_age <- summary(glm(
+seas2_IN_count_age <- glm(
   IN_total ~ age_months,
   data = seas2_separated
-))
+)
 
-seas2_IN_count_age
+summary(seas2_IN_count_age)
+
+confint(seas2_IN_count_age, method = "Wald", parm = "age_months") #fixed effect confidence interval
+
+exp(coef(seas2_IN_count_age)) #odds ratio
 ```
 
-The number of explanations that reference inclusion given by participants does significantly differ by age, t = `r round(seas2_IN_count_age$coefficients[2,3], 2)`, p = `r signif(seas2_IN_count_age$coefficients[2,4], 2)`.
+The number of explanations that reference inclusion given by participants does significantly differ by age, t = `r round(summary(seas2_IN_count_age)$coefficients[2,3], 2)`, p = `r signif(summary(seas2_IN_count_age)$coefficients[2,4], 2)`.
 
 ```{r IN-count-QType-glm}
 #Does whether a response references inclusion depend on the question type (status or resources), age, or the interaction thereof?
@@ -387,15 +395,19 @@ IN_count_age_scatter
 ### Specific Game
 ```{r SG-count-age-glm}
 #Does the frequency of explanations that reference the game specifically change with age?
-seas2_SG_count_age <- summary(glm(
+seas2_SG_count_age <- glm(
   SG_total ~ age_months,
   data = seas2_separated
-))
+)
 
-seas2_SG_count_age
+summary(seas2_SG_count_age)
+
+confint(seas2_SG_count_age, method = "Wald", parm = "age_months") #fixed effect confidence interval
+
+exp(coef(seas2_SG_count_age)) #odds ratio
 ```
 
-The number of explanations that reference the game with specific details given by participants does significantly differ by age, t = `r round(seas2_SG_count_age$coefficients[2,3], 2)`, p = `r signif(seas2_SG_count_age$coefficients[2,4], 2)`.
+The number of explanations that reference the game with specific details given by participants does significantly differ by age, t = `r round(summary(seas2_SG_count_age)$coefficients[2,3], 2)`, p = `r signif(summary(seas2_SG_count_age)$coefficients[2,4], 2)`.
 
 ```{r SG-count-QType-glm}
 #does whether a response references the game specifically depend on the question type (status or resources), age, or the interaction thereof?
@@ -1178,12 +1190,16 @@ seas2_wordtot <- seas2 |>
     word_total = sum(c_across(contains("word")))) |>
   filter(!is.na(word_total))
 
-seas2_word_glm <- summary(glm(
+seas2_word_glm <- glm(
   word_total ~ age_months,
   data = seas2_wordtot
-))
+)
 
-seas2_word_glm
+summary(seas2_word_glm)
+
+confint(seas2_word_glm, method = "Wald", parm = "age_months") #fixed effect confidence interval
+
+exp(coef(seas2_word_glm)) #odds ratio
 ```
 
-The number of words used by participants significantly differs based on age, t = `r round(seas2_word_glm$coefficients[2,3], 2)`, p = `r signif(seas2_word_glm$coefficients[2,4], 2)`.
+The number of words used by participants significantly differs based on age, t = `r round(summary(seas2_word_glm)$coefficients[2,3], 2)`, p = `r signif(summary(seas2_word_glm)$coefficients[2,4], 2)`.
