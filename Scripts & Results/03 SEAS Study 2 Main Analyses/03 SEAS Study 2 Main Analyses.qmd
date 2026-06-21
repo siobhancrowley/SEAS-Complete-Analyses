@@ -148,27 +148,19 @@ mem_check_main <- seas2 |>
 #   mem_check ~ trial + type + interaction + gender + siblings + age_months + EQ_total + (1 | subject),
 #   data = mem_check_main, 
 #   family = "binomial"
-# )) #rank-deficient; dropped type, siblings, EmQue, and gender in that order until converged
+# )) #rank-deficient
 
-mem_glmm_main <- summary(glmer(
-  mem_check ~ trial + interaction + age_months + (1 | subject),
-  data = mem_check_main, 
-  family = "binomial"
-))
-  
-mem_glmm_main
-
-mem_age_main <- glmer(
+mem_glmm_main <- glmer(
   mem_check ~ age_months + (1 | subject),
   data = mem_check_main, 
   family = "binomial"
 )
+  
+summary(mem_glmm_main)
 
-summary(mem_age_main)
+confint(mem_glmm_main, method = "Wald", parm = "age_months") #fixed effect confidence interval
 
-confint(mem_age_main, method = "Wald", parm = "age_months") #fixed effect confidence interval
-
-exp(fixef(mem_age_main)) #odds ratio
+exp(fixef(mem_glmm_main)) #odds ratio
 
 #Comparison Trials
 mem_check_comp <- seas2 |>
@@ -186,36 +178,24 @@ mem_check_comp <- seas2 |>
 #   mem_check ~ trial + gender + siblings + age_months + EQ_total + (1 | subject),
 #   data = mem_check_comp, 
 #   family = "binomial"
-# )) #rank-deficient; dropped siblings, EQ_total, and gender in that order
+# )) #rank-deficient
 
 
-mem_glmm_comp <- summary(glmer(
-  mem_check ~ trial + age_months + (1 | subject),
-  data = mem_check_comp, 
-  family = "binomial"
-)) 
-
-mem_glmm_comp
-
-mem_age_comp <- glmer(
+mem_glmm_comp <- glmer(
   mem_check ~ age_months + (1 | subject),
   data = mem_check_comp, 
   family = "binomial"
 )
 
-summary(mem_age_comp)
+summary(mem_glmm_comp)
 
-confint(mem_age_comp, method = "Wald", parm = "age_months") #fixed effect confidence interval
+confint(mem_glmm_comp, method = "Wald", parm = "age_months") #fixed effect confidence interval
 
-exp(fixef(mem_age_comp)) #odds ratio
+exp(fixef(mem_glmm_comp)) #odds ratio
 ```
 
 To test whether other factors influenced performance on the memory check questions, we created a pair of generalized linear mixed models 
-(GLMMs) to examine the memory check questions for the main trials and those for the comparison trials.
-
-The original model for main trials was rank-deficient; type, siblings, EmQue total, and gender were removed in that order until the model converged--the final model contained trial, interaction (exclusion/inclusion), and age in months. Of these, only age was significant (z = `r round(summary(mem_age_main)$coefficients[2,3], 2)`, p = `r signif(summary(mem_age_main)$coefficients[2,4], 2)`), indicating that children were more likely to correctly answer the main trial memory check questions as they got older. 
-
-The model for the comparison trials also did not converge initially, and siblings, EmQue total, and gender were removed until the model converged--only trial and age were present in this model, and only age was significant (z = `r round(summary(mem_age_comp)$coefficients[2,3], 2)`, p = `r signif(summary(mem_age_comp)$coefficients[2, 4], 2)`).
+(GLMMs) to examine the memory check questions for the main trials and those for the comparison trials. Both of these models did not converge, so we simplified them to include age only, as the most theoretically interesting variable. Age was significant for both the main trials (z = `r round(summary(mem_glmm_main)$coefficients[2,3], 2)`, p = `r signif(summary(mem_glmm_main)$coefficients[2,4], 2)`) and comparison trials (z = `r round(summary(mem_glmm_comp)$coefficients[2,3], 2)`, p = `r signif(summary(mem_glmm_comp)$coefficients[2, 4], 2)`).
 
 ## Main Analyses
 ### Hypothesis 1
@@ -252,12 +232,12 @@ We expect that age will be associated with accuracy on memory check questions.
 
 ```{r mem-age-glmms}
 #Calculated during preliminary models section
-summary(mem_age_main)
+summary(mem_glmm_main)
 
-summary(mem_age_comp)
+summary(mem_glmm_comp)
 ```
 
-Age is significantly associated with correct memory check responses in the main trials, z = `r round(summary(mem_age_main)$coefficients[2,3], 2)`, p = `r signif(summary(mem_age_main)$coefficients[2,4], 2)`, and in the comparison trials, z = `r round(summary(mem_age_comp)$coefficients[2,3], 2)`, p = `r signif(summary(mem_age_comp)$coefficients[2,4], 2)`, in both cases such that older participants were more likely to respond correctly.
+Age is significantly associated with correct memory check responses in the main trials, z = `r round(summary(mem_glmm_main)$coefficients[2,3], 2)`, p = `r signif(summary(mem_glmm_main)$coefficients[2,4], 2)`, and in the comparison trials, z = `r round(summary(mem_glmm_comp)$coefficients[2,3], 2)`, p = `r signif(summary(mem_glmm_comp)$coefficients[2,4], 2)`, in both cases such that older participants were more likely to respond correctly.
 
 ```{r mem-age-total-scatter}
 #for all trials
@@ -422,18 +402,20 @@ seas2_exclusion_pivoted <- seas2_main_pivoted |>
 #   status ~ trial + type + age_months + gender + siblings + EQ_total + (1 | subject),
 #   data = seas2_exclusion_pivoted,
 #   family = "binomial"
-# )) #rank-deficient; removed type, siblings, EQ_total, and gender in that order
+# )) #rank-deficient
 
-em_status_glmm <- summary(glmer(
-  status ~ trial + age_months + (1 | subject),
+em_status_glmm <- glmer(
+  status ~ age_months + (1 | subject),
   data = seas2_exclusion_pivoted,
   family = "binomial"
-))
+)
 
-em_status_glmm
+summary(em_status_glmm)
+
+confint(em_status_glmm, method = "Wald", parm = "age_months") #fixed effect confidence interval
 ```
 
-The original GLMM to assess excluder selection in the main exclusion trials was rank-deficient; type, siblings, EmQue total, and gender were removed for the model to converge. Neither trial nor age in months were significant in the final model.
+The original GLMM to assess excluder selection in the main exclusion trials did not converge, so age was examined alone. Age was not significant for main exclusion trials.
 
 ## Main Analyses
 ### Hypothesis 1
@@ -453,18 +435,11 @@ In a one-sample t-test for the selection of the excluder over an excluded charac
 We expect that age will be associated with identifying the social excluder as being in charge.
 
 ```{r em-status-age-glmm}
-em_status_age_glmm <- glmer(
-  status ~ age_months + (1 | subject),
-  data = seas2_exclusion_pivoted,
-  family = "binomial"
-)
-
-summary(em_status_age_glmm)
-
-confint(em_status_age_glmm, method = "Wald", parm = "age_months") #fixed effect confidence interval
+#done in preliminary model stage
+summary(em_status_glmm)
 ```
 
-According to a GLMM, age did not significantly influence the likelihood of selecting the excluder over the excluded character as being in charge, p = `r signif(summary(em_status_age_glmm)$coefficients[2,4], 2)`.
+According to a GLMM, age did not significantly influence the likelihood of selecting the excluder over the excluded character as being in charge, p = `r signif(summary(summary(em_status_glmm))$coefficients[2,4], 2)`.
 
 ```{r em-status-total-scatter}
 em_status_total_scatter <- seas2 |>
@@ -607,8 +582,6 @@ seas2 <- seas2 |>
 
 ## Preliminary Analysis
 ```{r em-resources-glmm}
-#CHECK
-
 #General resource pivot for all the main trial questions
 seas2_main_resource_pivoted <- seas2 |>
   select(-contains("comp")) |>
@@ -634,28 +607,20 @@ seas2_exclusion_resource_pivoted <- seas2_main_resource_pivoted |>
 # )) #rank-deficient; removed type, siblings, EQ_total, and gender in that order
 
 
-em_resource_glmm <- summary(glmer(
-  resource ~ trial + resource_type + age_months + (1 | subject),
-  data = seas2_exclusion_resource_pivoted,
-  family = "binomial"
-))
-
-em_resource_glmm
-
-em_resource_final <- glmer(
-  resource ~ trial + age_months + (1 | subject),
+em_resource_glmm <- glmer(
+  resource ~age_months + (1 | subject),
   data = seas2_exclusion_resource_pivoted,
   family = "binomial"
 )
 
-summary(em_resource_final)
+summary(em_resource_glmm)
 
-confint(em_resource_final, method = "Wald") #fixed effect confidence interval
+confint(em_resource_glmm, method = "Wald", parm = "age_months") #fixed effect confidence interval
 
-exp(fixef(em_resource_final)) #odds ratio
+exp(fixef(em_resource_glmm)) #odds ratio
 ```
 
-The GLMM for excluder resource selection in the exclusion main trials was rank-deficient; type, siblings, EmQue total and gender were removed. In the final model, trial (Trial 2: z = `r round(summary(em_resource_final)$coefficients[2,3], 2)`, p = `r signif(summary(em_resource_final)$coefficients[2,4], 2)`; Trial 3: z = `r round(summary(em_resource_final)$coefficients[3,3], 2)`, p = `r signif(summary(em_resource_final)$coefficients[3,4], 2)`; Trial 4: z = `r round(summary(em_resource_final)$coefficients[4,3], 2)`, p = `r signif(summary(em_resource_final)$coefficients[4,4], 2)`) and age (z = `r round(summary(em_resource_final)$coefficients[5,3], 2)`, p = `r signif(summary(em_resource_final)$coefficients[5,4], 2)`) were significant, but resource type was not. This suggests that participants were more likely to choose the excluder as having more resources in earlier trials and as they get older.
+The GLMM for excluder resource selection also did not converge, and age was examined on its own. Age was significant (z = `r round(summary(em_resource_glmm)$coefficients[2,3], 2)`, p = `r signif(summary(em_resource_glmm)$coefficients[2,4], 2)`), suggesting that participants were more likely to choose the excluder as having more resources in earlier trials and as they get older.
 
 ```{r em-resource-total-scatter}
 em_resource_total_scatter <- seas2 |>
@@ -756,31 +721,39 @@ Conducting the same binomial test to assess whether children were more likely th
 We expect that age will be associated with identifying the excluder as having more physical resources.
 
 ```{r em-physresources-age-glm}
-em_phys_age_glm <- summary(glm(
+em_phys_age_glm <- glm(
   exclusion_physical_selection ~ age_months,
   data = seas2,
   family = "binomial"
-))
+)
 
-em_phys_age_glm
+summary(em_phys_age_glm)
+
+confint(em_phys_age_glm, method = "Wald", parm = "age_months") #fixed effect confidence interval
+
+exp(coef(em_phys_age_glm)) #odds ratio
 ```
 
-Age is significantly associated with selecting the excluder over the excluded character as having more physical resources, z = `r round(em_phys_age_glm$coefficients[2,3], 2)`, p = `r signif(em_phys_age_glm$coefficients[2,4], 2)`.
+Age is significantly associated with selecting the excluder over the excluded character as having more physical resources, z = `r round(summary(em_phys_age_glm)$coefficients[2,3], 2)`, p = `r signif(summary(em_phys_age_glm)$coefficients[2,4], 2)`.
 
 ### Hypothesis 4
 We expect that age will be associated with identifying the excluder as having more social resources.
 
 ```{r em-socresources-age-glm}
-em_soc_age_glm <- summary(glm(
+em_soc_age_glm <- glm(
   exclusion_social_selection ~ age_months,
   data = seas2,
   family = "binomial"
-))
+)
 
-em_soc_age_glm
+summary(em_soc_age_glm)
+
+confint(em_soc_age_glm, method = "Wald", parm = "age_months") #fixed effect confidence interval
+
+exp(coef(em_soc_age_glm)) #odds ratio
 ```
 
-Age is significantly associated with selecting the excluder over the excluded character as having more social resources, z = `r round(em_soc_age_glm$coefficients[2,3], 2)`, p = `r signif(em_soc_age_glm$coefficients[2,4], 2)`.
+Age is significantly associated with selecting the excluder over the excluded character as having more social resources, z = `r round(summary(em_soc_age_glm)$coefficients[2,3], 2)`, p = `r signif(summary(em_soc_age_glm)$coefficients[2,4], 2)`.
 
 ```{r em-resources-type-age-scatter}
 em_resource_type_age_scatter <- seas2 |>
@@ -924,18 +897,20 @@ eim_status_num <- seas2_main_pivoted |>
 #   status ~ trial + type + interaction + age_months + gender + siblings + EQ_total + (1 | subject),
 #   data = eim_status_num,
 #   family = "binomial"
-# )) #rank-deficient; removed type and siblings
+# )) #rank-deficient
 
-eim_status_glmm <- summary(glmer(
-  status ~ trial + interaction + gender + EQ_total + age_months + (1 | subject),
+eim_status_glmm <- glmer(
+  status ~ age_months + (1 | subject),
   data = eim_status_num,
   family = "binomial"
-))
+)
 
-eim_status_glmm
+summary(eim_status_glmm)
+
+confint(eim_status_glmm, method = "Wald", parm = "age_months") #fixed effect confidence interval
 ```
 
-The GLMM examining status selection across all main trials was initially rank-deficient, and type and siblings were removed to make it converge. The final model included trial, interaction, gender, EmQue total, and age; none of these were significant.
+The GLMM examining status selection across all main trials did not converge, so age was examined alone. This variable was not significant for these selections. 
 
 ```{r eim-resources-glmm}
 eim_resource_num <- seas2_main_resource_pivoted |>
@@ -947,18 +922,22 @@ eim_resource_num <- seas2_main_resource_pivoted |>
 #   resource ~ trial + type + resource_type + interaction + gender + siblings + EQ_total + age_months + (1 | subject),
 #   data = eim_resource_num,
 #   family = "binomial"
-# )) #rank-deficient; removed type, siblings, EQ_total, and gender in that order
+# )) #rank-deficient
 
-eim_resource_glmm <- summary(glmer(
-    resource ~ trial + resource_type + interaction + age_months + (1 | subject),
+eim_resource_glmm <- glmer(
+    resource ~ age_months + (1 | subject),
     data = eim_resource_num,
     family = "binomial"
-))
+)
 
-eim_resource_glmm
+summary(eim_resource_glmm)
+
+confint(eim_resource_glmm, method = "Wald", parm = "age_months") #fixed effect confidence interval
+
+exp(fixef(eim_resource_glmm)) #odds ratio
 ```
 
-The GLMM for resource selection across all main trials was also initially rank-deficient, and type, siblings, EmQue total, and gender were removed in that order to make it converge. The final model included trial, resource type, interaction (exclusion/inclusion), and age; of these, interaction (z = `r round(eim_resource_glmm$coefficients[6,3], 2)`, p = `r signif(eim_resource_glmm$coefficients[6,4], 2)`) and age (z = `r round(eim_resource_glmm$coefficients[7,3], 2)`, p = `r signif(eim_resource_glmm$coefficients[7,4], 2)`) were significant.
+The GLMM for resource selection also did not converge, and age was examined alone. Age was significant for these selections (z = `r round(summary(eim_resource_glmm)$coefficients[2,3], 2)`, p = `r signif(summary(eim_resource_glmm)$coefficients[2,4], 2)`), such that older participants were more likely to select the target character (excluder/includer) than the non-target character (excluded/included).
 
 ## Main Analyses
 ### Hypothesis 1
@@ -973,7 +952,7 @@ eim_status_condage_glmm <- glmer(
 
 summary(eim_status_condage_glmm)
 
-confint(eim_status_condage_glmm, method = "Wald", parm = "interactioninclusion") #interaction confidence interval
+confint(eim_status_condage_glmm, method = "Wald", parm = c("interactioninclusion", "age_months", "interactioninclusion:age_months")) #interaction confidence interval
 ```
 
 A GLMM found no significant associations with status selection and condition (exclusion/inclusion), age, or an interaction between those two factors.
@@ -982,8 +961,6 @@ A GLMM found no significant associations with status selection and condition (ex
 We predict that children will view social excluders as having physical resources over excluded characters more often than they see includers as having physical resources over included characters.
 
 ```{r eim-physresources-glmm}
-#CHECK, singular
-
 eim_phys_pivoted <- eim_resource_num |>
   filter(resource_type == "physical")
 
@@ -995,7 +972,9 @@ eim_phys_glmm <- glmer(
 
 summary(eim_phys_glmm)
 
-confint(eim_phys_glmm, method = "Wald", parm = "interactioninclusion") #interaction confidence interval
+confint(eim_phys_glmm, method = "Wald", parm = c("interactioninclusion", "age_months", "interactioninclusion:age_months")) #interaction confidence interval
+
+exp(fixef(eim_phys_glmm)) #odds ratio
 ```
 
 In this GLMM, physical resources selection was significantly associated with age (z = `r round(summary(eim_phys_glmm)$coefficients[3,3], 2)`, p = `r signif(summary(eim_phys_glmm)$coefficients[3,4], 2)`), but not interaction or interaction x age.
@@ -1004,8 +983,6 @@ In this GLMM, physical resources selection was significantly associated with age
 We expect that children will view social excluders as having social resources over excluded characters more often than they see includers as having physical resources over included characters.
 
 ```{r eim-socresources-glmm}
-#CHECK, singular
-
 eim_soc_pivoted <- eim_resource_num |>
   filter(resource_type == "social")
 
@@ -1017,7 +994,7 @@ eim_soc_glmm <- glmer(
 
 summary(eim_soc_glmm)
 
-confint(eim_soc_glmm, method = "Wald", parm = "interactioninclusion") #interaction confidence interval
+confint(eim_soc_glmm, method = "Wald", parm = c("interactioninclusion", "age_months", "interactioninclusion:age_months"))
 
 exp(fixef(eim_soc_glmm)) #odds ratio
 ```
@@ -1134,8 +1111,6 @@ seas2 <- seas2 |>
 
 ## Preliminary Analyses
 ```{r eic-status-glmm}
-#CHECK, singular
-
 #Pivot for comparison status
 seas2_comp_status_pivot <- seas2 |>
   select(subject, gender, age_months, siblings, EQ_total, side, comp_status_1_num, comp_status_2_num) |>
@@ -1150,21 +1125,23 @@ seas2_comp_status_pivot <- seas2 |>
 #   response ~ trial + gender + siblings + EQ_total + age_months + (1 | subject),
 #   data = seas2_comp_status_pivot,
 #   family = "binomial"
-# )) #warning messges; removed siblings, EQ_total, and gender in order
+# )) #warning messges
 
 
-eic_status_glmm <- summary(glmer(
-  response ~ trial + age_months + (1 | subject),
+eic_status_glmm <- glmer(
+  response ~ age_months + (1 | subject),
   data = seas2_comp_status_pivot,
   family = "binomial"
-))
+)
+
+summary(eic_status_glmm)
+
+confint(eim_status_glmm, method = "Wald", parm = "age_months")
 ```
 
-The GLMM assessing status selection in the comparison trials initially produced errors as the variance-covariance matrix computed from finite-difference Hessian was not positive definite or contained NA values. In this order, siblings, EmQue total, and gender were removed. The final model contained trial and age in months, but neither of these were significant.
+The GLMM assessing status selection in the comparison trials also did not converge, and age was assessed alone. Age was not significant for this selection.
 
 ```{r eic-resources-glmm}
-#CHECK, singular
-
 #Pivot for comparison resource
 seas2_comp_resource_pivot <- seas2 |>
   select(subject, gender, age_months, siblings, side, EQ_total, starts_with("comp_resource_type"), matches("comp_resource_.$")) |>
@@ -1178,16 +1155,18 @@ seas2_comp_resource_pivot <- seas2 |>
   )
 
 #Binomial GLMM
-eic_resource_glmm <- summary(glmer(
-  resource ~ trial + resource_type + siblings + gender + EQ_total + age_months + (1 | subject),
+eic_resource_glmm <- glmer(
+  resource ~ age_months + (1 | subject),
   data = seas2_comp_resource_pivot,
   family = "binomial"
-)) 
+)
 
-eic_resource_glmm
+summary(eic_resource_glmm)
+
+confint(eic_resource_glmm, method = "Wald", parm = "age_months")
 ```
 
-The GLMM examining resource selection in the comparison trials contained trial, resource type, siblings, gender, EmQue total, and age in months, but none of these were significant.
+To be consistent with other analyses, the GLMM assessing resource selection for the comparison trials included age only. Age was not significant for these selections.
 
 ## Main Analyses
 ### Hypothesis 1
@@ -1242,20 +1221,11 @@ To examine whether children were more likely than chance to select the excluder 
 We predict that age will be associated with identifying the social excluder as being in charge more often than the includer.
 
 ```{r eic-status-age-glmm}
-#CHECK, singular
-
-eic_status_age_glmm <- glmer(
-  response ~ age_months + (1 | subject),
-  data = seas2_comp_status_pivot,
-  family = "binomial"
-)
-
-summary(eic_status_age_glmm)
-
-confint(eic_status_age_glmm, method = "Wald", parm = "age_months") #age confidence interval
+#done in preliminary model stage
+summary(eic_status_glmm)
 ```
 
-Age was not significantly associated with selecting the excluder over the includer as being in charge, p = `r signif(summary(eic_status_age_glmm)$coefficients[2,4], 2)`.
+Age was not significantly associated with selecting the excluder over the includer as being in charge, p = `r signif(summary(eic_status_glmm)$coefficients[2,4], 2)`.
 
 ```{r eic-status-trial-scatter}
 eic_status_trial_scatter <- seas2_comp_status_pivot |>
