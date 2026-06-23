@@ -2,7 +2,7 @@
 title: "02 SEAS Study 1 Explanatory Analyses"
 format: html
 author: Siobhan Crowley
-date: 06/09/2026
+date: 06/22/2026
 editor: source
 editor_options: 
   chunk_output_type: console
@@ -239,21 +239,6 @@ seas_pivoted |>
 ```
 
 ## GLMMs
-### Overall
-```{r explain-count-lmer}
-#CHECK
-
-#Does the frequency of each answer type change with age?
-seas_count_lmer <- summary(lmer(
-  total ~ age_months * explanation_type + (1 | subject),
-  data = seas_pivoted
-)) #lmer correct? I thought it would be glmer with a poisson family but that produced errors
-
-seas_count_lmer
-```
-
-In this model, SG (p = `r signif(seas_count_lmer$coefficients[15,5], 2)`) and SG x age (p = `r signif(seas_count_lmer$coefficients[30,5], 2)`) are significant, demonstrating that the frequencies of explanation responses (0-8 across trial) changes with these conditions.
-
 ### Exclusion
 ```{r EX-count-age-glm}
 #Does the frequency of explanations that reference exclusion change with age?
@@ -264,12 +249,10 @@ seas_EX_count_age <- glm(
 
 summary(seas_EX_count_age)
 
-confint(seas_EX_count_age, method = "Wald", parm = "age_months") #fixed effect confidence interval
-
-exp(coef(seas_EX_count_age)) #odds ratio
+summary(seas_EX_count_age)$coefficients[2,4] * 2 #Bonferroni corrected p
 ```
 
-The number of explanations that reference exclusion given by participants does significantly differ by age, t = `r round(summary(seas_EX_count_age)$coefficients[2,3], 2)`, p = `r signif(summary(seas_EX_count_age)$coefficients[2,4], 2)`, such that older participants are more likely to use a higher frequency of EX explanations.
+The number of explanations that reference exclusion given by participants intitially appears to significantly differ by age, t = `r round(summary(seas_EX_count_age)$coefficients[2,3], 2)`, p = `r signif(summary(seas_EX_count_age)$coefficients[2,4], 2)`, such that older participants are more likely to use a higher frequency of EX explanations, but is not significant when a Bonferroni correction for multiple comparisons is applied (p = `r signif(summary(seas_EX_count_age)$coefficients[2,4] * 2, 2)`).
 
 ```{r EX-count-QType-glm}
 #Does whether a response references exclusion depend on the question type (status or resources), age, or the interaction thereof?
@@ -326,12 +309,14 @@ seas_SG_count_age <- glm(
 
 summary(seas_SG_count_age)
 
+summary(seas_SG_count_age)$coefficients[2,4] * 2 #Bonferroni corrected p
+
 confint(seas_SG_count_age, method = "Wald", parm = "age_months") #fixed effect confidence interval
 
 exp(coef(seas_SG_count_age)) #odds ratio
 ```
 
-The number of explanations that reference the game with specific details given by participants does significantly differ by age, t = `r round(summary(seas_SG_count_age)$coefficients[2,3], 2)`, p = `r signif(summary(seas_SG_count_age)$coefficients[2,4], 2)`.
+The number of explanations that reference the game with specific details given by participants does significantly differ by age, t = `r round(summary(seas_SG_count_age)$coefficients[2,3], 2)`, p = `r signif(summary(seas_SG_count_age)$coefficients[2,4], 2)`, and remains significant after correction (p = `r signif(summary(seas_SG_count_age)$coefficients[2,4] * 2, 2)`).
 
 ```{r SG-count-QType-glm}
 #Does whether a response references the game specifically depend on the question type (status or resources), age, or the interaction thereof?
@@ -536,23 +521,9 @@ seas_pivoted |>
 ```
 
 ## GLMMs
-### Overall
-```{r explain-present-lmer}
-#CHECK
-
-seas_present_lmer <- summary(lmer(
-  present ~ age_months * explanation_type + (1 | subject),
-  data = seas_pivoted
-)) #Again, I thought this would be a binomial glmer but errors; however lmer output doesn't seem to match graphs
-
-seas_present_lmer
-```
-
-In this model, the presence of a type of explanation across a participant's responses significantly differs based on age (p = `r signif(seas_present_lmer$coefficients[2,5], 2)`) and age x PR (p = `r signif(seas_present_lmer$coefficients[28,5], 2)`).
-
-### Exclusion
-```{r EX-present-age-glm}
-#Does the presence of explanations that reference exclusion change with age?
+### Authority
+```{r AR-present-age-glm}
+#Does the presence of explanations that reference authority change with age?
 
 seas_separated <- seas_separated |>
   mutate(
@@ -564,15 +535,66 @@ seas_separated <- seas_separated |>
   ) #Adding present columns to non-pivoted dataset
 
 
-seas_EX_present_age <- summary(glm(
-  EX_present ~ age_months,
+seas_AR_present_age <- summary(glm(
+  AR_present ~ age_months,
   data = seas_separated
 ))
 
-seas_EX_present_age
+seas_AR_present_age
 ```
 
-Whether participants reference exclusion at least once in the study significantly differs with age, t = `r round(seas_EX_present_age$coefficients[2,3], 2)`, p = `r signif(seas_EX_present_age$coefficients[2,4], 2)`.
+Whether participants reference authority at least once in the study does not significantly differ with age, t = `r round(seas_AR_present_age$coefficients[2,3], 2)`, p = `r signif(seas_AR_present_age$coefficients[2,4], 2)`.
+
+```{r AR-present-age-scatter}
+AR_present_age_scatter <- seas_separated |>
+  ggplot(aes(x = age_months, y = AR_present)) +
+  geom_jitter() +
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 1 Explanations Referencing Authority by Age",
+    x = "Age (Months)",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(
+    breaks = c(0,1),
+    labels = c("Not Referenced", "Authority Referenced")
+    )
+
+AR_present_age_scatter
+```
+
+
+### Exclusion
+```{r EX-present-age-glm}
+#Does the presence of explanations that reference exclusion change with age?
+
+seas_EX_present_age <- glm(
+  EX_present ~ age_months,
+  data = seas_separated
+)
+
+summary(seas_EX_present_age)
+
+summary(seas_EX_present_age)$coefficients[2,4] * 7 #Bonferroni-corrected p
+
+confint(seas_EX_present_age, method = "Wald", parm = "age_months") #fixed effect confidence interval
+
+exp(coef(seas_EX_present_age)) #odds ratio
+```
+
+Whether participants reference exclusion at least once in the study significantly differs with age, t = `r round(summary(seas_EX_present_age)$coefficients[2,3], 2)`, p = `r signif(summary(seas_EX_present_age)$coefficients[2,4], 2)`, and this survives a Bonferroni correction for multiple comparisons (p = `r signif(summary(seas_EX_present_age)$coefficients[2,4] * 7, 2)`)
 
 ```{r EX-present-age-scatter}
 EX_present_age_scatter <- seas_separated |>
@@ -604,117 +626,20 @@ EX_present_age_scatter <- seas_separated |>
 EX_present_age_scatter
 ```
 
-### Preferences
-```{r PR-present-age-glm}
-#Does the presence of explanations that reference preferences change with age?
-seas_PR_present_age <- summary(glm(
-  PR_present ~ age_months,
-  data = seas_separated
-))
-
-seas_PR_present_age
-```
-
-Whether participants reference preferences at least once in the study does not significantly differ with age, p = `r signif(seas_PR_present_age$coefficients[2,4], 2)`.
-
-### Specific Game
-```{r SG-present-age-glm}
-#Does the presence of explanations that reference the game specifically change with age?
-seas_SG_present_age <- summary(glm(
-  SG_present ~ age_months,
-  data = seas_separated
-))
-
-seas_SG_present_age
-```
-
-Whether participants reference the game specifically at least once in the study significantly differs with age, t = `r round(seas_SG_present_age$coefficients[2,3], 2)`, p = `r signif(seas_SG_present_age$coefficients[2,4], 2)`.
-
-```{r SG-present-age-scatter}
-SG_present_age_scatter <- seas_separated |>
-  ggplot(aes(x = age_months, y = SG_present)) +
-  geom_jitter() +
-  geom_smooth(
-    method = "glm", 
-    method.args = list(family = "binomial"),
-    formula = y ~ x, 
-    color = magma_colors[3], 
-    fill = magma_colors[5], 
-    alpha = 0.25) +
-  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
-  labs(
-    title = "Study 1 Explanations Referencing the Game Specifically by Age",
-    x = "Age (Months)",
-    y = NULL
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 30),
-    text = element_text(family = "serif", size = 25)
-        ) +
-  scale_y_continuous(
-    breaks = c(0,1),
-    labels = c("Not Referenced", "Specific Game Referenced")
-    )
-
-SG_present_age_scatter
-```
-
-### Vague Game
-```{r VG-present-age-glm}
-#Does the presence of explanations that reference the game vaguely change with age?
-seas_VG_present_age <- summary(glm(
-  VG_present ~ age_months,
-  data = seas_separated
-))
-
-seas_VG_present_age
-```
-
-Whether participants reference the game vaguely at least once in the study significantly differs with age, t = `r round(seas_VG_present_age$coefficients[2,3], 2)`, p = `r signif(seas_VG_present_age$coefficients[2,4], 2)`.
-
-```{r VG-present-age-scatter}
-VG_present_age_scatter <- seas_separated |>
-  ggplot(aes(x = age_months, y = VG_present)) +
-  geom_jitter() +
-  geom_smooth(
-    method = "glm", 
-    method.args = list(family = "binomial"),
-    formula = y ~ x, 
-    color = magma_colors[3], 
-    fill = magma_colors[5], 
-    alpha = 0.25) +
-  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
-  labs(
-    title = "Study 1 Explanations Referencing the Game Vaguely by Age",
-    x = "Age (Months)",
-    y = NULL
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 30),
-    text = element_text(family = "serif", size = 25)
-        ) +
-  scale_y_continuous(
-    breaks = c(0,1),
-    labels = c("Not Referenced", "Vague Game Referenced")
-    )
-
-VG_present_age_scatter
-```
-
 ### Friends
 ```{r FR-present-age-glm}
 #Does the presence of explanations that reference preferences change with age?
-seas_FR_present_age <- summary(glm(
+seas_FR_present_age <- glm(
   FR_present ~ age_months,
   data = seas_separated
-))
+)
 
-seas_FR_present_age
+summary(seas_FR_present_age)
+
+summary(seas_FR_present_age)$coefficients[2,4] * 7 #Bonferroni-corrected p
 ```
 
-Whether participants reference friends at least once in the study significantly differs with age, t = `r round(seas_FR_present_age$coefficients[2,3], 2)`, p = `r signif(seas_FR_present_age$coefficients[2,4], 2)`.
+Whether participants reference friends at least once in the study significantly differs with age, t = `r round(summary(seas_FR_present_age)$coefficients[2,3], 2)`, p = `r signif(summary(seas_FR_present_age)$coefficients[2,4], 2)`, but this does not survive correction (p = `r signif(summary(seas_FR_present_age)$coefficients[2,4] * 7, 2)`). 
 
 ```{r FR-present-age-scatter}
 FR_present_age_scatter <- seas_separated |>
@@ -748,16 +673,18 @@ FR_present_age_scatter
 
 ### Possessions
 ```{r PS-present-age-glm}
-#Does the presence of explanations that reference preferences change with age?
-seas_PR_present_age <- summary(glm(
+#Does the presence of explanations that reference possessions change with age?
+seas_PS_present_age <- glm(
   PS_present ~ age_months,
   data = seas_separated
-))
+)
 
-seas_PR_present_age
+summary(seas_PS_present_age)
+
+summary(seas_PS_present_age)$coefficients[2,4] * 7 #Bonferroni-corrected p
 ```
 
-Whether participants reference possessions at least once in the study significantly differs with age, t = `r round(seas_PR_present_age$coefficients[2,3], 2)`, p = `r signif(seas_PR_present_age$coefficients[2,4], 2)`.
+Whether participants reference possessions at least once in the study appears to significantly differ with age, t = `r round(summary(seas_PS_present_age)$coefficients[2,3], 2)`, p = `r signif(summary(seas_PS_present_age)$coefficients[2,4], 2)`, but does not survive correction (p = `r signif(summary(seas_PS_present_age)$coefficients[2,4] * 7, 2)`).
 
 ```{r PS-present-age-scatter}
 PS_present_age_scatter <- seas_separated |>
@@ -787,6 +714,142 @@ PS_present_age_scatter <- seas_separated |>
     )
 
 PS_present_age_scatter
+```
+
+### Specific Game
+```{r SG-present-age-glm}
+#Does the presence of explanations that reference the game specifically change with age?
+seas_SG_present_age <- glm(
+  SG_present ~ age_months,
+  data = seas_separated
+)
+
+summary(seas_SG_present_age)
+
+summary(seas_SG_present_age)$coefficients[2,4] * 7 #Bonferroni corrected p
+
+confint(seas_SG_present_age, method = "Wald", parm = "age_months") #fixed effect confidence interval
+
+exp(coef(seas_SG_present_age)) #odds ratio
+```
+
+Whether participants reference the game specifically at least once in the study significantly differs with age, t = `r round(summary(seas_SG_present_age)$coefficients[2,3], 2)`, p = `r signif(summary(seas_SG_present_age)$coefficients[2,4], 2)`, and survives correction (p = `r signif(summary(seas_SG_present_age)$coefficients[2,4] * 7, 2)`). 
+
+```{r SG-present-age-scatter}
+SG_present_age_scatter <- seas_separated |>
+  ggplot(aes(x = age_months, y = SG_present)) +
+  geom_jitter() +
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"),
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 1 Explanations Referencing the Game Specifically by Age",
+    x = "Age (Months)",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(
+    breaks = c(0,1),
+    labels = c("Not Referenced", "Specific Game Referenced")
+    )
+
+SG_present_age_scatter
+```
+
+### Superficial Traits
+```{r ST-present-age-glm}
+#Does the presence of explanations that reference superficial traits change with age?
+seas_ST_present_age <- glm(
+  ST_present ~ age_months,
+  data = seas_separated
+)
+
+summary(seas_ST_present_age)
+```
+
+Whether participants reference superficial traits at least once in the study does not significantly differ with age, t = `r round(summary(seas_ST_present_age)$coefficients[2,3], 2)`, p = `r signif(summary(seas_ST_present_age)$coefficients[2,4], 2)`. 
+
+```{r ST-present-age-scatter}
+ST_present_age_scatter <- seas_separated |>
+  ggplot(aes(x = age_months, y = ST_present)) +
+  geom_jitter() +
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 1 Explanations Referencing Superficial Traits by Age",
+    x = "Age (Months)",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(
+    breaks = c(0,1),
+    labels = c("Not Referenced", "Superficial Traits Referenced")
+    )
+
+ST_present_age_scatter
+```
+
+### Vague Game
+```{r VG-present-age-glm}
+#Does the presence of explanations that reference the game vaguely change with age?
+seas_VG_present_age <- glm(
+  VG_present ~ age_months,
+  data = seas_separated
+)
+
+summary(seas_VG_present_age)
+
+summary(seas_VG_present_age)$coefficients[2,4] * 7 #Bonferroni-corrected p
+```
+
+Whether participants reference the game vaguely at least once in the study appeared to significantly differ with age, t = `r round(summary(seas_VG_present_age)$coefficients[2,3], 2)`, p = `r signif(summary(seas_VG_present_age)$coefficients[2,4], 2)`, but did not survive correction (p = `r signif(summary(seas_VG_present_age)$coefficients[2,4] * 7, 2)`). 
+```{r VG-present-age-scatter}
+VG_present_age_scatter <- seas_separated |>
+  ggplot(aes(x = age_months, y = VG_present)) +
+  geom_jitter() +
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"),
+    formula = y ~ x, 
+    color = magma_colors[3], 
+    fill = magma_colors[5], 
+    alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
+  labs(
+    title = "Study 1 Explanations Referencing the Game Vaguely by Age",
+    x = "Age (Months)",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 30),
+    text = element_text(family = "serif", size = 25)
+        ) +
+  scale_y_continuous(
+    breaks = c(0,1),
+    labels = c("Not Referenced", "Vague Game Referenced")
+    )
+
+VG_present_age_scatter
 ```
 
 ## Correlations
