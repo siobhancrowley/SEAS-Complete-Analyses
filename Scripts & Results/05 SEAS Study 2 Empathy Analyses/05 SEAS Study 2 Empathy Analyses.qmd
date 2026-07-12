@@ -260,7 +260,7 @@ attention_cor_matrix <- rcorr(as.matrix(attention_outcomes), type = "pearson")
 
 attention_correlation <- attention_cor_matrix$r[1, -1]
 attention_p <- attention_cor_matrix$P[1, -1]
-attention_degrees <- attention_cor_matrix$n[1, 1]
+attention_degrees <- attention_cor_matrix$n[1, 1] - 2
 
 attention_df <- data.frame(r = attention_correlation, p = attention_p)
 
@@ -313,7 +313,7 @@ prosocial_cor_matrix <- rcorr(as.matrix(prosocial_outcomes), type = "pearson")
 
 prosocial_correlation <- prosocial_cor_matrix$r[1, -1]
 prosocial_p <- prosocial_cor_matrix$P[1, -1]
-prosocial_degrees <- prosocial_cor_matrix$n[1, 1]
+prosocial_degrees <- prosocial_cor_matrix$n[1, 1] - 2
 
 prosocial_df <- data.frame(r = prosocial_correlation, p = prosocial_p)
 

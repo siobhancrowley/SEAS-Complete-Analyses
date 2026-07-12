@@ -380,7 +380,7 @@ seas_count_status_cor_matrix <- rcorr(as.matrix(seas_count_status_cor_data), typ
 
 seas_count_status_correlation <- seas_count_status_cor_matrix$r[1, -1]
 seas_count_status_p <- seas_count_status_cor_matrix$P[1, -1]
-seas_status_degrees <- seas_count_status_cor_matrix$n[1, 1] #Confirmed ns the same within status
+seas_status_degrees <- seas_count_status_cor_matrix$n[1, 1] - 2 #Confirmed ns the same within status
 
 seas_count_status_df <- data.frame(rho = seas_count_status_correlation, p = seas_count_status_p)
 
@@ -441,7 +441,7 @@ seas_count_resource_cor_matrix <- rcorr(as.matrix(seas_count_resource_cor_data),
 
 seas_count_resource_correlation <- seas_count_resource_cor_matrix$r[1, -1]
 seas_count_resource_p <- seas_count_resource_cor_matrix$P[1, -1]
-seas_resource_degrees <- seas_count_resource_cor_matrix$n[1, 1]
+seas_resource_degrees <- seas_count_resource_cor_matrix$n[1, 1] - 2
 
 seas_count_resource_df <- data.frame(rho = seas_count_resource_correlation, p = seas_count_resource_p)
 
