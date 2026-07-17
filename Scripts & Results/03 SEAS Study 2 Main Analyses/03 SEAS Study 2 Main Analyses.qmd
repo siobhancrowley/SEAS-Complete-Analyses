@@ -1012,10 +1012,10 @@ eim_soc_ageint_scatter <- eim_soc_pivoted |>
     alpha = 0.25) +
   geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
   scale_color_manual(
-    values = c(magma_colors[3], magma_colors[7]), 
+    values = c(mako(10)[3], mako(10)[7]), 
     labels = c("Exclusion", "Inclusion")) +
   scale_fill_manual(
-    values = c(magma_colors[3], magma_colors[7]),
+    values = c(mako(10)[3], mako(10)[7]),
     labels = c("Exclusion", "Inclusion")) +
   labs(
     title = "Study 2 Social Resource Selection for Main Trials",
@@ -1055,10 +1055,10 @@ eim_resource_scatter_facet <- eim_resource_num |>
   geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 1, alpha = 0.5) +
   facet_wrap(~resource_type) +
   scale_color_manual(
-    values = c(magma_colors[3], magma_colors[7]), 
+    values = c(mako(10)[3], mako(10)[7]), 
     labels = c("Exclusion", "Inclusion")) +
   scale_fill_manual(
-    values = c(magma_colors[3], magma_colors[7]),
+    values = c(mako(10)[3], mako(10)[7]),
     labels = c("Exclusion", "Inclusion")) +
   labs(
     title = "Study 2 Resource Selection for Main Trials",
